@@ -116,7 +116,7 @@ mongoose
   });
   const store = new MongoDBStore({
     uri: process.env.DB_URL, // Your MongoDB connection string
-    collection: 'sessions',
+    collection: 'session',
     // Additional options if needed
   });
   
