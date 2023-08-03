@@ -6,7 +6,6 @@ const mongoSanitize = require("express-mongo-sanitize");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const path = require("path");
-const ejs = require("ejs");
 engine = require("ejs-mate");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
