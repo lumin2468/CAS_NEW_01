@@ -114,22 +114,7 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
   });
-  const store = new MongoDBStore({
-    uri: process.env.DB_URL, // Your MongoDB connection string
-    collection: 'session',
-    // Additional options if needed
-  });
   
-  // Catch errors
-  store.on('error', function (error) {
-    console.error('MongoDB Session Store Error:', error);
-  });
-  
-// Define routes
-app.get("/cas", async (req, res) => {
-  const designation = await Designation.find();
-  res.render("index", { designation });
-});
 
 app.post(
   "/cas/login",
