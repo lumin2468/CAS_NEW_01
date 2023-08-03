@@ -109,7 +109,11 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label"> from Directorate Bank <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="directorate_bank", value="<%=directorate_data.bank.bank%>">
+                        <select class="form-control" id="officeSelect" name="receiver_bank">
+                            <% for( let dir of directorate_data.bank ) { %>
+                                <option value="<%= dir.bank %>" <%=directorate_data.bank === dir.bank ? 'selected': '' %> ><%= dir.bank %></option>
+                            <% } %>
+                        </select>
 
                     </div>
                 </div> 
@@ -296,12 +300,12 @@
       }
   
     //   // Event listener to trigger data fetching when the scheme select value changes
-    //   schemeSelect.addEventListener('change', fetchTableData);
+      schemeSelect.addEventListener('change', fetchTableData);
       officeSelect.addEventListener('change', fetchOfcData);
       mop.addEventListener('change', modeofPmnts);
   
       // Initially, call the fetch function to populate the table based on the default selected scheme (Select)
-    //   fetchTableData();
+      fetchTableData();
     });
 
       // Check if the voucher number exists

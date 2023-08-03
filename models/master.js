@@ -659,8 +659,8 @@ const dirCounterSchema =Schema({
 
 const dirRecCounterSchema =Schema({
   directorate: String,
-  district: String,
-  scheme: String,
+  source: String,
+  purpose: String,
   financialYear: String,
   count: { type: Number, default: 1 },
 });
@@ -674,7 +674,7 @@ const dirRecCounterSchema =Schema({
     count: { type: Number, default: 1 },
   });
 
-  const disPayCounterSchema  =Schema({
+  const disPayCounterSchema  = Schema({
     district: String,
     scheme: String,
     component: String,
@@ -683,14 +683,20 @@ const dirRecCounterSchema =Schema({
     count: { type: Number, default: 1 },
   });
 
-  const disAdvCounterSchema  =Schema({
+  const disAdvCounterSchema  = Schema ({
     district: String,
     party: String,
     purpose: String,
     financialYear: String,
     count: { type: Number, default: 1 },
   });
+
+
+
 // Bank Account Schema
+
+
+
 const modeofpayment = Schema({
  name:{
   type:String,

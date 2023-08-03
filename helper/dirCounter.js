@@ -19,11 +19,9 @@ module.exports = function generateVoucherNumber(directorate, district, scheme, f
     return `${district}/${benificiary}/${scheme}/${component}/P-${financialYear}/${formattedCounter}`;
   }
 
-  
-  module.exports = function generateDisAdvVoucherNumber( district,party, purpose,financialYear, counter) {
+  module.exports = function generateDisAdvVoucherNumber( district,benificiary, scheme, component, financialYear, counter) {
     const formattedCounter = counter.toString().padStart(5, '0');
-    return `${district}/${party}/${purpose}/Adv-${financialYear}/${formattedCounter}`;
+    return `${district}/${benificiary}/${scheme}/${component}/P-${financialYear}/${formattedCounter}`;
   }
-
 
   

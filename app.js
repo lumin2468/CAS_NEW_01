@@ -18,11 +18,8 @@ const session = require("express-session");
 const generateVoucherNumber = require("./helper/dirCounter");
 const generateRecVoucherNumber = require("./helper/dirCounter");
 const generateDisRecVoucherNumber = require("./helper/dirCounter");
-const  generateDisPayVoucherNumber = require("./helper/dirCounter");
-const  generateDisAdvVoucherNumber = require("./helper/dirCounter");
-
-
-
+const generateDisPayVoucherNumber = require("./helper/dirCounter");
+const generateDisAdvVoucherNumber = require("./helper/dirCounter");
 
 // Import the Mongoose models
 const {
@@ -480,6 +477,7 @@ app.post("/cas/scheme2component", async (req, res) => {
   }
 });
 
+
 app.get("/cas/directorate/payment", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
@@ -558,11 +556,14 @@ app.post("/cas/directorate/payment", async (req, res) => {
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
+    const directorate_abbvr = directorate_data.name.slice(0, 3).toUpperCase();
+    const district_abbvr = district_office.name.slice(0, 3).toUpperCase();
+    const scheme_abbvr = scheme_details.name.slice(0, 3).toUpperCase();
 
     const voucherNo = generateVoucherNumber(
-      directorate_data.abbreviation,
-      district_office.abbreviation,
-      scheme_details.abbreviation,
+      directorate_abbvr,
+      district_abbvr,
+      scheme_abbvr,
       financial_year,
       counter.count
     );
@@ -698,10 +699,13 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
+    const directorate_abbvr = directorateData.name.slice(0, 3).toUpperCase();
+    const source_abbvr = source.slice(0, 3).toUpperCase();
+   
 
     const voucherNo = generateRecVoucherNumber(
-      directorateData.abbreviation,
-      source,
+      directorate_abbvr,
+      source_abbvr,
       purposeAbbr,
       financialYear,
       recCounter.count
@@ -735,72 +739,86 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/cas/directorate/openingBalance",isAuthenticated, async (req, res) => {
-  try {
-    const financialYear = await FinancialYear.find();
-    const directorateOfc = req.user.user.directorate;
-    const dirOfcDetails=await Directorate.findOne({_id:directorateOfc})
-    const bnkDetails=await BankDetails.find({directorate:directorateOfc})
-    console.log(dirOfcDetails.bank)
-    res.render("directorate/opening-balance",{dirOfcDetails,financialYear, bnkDetails});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+app.get(
+  "/cas/directorate/openingBalance",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const financialYear = await FinancialYear.find();
+      const directorateOfc = req.user.user.directorate;
+      const dirOfcDetails = await Directorate.findOne({ _id: directorateOfc });
+      const bnkDetails = await BankDetails.find({
+        directorate: directorateOfc,
+      });
+      console.log(dirOfcDetails.bank);
+      res.render("directorate/opening-balance", {
+        dirOfcDetails,
+        financialYear,
+        bnkDetails,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
-app.post("/cas/directorate/openingBalance",isAuthenticated, async (req, res) => {
-  try {
+);
+app.post(
+  "/cas/directorate/openingBalance",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { date, cash, bank_details, bank_balance, advance } = req.body;
+      const directorate = req.user.user.directorate;
+      const dirDetails = await Directorate.findOne({ _id: directorate });
 
-    const {
-      date,
-      cash,
-      bank_details,
-      bank_balance,
-      advance
-    }=req.body
-    const directorate = req.user.user.directorate;
-    const dirDetails=await Directorate.findOne({_id:directorate})
-
-    const bnkDetails=await BankDetails.findOne({bank:bank_details, directorate: directorate})
-    console.log(bnkDetails.balance)
-    bnkDetails.balance=parseInt(bnkDetails.balance) + parseInt(bank_balance)
-    bnkDetails.save()
-    const newOpeningbal=new DirOpeningBalance({
-      date,
-      cash:parseInt(cash),
-      directorate:directorate,
-      bank:bnkDetails._id,    
-      advance:parseInt(advance)
-    })
-   newOpeningbal.save()
-   dirDetails.openingBalance.push(newOpeningbal._id)
-   dirDetails.save()
-    res.redirect("/cas/directorate/openingBalance");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+      const bnkDetails = await BankDetails.findOne({
+        bank: bank_details,
+        directorate: directorate,
+      });
+      console.log(bnkDetails.balance);
+      bnkDetails.balance =
+        parseInt(bnkDetails.balance) + parseInt(bank_balance);
+      bnkDetails.save();
+      const newOpeningbal = new DirOpeningBalance({
+        date,
+        cash: parseInt(cash),
+        directorate: directorate,
+        bank: bnkDetails._id,
+        advance: parseInt(advance),
+      });
+      newOpeningbal.save();
+      dirDetails.openingBalance.push(newOpeningbal._id);
+      dirDetails.save();
+      res.redirect("/cas/directorate/openingBalance");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
-});
+);
 
-
-app.get("/cas/directorate/district",isAuthenticated, async (req, res) => {
+app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
 
-    const directorates = await Directorate.findOne({_id:directorateOfc});
+    const directorates = await Directorate.findOne({ _id: directorateOfc });
     const districtName = await DistrictName.find();
-    const district = await District.find({directorate: directorateOfc})
+    const district = await District.find({ directorate: directorateOfc })
       .populate("directorate")
       .populate("district");
-    
-    res.render("/directorate/districtLevelOffice", { directorates, district, districtName });
+
+    res.render("/directorate/districtLevelOffice", {
+      directorates,
+      district,
+      districtName,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cas/directorate/district",isAuthenticated, async (req, res) => {
+app.post("/cas/directorate/district", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
     const { directorate, districtName, office_name, office_address } = req.body;
@@ -933,11 +951,13 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
-
-    const voucherNo = generateDisRecVoucherNumber(
-      directorate_data.abbreviation,
-      district_office.abbreviation,
-      scheme_details.abbreviation,
+    const directorate_abbvr =( directorate_data.name).slice(0, 3).toUpperCase();
+    const district_abbvr = (district_office.name).slice(0, 3).toUpperCase();
+    const scheme_abbvr =( scheme_details.name).slice(0, 3).toUpperCase();
+      const voucherNo = generateDisRecVoucherNumber(
+      directorate_abbvr,
+      district_abbvr,
+      scheme_abbvr,
       financial_year,
       counter.count
     );
@@ -993,89 +1013,90 @@ app.get("/cas/district/receipt/:id", async (req, res) => {
   }
 });
 
-app.get("/cas/district/benificiary",isAuthenticated, async (req, res) => {
+app.get("/cas/district/benificiary", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
-    const officeDetails= await District.findOne({_id:office_Id}).populate('schemes')
-    res.render("districtOffice/benificiary",{officeDetails});
+    const officeDetails = await District.findOne({ _id: office_Id }).populate(
+      "schemes"
+    );
+    res.render("districtOffice/benificiary", { officeDetails });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cas/district/benificiary",isAuthenticated, async (req, res) => {
-  try {
-    const{
-    benificiary_name,
-    office_name,
-    dob,
-    scheme,
-    Gender,
-    Aadhar_No,
-    Bnk_Acc_No,
-    Ifsc_code,
-    branch_details,
-    desc }=req.body
-    const office_Id = req.user.user.officeId;
-    const office_details=await District.findOne({_id:office_Id});
-    const schemeDetails= await Scheme.findOne({})
-    const newBenificiary= new Beneficiary({
-    benificiary_name,
-    office_name:office_details._id,
-    dob,
-    scheme: schemeDetails._id,
-    Gender,
-    Aadhar_No,
-    Bnk_Acc_No,
-    Ifsc_code,
-    branch_details,
-    desc
-    })
-    office_details.beneficiary.push(newBenificiary)
-    office_details.save()
-    newBenificiary.save()
-
-res.redirect('/cas/district/benificiary')
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-app.get("/cas/district/purpose",isAuthenticated, async (req, res) => {
-  try {
-    const office_Id = req.user.user.officeId;
-    const officeDetails= await District.findOne({_id:office_Id}).populate('schemes')
-    res.render("districtOffice/purpose",{officeDetails});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-app.post("/cas/district/purpose",isAuthenticated, async (req, res) => {
+app.post("/cas/district/benificiary", isAuthenticated, async (req, res) => {
   try {
     const {
-    name,
-    start_date,
-    end_date,
-    abbvr,
-    desc
-  }= req.body
+      benificiary_name,
+      office_name,
+      dob,
+      scheme,
+      Gender,
+      Aadhar_No,
+      Bnk_Acc_No,
+      Ifsc_code,
+      branch_details,
+      desc,
+    } = req.body;
     const office_Id = req.user.user.officeId;
-    const officeDetails= await District.findOne({_id:office_Id}).populate('schemes')
-    const newPurpose= new Purpose({
+    const office_details = await District.findOne({ _id: office_Id });
+    const schemeDetails = await Scheme.findOne({});
+    const newBenificiary = new Beneficiary({
+      benificiary_name,
+      office_name: office_details._id,
+      dob,
+      scheme: schemeDetails._id,
+      Gender,
+      Aadhar_No,
+      Bnk_Acc_No,
+      Ifsc_code,
+      branch_details,
+      desc,
+    });
+    office_details.beneficiary.push(newBenificiary);
+    office_details.save();
+    newBenificiary.save();
+
+    res.redirect("/cas/district/benificiary");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/cas/district/purpose", isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+    const officeDetails = await District.findOne({ _id: office_Id }).populate(
+      "schemes"
+    );
+    res.render("districtOffice/purpose", { officeDetails });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/purpose", isAuthenticated, async (req, res) => {
+  try {
+    const { name, start_date, end_date, abbvr, desc } = req.body;
+    const office_Id = req.user.user.officeId;
+    const officeDetails = await District.findOne({ _id: office_Id }).populate(
+      "schemes"
+    );
+    const newPurpose = new Purpose({
       name,
-      office:office_Id,
+      office: office_Id,
       start_date,
       end_date,
       abbvr,
-      desc
-    })
-    newPurpose.save()
-    officeDetails.purpose.push(newPurpose._id)
-    officeDetails.save()
+      desc,
+    });
+    newPurpose.save();
+    officeDetails.purpose.push(newPurpose._id);
+    officeDetails.save();
     res.redirect("/cas/district/purpose");
   } catch (error) {
     console.error(error);
@@ -1083,37 +1104,29 @@ app.post("/cas/district/purpose",isAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/cas/district/vendor",isAuthenticated, async (req, res) => {
+app.get("/cas/district/vendor", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
-    const officeDetails= await District.findOne({_id:office_Id}).populate('schemes')
-    res.render("districtOffice/vendor",{officeDetails});
+    const officeDetails = await District.findOne({ _id: office_Id }).populate(
+      "schemes"
+    );
+    res.render("districtOffice/vendor", { officeDetails });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cas/district/vendor",isAuthenticated, async (req, res) => {
+app.post("/cas/district/vendor", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
-    const officeDetails= await District.findOne({_id:office_Id}).populate('schemes')
-   
-    const{
-    name,
-    office_name,
-    dob,
-    gst,
-    Gender,
-    Aadhar_No,
-    Bnk_Acc_No,
-    Ifsc_code,
-    branch_details,
-    desc}= req.body
+    const officeDetails = await District.findOne({ _id: office_Id }).populate(
+      "schemes"
+    );
 
-    const newParty= new Vendor({
+    const {
       name,
-      office_name:office_Id,
+      office_name,
       dob,
       gst,
       Gender,
@@ -1121,11 +1134,24 @@ app.post("/cas/district/vendor",isAuthenticated, async (req, res) => {
       Bnk_Acc_No,
       Ifsc_code,
       branch_details,
-      desc
-    })
-    newParty.save()
-    officeDetails.vendor.push(newParty._id)
-    officeDetails.save()
+      desc,
+    } = req.body;
+
+    const newParty = new Vendor({
+      name,
+      office_name: office_Id,
+      dob,
+      gst,
+      Gender,
+      Aadhar_No,
+      Bnk_Acc_No,
+      Ifsc_code,
+      branch_details,
+      desc,
+    });
+    newParty.save();
+    officeDetails.vendor.push(newParty._id);
+    officeDetails.save();
 
     res.redirect("/cas/district/vendor");
   } catch (error) {
@@ -1134,258 +1160,289 @@ app.post("/cas/district/vendor",isAuthenticated, async (req, res) => {
   }
 });
 
-
-
-app.get("/cas/district/payment",isAuthenticated, async (req, res) => {
+app.get("/cas/district/payment", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
-
     let voucherNo = "";
 
     if (req.query.voucher) {
       voucherNo = req.query.voucher;
     }
-    const office_details=await District.findOne({_id:office_Id}).populate('bank').populate('schemes').populate('beneficiary');
+    const paymentDetails = await DisPayment.find({ office_name: office_Id })
+      .populate("office_name")
+      .populate("scheme")
+      .populate("beneficiary")
+      .populate("financial_year");
+
+      console.log(`paymentdetails`,paymentDetails)
+
+    const office_details = await District.findOne({ _id: office_Id })
+      .populate("bank")
+      .populate("schemes")
+      .populate("beneficiary");
     const modeofpmnt = await modeofPayment.find();
-   const benificiaryData=await Beneficiary.find({office_name:office_Id})
-   const financialYear = await FinancialYear.find();
-
-  
-
-
-    res.render("districtOffice/payment-voucher",{office_details, modeofpmnt,financialYear, voucherNo});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-
-app.post("/cas/district/payment",isAuthenticated, async (req, res) => {
-  try {
-   
-    const office_Id = req.user.user.officeId;
-    
-    const { 
-    date,
-   mode_of_payment,
-   transaction_Id,
-   transaction_date,
-   sanction_ord_no,
-   scheme,
-   beneficiary,
-   office_name,
-   components_name,
-   from_bank,
-   benifBank,
-   amount,
-   financial_year,
-   desc
-  }=req.body
-
-  const districtDetails = await District.findOne({_id:office_Id})
-    const schemeDetails= await Scheme.findOne({name: scheme})
-    const bankDetails=await SchemeBankMaster.findOne({office:districtDetails._id,scheme:schemeDetails._id})
-    
-
-  const financialYear = await FinancialYear.findOne({year:financial_year});
-
-  const counter = await DisPayCounter.findOneAndUpdate(
-    {
-      district: districtDetails.name,
-      scheme: scheme,
-      component:components_name,
-      beneficiary:beneficiary,
-      financialYear: financialYear,
-    },
-    { $inc: { count: 1 } }, // Increment the counter by 1
-    { upsert: true, new: true } // Create a new document if it doesn't exist
-  );
-   
-  
-    const component_abbr=components_name.slice(0,3).toUpperCase()
-    const benificiary=beneficiary.slice(0,4).toUpperCase()
-    console.log(`hgjhgjg`,components_name)
-    
-    const voucherNo = generateDisPayVoucherNumber(
-    districtDetails.abbreviation,
-    benificiary,
-    schemeDetails.abbreviation,
-    components_name,
-    financial_year,
-    counter.count
-  );
-    const benifData=await Beneficiary.findOne({benificiary_name:beneficiary})
-   const disOfcPayment= new DisPayment({
-    date,
-    mode_of_payment,  
-    transaction_Id,
-    transaction_date,
-    sanction_ord_no,
-    scheme: schemeDetails._id,
-    beneficiary: benifData._id,
-    office_name:districtDetails._id,
-    components_name,
-    from_bank:bankDetails.bankId,
-    benifBank,
-    autoVoucherNo:voucherNo,
-    status:"pending",
-    amount,
-    financial_year:financialYear._id,
-    desc
-   })
-    
-disOfcPayment.save()
-res.redirect(
-  `/cas/district/payment?voucher=${encodeURIComponent(voucherNo)}`
-);
-    
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-
-app.get("/cas/district/advance",isAuthenticated, async (req, res) => {
-  try {
-    const office_Id = req.user.user.officeId;
-
-    let voucherNo = "";
-
-    if (req.query.voucher) {
-      voucherNo = req.query.voucher;
-    }
-    const office_details=await District.findOne({_id:office_Id}).populate('bank').populate('purpose').populate('vendor');
-    const modeofpmnt = await modeofPayment.find();
-    const benificiaryData=await Beneficiary.find({office_name:office_Id})
+    const benificiaryData = await Beneficiary.find({ office_name: office_Id });
     const financialYear = await FinancialYear.find();
 
-  
-
-
-    res.render("districtOffice/advance",{office_details, modeofpmnt,financialYear, voucherNo});
+    res.render("districtOffice/payment-voucher", {
+      office_details,
+      modeofpmnt,
+      financialYear,
+      voucherNo,
+      paymentDetails,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
-app.post("/cas/district/advance",isAuthenticated, async (req, res) => {
+app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
+
+    const {
+      date,
+      mode_of_payment,
+      transaction_Id,
+      transaction_date,
+      sanction_ord_no,
+      scheme,
+      beneficiary,
+      office_name,
+      components_name,
+      from_bank,
+      benifBank,
+      amount,
+      financial_year,
+      desc,
+    } = req.body;
+
+    const districtDetails = await District.findOne({ _id: office_Id });
+    const schemeDetails = await Scheme.findOne({ name: scheme });
+    const bankDetails = await SchemeBankMaster.findOne({
+      office: districtDetails._id,
+      scheme: schemeDetails._id,
+    });
+
+    const financialYear = await FinancialYear.findOne({ year: financial_year });
+
+    const counter = await DisPayCounter.findOneAndUpdate(
+      {
+        district: districtDetails.name,
+        scheme: scheme,
+        component: components_name,
+        beneficiary: beneficiary,
+        financialYear: financialYear,
+      },
+      { $inc: { count: 1 } }, // Increment the counter by 1
+      { upsert: true, new: true } // Create a new document if it doesn't exist
+    );
+
+    const district_abbvr = office_name.slice(0, 3).toUpperCase();
+    const scheme_abbvr = scheme.slice(0, 3).toUpperCase();
+    const component_abbr = components_name.slice(0, 3).toUpperCase();
+    const benificiary = beneficiary.slice(0, 4).toUpperCase();
     
-    const { 
-    date,
-    mode_of_payment,
-    transaction_id,
-    transaction_date,
-    sanction_no,
-    purpose,
-    party,
-    office_name,
-    from_bank,
-    partyBank,
-    amount,
-    financial_year,
-    desc
-  }= req.body
 
-  
+    const voucherNo = generateDisPayVoucherNumber(
+      district_abbvr,
+      benificiary,
+      scheme_abbvr,
+      component_abbr,
+      financial_year,
+      counter.count
+    );
+    const benifData = await Beneficiary.findOne({
+      benificiary_name: beneficiary,
+    });
+    const disOfcPayment = new DisPayment({
+      date,
+      mode_of_payment,
+      transaction_Id,
+      transaction_date,
+      sanction_ord_no,
+      scheme: schemeDetails._id,
+      beneficiary: benifData._id,
+      office_name: districtDetails._id,
+      components_name,
+      from_bank: bankDetails.bankId,
+      benifBank,
+      autoVoucherNo: voucherNo,
+      status: "pending",
+      amount,
+      financial_year: financialYear._id,
+      desc,
+    });
 
-    const office_details=await District.findOne({_id:office_Id}).populate('bank').populate('purpose').populate('vendor');
-    const bank = await BankDetails.findOne({accountNumber:from_bank, office:office_Id});
-    const purposeId= await Purpose.findOne({name:purpose, office: office_Id});
-    const vendorId = await Vendor.findOne({name:party, office_name: office_Id});
+    disOfcPayment.save();
+    res.redirect(
+      `/cas/district/payment?voucher=${encodeURIComponent(voucherNo)}`
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/cas/district/advance", isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+
+    let voucherNo = "";
+
+    if (req.query.voucher) {
+      voucherNo = req.query.voucher;
+    }
+    const office_details = await District.findOne({ _id: office_Id })
+      .populate("bank")
+      .populate("purpose")
+      .populate("vendor");
+    const modeofpmnt = await modeofPayment.find();
+    const benificiaryData = await Beneficiary.find({ office_name: office_Id });
+    const financialYear = await FinancialYear.find();
+
+    res.render("districtOffice/advance", {
+      office_details,
+      modeofpmnt,
+      financialYear,
+      voucherNo,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+
+    const {
+      date,
+      mode_of_payment,
+      transaction_id,
+      transaction_date,
+      sanction_no,
+      purpose,
+      party,
+      office_name,
+      from_bank,
+      partyBank,
+      amount,
+      financial_year,
+      desc,
+    } = req.body;
+
+    const office_details = await District.findOne({ _id: office_Id })
+      .populate("bank")
+      .populate("purpose")
+      .populate("vendor");
+    const bank = await BankDetails.findOne({
+      accountNumber: from_bank,
+      office: office_Id,
+    });
+    const purposeId = await Purpose.findOne({
+      name: purpose,
+      office: office_Id,
+    });
+    const vendorId = await Vendor.findOne({
+      name: party,
+      office_name: office_Id,
+    });
 
     const counter = await DisAdvCounter.findOneAndUpdate(
       {
-        district:office_name,
-        party:party,
-        purpose:purpose,
+        district: office_name,
+        party: party,
+        purpose: purpose,
         financialYear: financial_year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
 
+    const office_abbvr= (office_details.name).slice(0,3).toUpperCase()
+
     const voucherNo = generateDisAdvVoucherNumber(
-      office_details.abbreviation,
+      office_abbvr,
       party,
       purposeId.abbvr,
       financial_year,
       counter.count
     );
 
-  const newAdvanceVoucher= new Advance({
-    date,
-    mode_of_payment,
-    transaction_id:transaction_id,
-    transaction_date,
-    sanction_no,
-    purpose:purposeId._id,
-    party:vendorId._id,
-    office:office_details._id,
-    from_bank: bank._id,
-    partyBank,
-    amount,
-    financial_year,
-    autoVoucherNo:voucherNo,
-    status:'pending',
-    desc
-  })
+    const newAdvanceVoucher = new Advance({
+      date,
+      mode_of_payment,
+      transaction_id: transaction_id,
+      transaction_date,
+      sanction_no,
+      purpose: purposeId._id,
+      party: vendorId._id,
+      office: office_details._id,
+      from_bank: bank._id,
+      partyBank,
+      amount,
+      financial_year,
+      autoVoucherNo: voucherNo,
+      status: "pending",
+      desc,
+    });
 
-newAdvanceVoucher.save()
-    res.redirect(`/cas/district/advance?voucher=${encodeURIComponent(voucherNo)}`);
+    newAdvanceVoucher.save();
+    res.redirect(
+      `/cas/district/advance?voucher=${encodeURIComponent(voucherNo)}`
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
-app.get("/cas/district/opening-balance",isAuthenticated, async (req, res) => {
+app.get("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
   try {
-    
     const office_Id = req.user.user.officeId;
-    const openingBal=await OpeningBalance.find({office: office_Id})
-    const ofcDetails=await District.findOne({_id:office_Id}).populate('bank')
-    const bnkdetails=await BankDetails.find({_id:openingBal.bank})
-    
-    res.render("districtOffice/opening-balance",{ofcDetails,openingBal,bnkdetails});
+    const openingBal = await OpeningBalance.find({ office: office_Id });
+    const ofcDetails = await District.findOne({ _id: office_Id }).populate(
+      "bank"
+    );
+    const bnkdetails = await BankDetails.find({ _id: openingBal.bank });
+
+    res.render("districtOffice/opening-balance", {
+      ofcDetails,
+      openingBal,
+      bnkdetails,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cas/district/opening-balance",isAuthenticated, async (req, res) => {
+app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
   try {
-    const {
-      date,
-      cash,
-      bank,
-      bank_balance,
-      advance}= req.body;
+    const { date, cash, bank, bank_balance, advance } = req.body;
     const office_Id = req.user.user.officeId;
-    const ofcDetails=await District.findOne({_id:office_Id}).populate('bank')
+    const ofcDetails = await District.findOne({ _id: office_Id }).populate(
+      "bank"
+    );
 
-    const bnkDetails=await BankDetails.findOne({bank:bank})
-    console.log(bnkDetails.balance)
-    bnkDetails.balance=parseInt(bnkDetails.balance) + parseInt(bank_balance)
-    bnkDetails.save()
-    const newOpeningbal=new OpeningBalance({
+    const bnkDetails = await BankDetails.findOne({ bank: bank });
+    console.log(bnkDetails.balance);
+    bnkDetails.balance = parseInt(bnkDetails.balance) + parseInt(bank_balance);
+    bnkDetails.save();
+    const newOpeningbal = new OpeningBalance({
       date,
-      cash:parseInt(cash),
-      office:office_Id,
-      bank:bnkDetails._id,    
-      advance:parseInt(advance)
-    })
-   newOpeningbal.save()
-   ofcDetails.openingBalance.push(newOpeningbal._id)
-   ofcDetails.save()
-   res.redirect("/cas/district/opening-balance");
+      cash: parseInt(cash),
+      office: office_Id,
+      bank: bnkDetails._id,
+      advance: parseInt(advance),
+    });
+    newOpeningbal.save();
+    ofcDetails.openingBalance.push(newOpeningbal._id);
+    ofcDetails.save();
+    res.redirect("/cas/district/opening-balance");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1397,3 +1454,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
+
+
+//203.193.144.19:80

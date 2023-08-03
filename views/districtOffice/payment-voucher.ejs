@@ -151,29 +151,31 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
+
                             <th>Sl. No.</th>
                             <th>Scheme Name</th>
-                            <th>Ledger</th>
+                            <th>Component</th>
+                            <th>Beneficiary</th>
                             <th>Voucher No.</th>
-                            <th>Voucher Type</th>
-                            <th>Receipt <br> Date</th>
-                            <th>Mode of <br> Receipt</th>
+                            <th>Payment <br> Date</th>
+                            <th>Mode of <br> Payment</th>
                             <th> Amount</th>
-                            <th>Narration</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <% for( let[index, paymntDtls] of paymentDetails.entries()) { %>
                         <tr>
-                            <td>1</td>
-                            <td>Blue Revolution</td>
-                            <td>Party Ledger</td>
-                            <td>ASC/R/2022/00002</td>
-                            <td>Receipt</td>
-                            <td>12/06/2023</td>
-                            <td>Cash</td>
-                            <td>10,00,000</td>
-                            <td>Purpose</td>
+                            <td><%= index+1 %></td>
+                            <td><%= paymntDtls.scheme.name  %></td>
+                            <td><%= paymntDtls.components_name %></td>
+                            <td><%= paymntDtls.beneficiary.benificiary_name %></td>
+                            <td><%= paymntDtls.autoVoucherNo  %>t</td>
+                            <td><%= (paymntDtls.date).toLocaleString('en-GB') %></td>
+                            <td><%=paymntDtls.mode_of_payment %></td>
+                            <td><%= paymntDtls.amount %></td>
+                            <td><%= paymntDtls.status %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="receipt-voucher-print.php" role="button" target="_blank">
                                     <span class="btn-inner">
@@ -199,6 +201,7 @@
                                 </a>
                             </td>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
