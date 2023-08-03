@@ -5,7 +5,6 @@ const express = require("express");
 const mongoSanitize = require("express-mongo-sanitize");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
-const MongoDBStore = require('connect-mongodb-session')(session);
 const path = require("path");
 const ejs = require("ejs");
 engine = require("ejs-mate");
@@ -16,6 +15,7 @@ const { consolidatedSchema } = require("./models/master");
 const verifyToken = require("./helper/auth");
 const isAuthenticated = require("./helper/authenticated");
 const session = require("express-session");
+const MongoDBStore = require('connect-mongodb-session')(session);
 const generateVoucherNumber = require("./helper/dirCounter");
 const generateRecVoucherNumber = require("./helper/dirCounter");
 const generateDisRecVoucherNumber = require("./helper/dirCounter");
@@ -95,13 +95,13 @@ app.set("view engine", "ejs");
 // -------------------Session Storage --------------------------------
 // MongoDB configuration for session store
 app.use(
-  session({
-    secret: process.env.SESSION_KEY,
-    resave: false,
-    saveUninitialized: true,
-  })
-);
-
+    session({
+      secret: process.env.SESSION_KEY,
+      resave: false,
+      saveUninitialized: true,
+    })
+  );
+  
 // Connect to MongoDB
 mongoose
   .connect(process.env.DB_URL, {
@@ -114,7 +114,22 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
   });
+  const store = new MongoDBStore({
+    uri: process.env.DB_URL, // Your MongoDB connection string
+    collection: 'sessions',
+    // Additional options if needed
+  });
   
+  // Catch errors
+  store.on('error', function (error) {
+    console.error('MongoDB Session Store Error:', error);
+  });
+  
+// Define routes
+app.get("/cas", async (req, res) => {
+  const designation = await Designation.find();
+  res.render("index", { designation });
+});
 
 app.post(
   "/cas/login",
