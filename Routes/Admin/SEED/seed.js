@@ -1,4 +1,4 @@
-const { consolidatedSchema } = require("../models/master")
+const { consolidatedSchema } = require("../../../models/master")
 
 const {User,Designation,DistrictName,FinancialYear, modeofPayment}= consolidatedSchema
 const mongoose = require('mongoose');
