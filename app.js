@@ -78,8 +78,10 @@ const pages = [
 //   "/cas/dashboard/assets",
 //   express.static((path.join(__dirname,"/public/assets")))
 // );
+
 app.use(pages, express.static(path.join(__dirname, "/public/assets")));
 app.use(morgan("tiny"));
+
 app.use(express.json());
 app.use(mongoSanitize());
 app.use(express.urlencoded({ extended: true }));
@@ -90,6 +92,17 @@ app.set("view engine", "ejs");
 
 // console.log(process.env.SECRET_KEY)
 // -------------------Session Storage --------------------------------
+// MongoDB configuration for session store
+const store = new MongoDBStore({
+  uri: process.env.DB_URL, // Your MongoDB connection string
+  collection: 'sessions',
+  // Additional options if needed
+});
+
+// Catch errors
+store.on('error', function (error) {
+  console.error('MongoDB Session Store Error:', error);
+});
 app.use(
   session({
     secret: process.env.SESSION_KEY,
