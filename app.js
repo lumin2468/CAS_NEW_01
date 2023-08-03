@@ -5,6 +5,7 @@ const express = require("express");
 const mongoSanitize = require("express-mongo-sanitize");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+const MongoDBStore = require('connect-mongodb-session')(session);
 const path = require("path");
 const ejs = require("ejs");
 engine = require("ejs-mate");
