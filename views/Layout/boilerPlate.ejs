@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('./navbar.ejs')  %>
+    <%- body %>
+
+</body>
+
+
+</html>
+
+<!-- script -->
+<script>
+  let btn1 = document.getElementById("btn1");
+  let btn2 = document.getElementById("btn2");
+  let master = document.getElementById("master");
+  let Reports = document.getElementById("Reports");
+  let Transaction = document.getElementById("Transaction");
+  let rightBtn = document.getElementById("rightBtn");
+  let dashlist = document.getElementById("list");
+  let dashlist2 = document.getElementById("list2");
+  let dashlist3 = document.getElementById("list3");
+  let largeSidebar = document.getElementById("large-sidebar");
+  let smallSidebar = document.getElementById("small-sidebar");
+  
+
+  master.onclick = () => {
+    if (dashlist.style.display === "none") {
+      dashlist.style.display = "block";
+    } else {
+      dashlist.style.display = "none";
+    }
+  };
+  Reports.onclick = () => {
+    if (dashlist3.style.display === "none") {
+      dashlist3.style.display = "block";
+    } else {
+      dashlist3.style.display = "none";
+    }
+  };
+  Transaction.onclick = () => {
+    if (dashlist2.style.display === "none") {
+      dashlist2.style.display = "block";
+    } else {
+      dashlist2.style.display = "none";
+    }
+  };
+  btn1.onclick = () => {
+    if (largeSidebar.style.display === "none") {
+      largeSidebar.style.display = "block";
+      smallSidebar.style.display = "none";
+    } else {
+      largeSidebar.style.display = "none";
+      smallSidebar.style.display = "block";
+    }
+  };
+  btn2.onclick = () => {
+    if (largeSidebar.style.display === "none") {
+      largeSidebar.style.display = "block";
+      smallSidebar.style.display = "none";
+    } else {
+      largeSidebar.style.display = "none";
+      smallSidebar.style.display = "block";
+    }
+  };
+
+  rightBtn.onclick = () => {
+      if (profile.style.display === "none") {
+        profile.style.display = "block";
+      } else {
+        profile.style.display = "none";
+      }
+    };
+  
+    function showSecondDropdown() {
+    const drop1 = document.getElementById("drop1");
+    const drop2 = document.getElementById("drop2");
+    const labelVal = document.getElementById("labelVal");
+    
+    
+
+    // if the selected option in the first dropdown is not 'Select', show the second dropdown
+    if (drop1.value !== "Select") {
+      drop2.classList.remove("hidden");
+      newLabel.textContent = drop1.value; // update the new label with the selected value
+    } else {
+      drop2.classList.add("hidden");
+      newLabel.textContent = ""; // clear the new label
+    }
+  }
+
+  master.onclick = () => {
+    if (dashlist.style.display === "none") {
+      dashlist.style.display = "block";
+    } else {
+      dashlist.style.display = "none";
+    }
+  };
+  Reports.onclick = () => {
+    if (dashlist3.style.display === "none") {
+      dashlist3.style.display = "block";
+    } else {
+      dashlist3.style.display = "none";
+    }
+  };
+  Transaction.onclick = () => {
+    if (dashlist2.style.display === "none") {
+      dashlist2.style.display = "block";
+    } else {
+      dashlist2.style.display = "none";
+    }
+  };
+  btn1.onclick = () => {
+    if (largeSidebar.style.display === "none") {
+      largeSidebar.style.display = "block";
+      smallSidebar.style.display = "none";
+    } else {
+      largeSidebar.style.display = "none";
+      smallSidebar.style.display = "block";
+    }
+  };
+  btn2.onclick = () => {
+    if (largeSidebar.style.display === "none") {
+      largeSidebar.style.display = "block";
+      smallSidebar.style.display = "none";
+    } else {
+      largeSidebar.style.display = "none";
+      smallSidebar.style.display = "block";
+    }
+  };
+
+  rightBtn.onclick = () => {
+    if (profile.style.display === "none") {
+      profile.style.display = "block";
+    } else {
+      profile.style.display = "none";
+    }
+  };
+</script>
+

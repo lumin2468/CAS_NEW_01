@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Scheme Bank</title>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex">
+      <!-- sidebar start large screen-->
+      <div
+        id="large-sidebar"
+        class="sidebar bg-white-300 h-screen pl-4 pt-1 relative w-48 flex flex-col hidden md:block"
+      >
+        <!-- expand&contract button start -->
+        <img
+          src="../assets/back.png"
+          alt=""
+          class="bg-white-800 rounded-full absolute -right-3 top-2 cursor-pointer w-7"
+          id="btn1"
+        />
+
+        <!-- expand&contract button end -->
+
+        <!-- logo start -->
+        <div>
+          <img src="../assets/odisha_logo.png" alt="" />
+        </div>
+        <!-- logo end -->
+
+        <!-- list start -->
+
+        <!-- dashboard start -->
+        <div
+          class="flex flex-row cursor-pointer gap-2 pt-3 items-center hover:bg-blue-200"
+        >
+          <a
+            aria-current="page"
+            href="../Dashboard.html"
+            class="flex flex-row gap-2"
+          >
+            <i
+              class="icon"
+              data-bs-toggle="tooltip"
+              title="Dashboard"
+              data-bs-placement="right"
+            >
+              <svg
+                class="w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  opacity="0.4"
+                  d="M16.0756 2H19.4616C20.8639 2 22.0001 3.14585 22.0001 4.55996V7.97452C22.0001 9.38864 20.8639 10.5345 19.4616 10.5345H16.0756C14.6734 10.5345 13.5371 9.38864 13.5371 7.97452V4.55996C13.5371 3.14585 14.6734 2 16.0756 2Z"
+                  fill="currentColor"
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M4.53852 2H7.92449C9.32676 2 10.463 3.14585 10.463 4.55996V7.97452C10.463 9.38864 9.32676 10.5345 7.92449 10.5345H4.53852C3.13626 10.5345 2 9.38864 2 7.97452V4.55996C2 3.14585 3.13626 2 4.53852 2ZM4.53852 13.4655H7.92449C9.32676 13.4655 10.463 14.6114 10.463 16.0255V19.44C10.463 20.8532 9.32676 22 7.92449 22H4.53852C3.13626 22 2 20.8532 2 19.44V16.0255C2 14.6114 3.13626 13.4655 4.53852 13.4655ZM19.4615 13.4655H16.0755C14.6732 13.4655 13.537 14.6114 13.537 16.0255V19.44C13.537 20.8532 14.6732 22 16.0755 22H19.4615C20.8637 22 22 20.8532 22 19.44V16.0255C22 14.6114 20.8637 13.4655 19.4615 13.4655Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </i>
+            <span>Dashboard</span>
+          </a>
+        </div>
+        <!-- dashboard end -->
+
+        <!-- master start -->
+        <div
+          class="flex flex-row cursor-pointer pt-3 items-center justify-between hover:bg-blue-200"
+          id="master"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <a aria-current="page" href="">
+              <i
+                class="icon"
+                data-bs-toggle="tooltip"
+                title="Menu Style"
+                data-bs-placement="right"
+              >
+                <svg
+                  width="20"
+                  class="icon-20"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    opacity="0.4"
+                    d="M13.6663 6.99992C13.6663 10.6826 10.6817 13.6666 6.99967 13.6666C3.31767 13.6666 0.333008 10.6826 0.333008 6.99992C0.333008 3.31859 3.31767 0.333252 6.99967 0.333252C10.6817 0.333252 13.6663 3.31859 13.6663 6.99992Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M4.01351 6.20239C3.57284 6.20239 3.21484 6.56039 3.21484 6.99973C3.21484 7.43973 3.57284 7.79839 4.01351 7.79839C4.45418 7.79839 4.81218 7.43973 4.81218 6.99973C4.81218 6.56039 4.45418 6.20239 4.01351 6.20239ZM6.99958 6.20239C6.55891 6.20239 6.20091 6.56039 6.20091 6.99973C6.20091 7.43973 6.55891 7.79839 6.99958 7.79839C7.44024 7.79839 7.79824 7.43973 7.79824 6.99973C7.79824 6.56039 7.44024 6.20239 6.99958 6.20239ZM9.18718 6.99973C9.18718 6.56039 9.54518 6.20239 9.98584 6.20239C10.4265 6.20239 10.7845 6.56039 10.7845 6.99973C10.7845 7.43973 10.4265 7.79839 9.98584 7.79839C9.54518 7.79839 9.18718 7.43973 9.18718 6.99973Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </i>
+            </a>
+            <span>Master</span>
+          </div>
+          <i class="right-icon pl-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              class="icon-18"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </i>
+        </div>
+        <!-- master end -->
+        <div id="list" style="display: none">
+          <ul class="pl-6">
+            <li class="list-disc">
+              <a href="./Department.html" class="text-xs">Department</a>
+            </li>
+            <li class="list-disc">
+              <a href="./Directorate.html" class="text-xs"> Directorate </a>
+            </li>
+            <li class="list-disc">
+              <a href="./DistrictOffice.html" class="text-xs">
+                District Office
+              </a>
+            </li>
+            <li class="list-disc">
+              <a href="./Bank.html" class="text-xs">Bank </a>
+            </li>
+            <li class="list-disc">
+              <a href="./Scheme.html" class="text-xs">Scheme</a>
+            </li>
+            <li class="list-disc">
+              <a href="./Ledger.html" class="text-xs">Ledger</a>
+            </li>
+            <li class="list-disc">
+              <a href="./Designation.html" class="text-xs">Designation</a>
+            </li>
+            <li class="list-disc">
+              <a href="./User.html" class="text-xs">User</a>
+            </li>
+            <li class="list-disc">
+              <a href="./FinancialYear.html" class="text-xs">Finacial Year</a>
+            </li>
+            <li class="list-disc">
+              <a href="./SchemeBank.html" class="text-xs">Scheme Bank</a>
+            </li>
+            <li class="list-disc">
+              <a href="./SchemeComponent.html" class="text-xs"
+                >Scheme Component</a
+              >
+            </li>
+            <li class="list-disc">
+              <a href="./SchemeMaster.html" class="text-xs">Scheme Master</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Transaction start -->
+        <div
+          class="flex flex-row cursor-pointer pt-3 items-center justify-between hover:bg-blue-200"
+          id="Transaction"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <a aria-current="page" href="./Dashboard.html">
+              <i
+                class="icon"
+                data-bs-toggle="tooltip"
+                title="Menu Style"
+                data-bs-placement="right"
+              >
+                <svg
+                  width="20"
+                  class="icon-20"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    opacity="0.4"
+                    d="M13.6663 6.99992C13.6663 10.6826 10.6817 13.6666 6.99967 13.6666C3.31767 13.6666 0.333008 10.6826 0.333008 6.99992C0.333008 3.31859 3.31767 0.333252 6.99967 0.333252C10.6817 0.333252 13.6663 3.31859 13.6663 6.99992Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M4.01351 6.20239C3.57284 6.20239 3.21484 6.56039 3.21484 6.99973C3.21484 7.43973 3.57284 7.79839 4.01351 7.79839C4.45418 7.79839 4.81218 7.43973 4.81218 6.99973C4.81218 6.56039 4.45418 6.20239 4.01351 6.20239ZM6.99958 6.20239C6.55891 6.20239 6.20091 6.56039 6.20091 6.99973C6.20091 7.43973 6.55891 7.79839 6.99958 7.79839C7.44024 7.79839 7.79824 7.43973 7.79824 6.99973C7.79824 6.56039 7.44024 6.20239 6.99958 6.20239ZM9.18718 6.99973C9.18718 6.56039 9.54518 6.20239 9.98584 6.20239C10.4265 6.20239 10.7845 6.56039 10.7845 6.99973C10.7845 7.43973 10.4265 7.79839 9.98584 7.79839C9.54518 7.79839 9.18718 7.43973 9.18718 6.99973Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </i>
+            </a>
+            <span>Transaction</span>
+          </div>
+          <i class="right-icon pl-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              class="icon-18"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </i>
+        </div>
+        <!-- Transaction start -->
+
+        <div id="list2" style="display: none">
+          <ul class="pl-6">
+            <li class="list-disc">
+              <a href="./OpeningBalance.html" class="text-xs">
+                Opening Balance
+              </a>
+            </li>
+            <li class="list-disc">
+              <a href="./Receipt.html" class="text-xs"> Receipt </a>
+            </li>
+            <li class="list-disc">
+              <a href="./PaymentVoucher.html" class="text-xs">
+                Payment Voucher
+              </a>
+            </li>
+            <li class="list-disc">
+              <a href="./PaymentApproval.html" class="text-xs">
+                Payment Approval
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Reports start -->
+        <div
+          class="flex flex-row cursor-pointer pt-3 items-center justify-between hover:bg-blue-200"
+          id="Reports"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <a aria-current="page" href="./Dashboard.html">
+              <i
+                class="icon"
+                data-bs-toggle="tooltip"
+                title="Menu Style"
+                data-bs-placement="right"
+              >
+                <svg
+                  width="20"
+                  class="icon-20"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    opacity="0.4"
+                    d="M13.6663 6.99992C13.6663 10.6826 10.6817 13.6666 6.99967 13.6666C3.31767 13.6666 0.333008 10.6826 0.333008 6.99992C0.333008 3.31859 3.31767 0.333252 6.99967 0.333252C10.6817 0.333252 13.6663 3.31859 13.6663 6.99992Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M4.01351 6.20239C3.57284 6.20239 3.21484 6.56039 3.21484 6.99973C3.21484 7.43973 3.57284 7.79839 4.01351 7.79839C4.45418 7.79839 4.81218 7.43973 4.81218 6.99973C4.81218 6.56039 4.45418 6.20239 4.01351 6.20239ZM6.99958 6.20239C6.55891 6.20239 6.20091 6.56039 6.20091 6.99973C6.20091 7.43973 6.55891 7.79839 6.99958 7.79839C7.44024 7.79839 7.79824 7.43973 7.79824 6.99973C7.79824 6.56039 7.44024 6.20239 6.99958 6.20239ZM9.18718 6.99973C9.18718 6.56039 9.54518 6.20239 9.98584 6.20239C10.4265 6.20239 10.7845 6.56039 10.7845 6.99973C10.7845 7.43973 10.4265 7.79839 9.98584 7.79839C9.54518 7.79839 9.18718 7.43973 9.18718 6.99973Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </i>
+            </a>
+            <span>Reports</span>
+          </div>
+          <i class="right-icon pl-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              class="icon-18"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </i>
+        </div>
+        <!-- Reports end -->
+        <!-- Reports sublist start -->
+        <div id="list3" style="display: none" class="pt-1">
+          <ul class="pl-6">
+            <li class="list-disc">
+              <a href="" class="text-xs"> Cash Book Register</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Reports sublist start -->
+      </div>
+      <!-- other list item start -->
+
+      <!-- sidebar end large screen-->
+
+      <!-- sidebar start small screen-->
+
+      <div
+        id="small-sidebar"
+        class="sidebar bg-white-300 h-screen relative w-18 flex flex-col md:hidden"
+      >
+        <img
+          src="../assets/next.png"
+          alt=""
+          class="bg-white-800 rounded-full absolute -right-3 top-2 cursor-pointer w-5"
+          id="btn2"
+        />
+        <div class="p-2">
+          <img src="../assets/odisha_logo_login.png" alt="" class="w-12" />
+        </div>
+        <div class="flex flex-row cursor-pointer pl-4">
+          <a
+            aria-current="page"
+            class="hover:bg-blue-200"
+            href="../Dashboard.html"
+          >
+            <i
+              class="icon"
+              data-bs-toggle="tooltip"
+              title="Dashboard"
+              data-bs-placement="right"
+            >
+              <svg
+                class="w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  opacity="0.4"
+                  d="M16.0756 2H19.4616C20.8639 2 22.0001 3.14585 22.0001 4.55996V7.97452C22.0001 9.38864 20.8639 10.5345 19.4616 10.5345H16.0756C14.6734 10.5345 13.5371 9.38864 13.5371 7.97452V4.55996C13.5371 3.14585 14.6734 2 16.0756 2Z"
+                  fill="currentColor"
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M4.53852 2H7.92449C9.32676 2 10.463 3.14585 10.463 4.55996V7.97452C10.463 9.38864 9.32676 10.5345 7.92449 10.5345H4.53852C3.13626 10.5345 2 9.38864 2 7.97452V4.55996C2 3.14585 3.13626 2 4.53852 2ZM4.53852 13.4655H7.92449C9.32676 13.4655 10.463 14.6114 10.463 16.0255V19.44C10.463 20.8532 9.32676 22 7.92449 22H4.53852C3.13626 22 2 20.8532 2 19.44V16.0255C2 14.6114 3.13626 13.4655 4.53852 13.4655ZM19.4615 13.4655H16.0755C14.6732 13.4655 13.537 14.6114 13.537 16.0255V19.44C13.537 20.8532 14.6732 22 16.0755 22H19.4615C20.8637 22 22 20.8532 22 19.44V16.0255C22 14.6114 20.8637 13.4655 19.4615 13.4655Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </i>
+          </a>
+        </div>
+        <div class="pl-4">
+          <ul class="flex flex-col gap-2 pt-3">
+            <li class="flex flex-row cursor-pointer">
+              <a aria-current="page" href="" class="hover:bg-blue-200">
+                <i
+                  class="icon"
+                  data-bs-toggle="tooltip"
+                  title="Menu Style"
+                  data-bs-placement="right"
+                >
+                  <svg
+                    class="w-5"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      opacity="0.4"
+                      d="M13.6663 6.99992C13.6663 10.6826 10.6817 13.6666 6.99967 13.6666C3.31767 13.6666 0.333008 10.6826 0.333008 6.99992C0.333008 3.31859 3.31767 0.333252 6.99967 0.333252C10.6817 0.333252 13.6663 3.31859 13.6663 6.99992Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.01351 6.20239C3.57284 6.20239 3.21484 6.56039 3.21484 6.99973C3.21484 7.43973 3.57284 7.79839 4.01351 7.79839C4.45418 7.79839 4.81218 7.43973 4.81218 6.99973C4.81218 6.56039 4.45418 6.20239 4.01351 6.20239ZM6.99958 6.20239C6.55891 6.20239 6.20091 6.56039 6.20091 6.99973C6.20091 7.43973 6.55891 7.79839 6.99958 7.79839C7.44024 7.79839 7.79824 7.43973 7.79824 6.99973C7.79824 6.56039 7.44024 6.20239 6.99958 6.20239ZM9.18718 6.99973C9.18718 6.56039 9.54518 6.20239 9.98584 6.20239C10.4265 6.20239 10.7845 6.56039 10.7845 6.99973C10.7845 7.43973 10.4265 7.79839 9.98584 7.79839C9.54518 7.79839 9.18718 7.43973 9.18718 6.99973Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </i>
+              </a>
+            </li>
+            <li class="flex flex-row cursor-pointer">
+              <a aria-current="page" href="" class="hover:bg-blue-200">
+                <i
+                  class="icon"
+                  data-bs-toggle="tooltip"
+                  title="Menu Style"
+                  data-bs-placement="right"
+                >
+                  <svg
+                    class="w-5"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      opacity="0.4"
+                      d="M13.6663 6.99992C13.6663 10.6826 10.6817 13.6666 6.99967 13.6666C3.31767 13.6666 0.333008 10.6826 0.333008 6.99992C0.333008 3.31859 3.31767 0.333252 6.99967 0.333252C10.6817 0.333252 13.6663 3.31859 13.6663 6.99992Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.01351 6.20239C3.57284 6.20239 3.21484 6.56039 3.21484 6.99973C3.21484 7.43973 3.57284 7.79839 4.01351 7.79839C4.45418 7.79839 4.81218 7.43973 4.81218 6.99973C4.81218 6.56039 4.45418 6.20239 4.01351 6.20239ZM6.99958 6.20239C6.55891 6.20239 6.20091 6.56039 6.20091 6.99973C6.20091 7.43973 6.55891 7.79839 6.99958 7.79839C7.44024 7.79839 7.79824 7.43973 7.79824 6.99973C7.79824 6.56039 7.44024 6.20239 6.99958 6.20239ZM9.18718 6.99973C9.18718 6.56039 9.54518 6.20239 9.98584 6.20239C10.4265 6.20239 10.7845 6.56039 10.7845 6.99973C10.7845 7.43973 10.4265 7.79839 9.98584 7.79839C9.54518 7.79839 9.18718 7.43973 9.18718 6.99973Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </i>
+              </a>
+            </li>
+            <li class="flex flex-row cursor-pointer">
+              <a aria-current="page" href="" class="hover:bg-blue-200">
+                <i
+                  class="icon"
+                  data-bs-toggle="tooltip"
+                  title="Menu Style"
+                  data-bs-placement="right"
+                >
+                  <svg
+                    class="w-5"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      opacity="0.4"
+                      d="M13.6663 6.99992C13.6663 10.6826 10.6817 13.6666 6.99967 13.6666C3.31767 13.6666 0.333008 10.6826 0.333008 6.99992C0.333008 3.31859 3.31767 0.333252 6.99967 0.333252C10.6817 0.333252 13.6663 3.31859 13.6663 6.99992Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M4.01351 6.20239C3.57284 6.20239 3.21484 6.56039 3.21484 6.99973C3.21484 7.43973 3.57284 7.79839 4.01351 7.79839C4.45418 7.79839 4.81218 7.43973 4.81218 6.99973C4.81218 6.56039 4.45418 6.20239 4.01351 6.20239ZM6.99958 6.20239C6.55891 6.20239 6.20091 6.56039 6.20091 6.99973C6.20091 7.43973 6.55891 7.79839 6.99958 7.79839C7.44024 7.79839 7.79824 7.43973 7.79824 6.99973C7.79824 6.56039 7.44024 6.20239 6.99958 6.20239ZM9.18718 6.99973C9.18718 6.56039 9.54518 6.20239 9.98584 6.20239C10.4265 6.20239 10.7845 6.56039 10.7845 6.99973C10.7845 7.43973 10.4265 7.79839 9.98584 7.79839C9.54518 7.79839 9.18718 7.43973 9.18718 6.99973Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- sidebar end small screen-->
+
+      <div class="flex flex-col justify-between w-full">
+        <div class="nav sm:flex flex-row justify-between">
+          <div class="pl-5">
+            <h3 class="text-blue-500 text-xl">Cashbook Analytics System</h3>
+            <p>Statewide Integrated Scheme Based Cash Book Management System</p>
+          </div>
+          <div class="pr-4 md:hidden pt-1" id="rightBtn">
+            <div class="mt-2 w-10 h-1 bg-black"></div>
+            <div class="mt-2 w-10 h-1 bg-black"></div>
+            <div class="mt-2 w-10 h-1 bg-black"></div>
+          </div>
+          <div class="hidden md:block lg:pr-2 pt-1 w-80">
+            <div class="flex flex-row justify-center">
+              <div class="w-10">
+                <img
+                  src="../assets/avatar.png"
+                  alt="User-Profile"
+                  class="rounded-full w-10"
+                  loading="lazy"
+                />
+              </div>
+              <div class="w-28">
+                <h6 class="">Director</h6>
+                <p class="">Director</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="w-full bg-white hidden" id="profile">
+          <div class="flex justify-end">
+            <div class="w-10">
+              <img
+                src="../assets/avatar.png"
+                alt="User-Profile"
+                class="rounded-full w-10"
+                loading="lazy"
+              />
+            </div>
+            <div class="w-28">
+              <h6 class="">Director</h6>
+              <p class="">Director</p>
+            </div>
+          </div>
+        </div>
+        <!-- Directorate Start  -->
+        <div class="p-7 bg-white h-full flex flex-col gap-5">
+          <div class="pb-1">
+            <h4 class="text-xl">Assign Bank with Scheme</h4>
+          </div>
+          <!-- first div start -->
+          <!-- {directorate_data,bank_details,scheme_details,district_office} -->
+          
+          <div
+          class="bg-white h-50 flex flex-col lg:justify-between gap-4 p-2 overflow-x-auto"
+          >
+          <form action="/cas/scheme2bank" method="post">
+        
+            <div class="flex flex-row lg:w-96 gap-4">
+              <div class="flex flex-col p-2 lg:w-96">
+                <label class="form-label"
+                  >Directorate<span class="text-danger">*</span></label
+                >
+                <select name="directorate" class="lg:w-96 sm:w-52 h-8">
+                  <option>Select</option>
+                  <% for( let dir of directorate_data ) { %>
+                      <option value="<%= dir.name %>" <%= directorate_data.name === dir.name ? 'selected': '' %> ><%= dir.name %></option>
+                  <% } %>
+                </select>
+              </div>
+              <div class="flex flex-col lg:w-96">
+                <div class="flex flex-col p-2">
+                  <label class="form-label"
+                    >Office Name<span class="text-danger">*</span></label
+                  >
+                  <select name="office_name" class="lg:w-96 sm:w-52 h-8">
+                    <option>Select</option>
+                    <% for( let dis of district_office) { %>
+                      <option value="<%= dis?.name %>" <%= district_office?.name === dis?.name ? 'selected': '' %> ><%= dis?.name %></option>
+                  <% } %>
+                  </select>
+                </div>
+              </div>
+              <div class="flex flex-col lg:w-96 pl-4">
+                <div class="flex flex-col p-2">
+                  <label class="form-label"
+                    >Scheme Name <span class="text-danger">*</span></label
+                  >
+
+                  <select name="scheme_name" class="lg:w-96 sm:w-52 h-8">
+                    <option>Select</option>
+                    <% for( let schm of scheme_details) { %>
+                      <option value="<%= schm?.name %>" <%= scheme_details?.name === schm?.name ? 'selected': '' %> ><%= schm?.name %></option>
+                  <% } %>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-row lg:w-96 gap-4">
+              <div class="flex flex-col p-2 lg:w-96">
+                <label class="form-label"
+                  >BankName<span class="text-danger">*</span></label
+                >
+                <select name="bank_name" class="lg:w-96 sm:w-52 h-8">
+                  <option>Select</option>
+                     <% for( let bnk of bank_details) { %>
+                      <option value="<%= bnk?.bank %>" <%= bank_details?.bank === bnk?.bank ? 'selected': '' %> ><%= bnk?.bank %></option>
+                  <% } %>
+                </select>
+              </div>
+            <div class="flex flex-col lg:w-full">
+              <div class="flex flex-col p-2 lg:w-96">
+                <label class="form-label">Scheme Description</label>
+                <textarea
+                  name="scheme_desc"
+                  id=""
+                  cols="60"
+                  rows="2"
+                  class="lg:w-full border-2"
+                ></textarea>
+              </div>
+            </div>
+            <div class="flex items-center justify-center">
+              <button
+                type="submit"
+                name="next"
+                class="bg-blue-500 p-2 rounded-md text-white"
+              >
+                Submit
+              </button>
+            </div>
+          </form>
+          </div>
+          <!-- first div end-->
+
+          <div
+            class="bg-white h-36 flex flex-col justify-between gap-4 p-3 overflow-x-auto"
+          >
+            <table
+              class="md:table-fixed overflow-y-auto border-collapse border border-slate-400"
+            >
+              <thead class="h-12">
+                <tr>
+                  <th
+                    class="bg-blue-500 rounded-l border border-slate-300 text-white"
+                  >
+                    Sl. No.
+                  </th>
+                  <th
+                    class="bg-blue-500 rounded-l border border-slate-300 text-white"
+                  >
+                    Scheme Name
+                  </th>
+                  <th
+                    class="bg-blue-500 rounded-l border border-slate-300 text-white"
+                  >
+                    Scheme Start Date
+                  </th>
+                  <th
+                    class="bg-blue-500 rounded-l border border-slate-300 text-white"
+                  >
+                    Scheme End Date
+                  </th>
+
+                  <th
+                    class="bg-blue-500 rounded-l border border-slate-300 text-white"
+                  >
+                    Action
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border border-slate-300">
+                  <td>1</td>
+                  <td class="border border-slate-300">Blue Revolution</td>
+                  <td class="border border-slate-300">14/06/2023</td>
+                  <td class="border border-slate-300">26/06/2023</td>
+                  <td class="flex justify-center items-center">
+                    <a
+                      class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
+                      href="#"
+                      role="button"
+                    >
+                      <span class="btn-inner">
+                        <svg
+                          class="w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            opacity="0.4"
+                            d="M19.9927 18.9534H14.2984C13.7429 18.9534 13.291 19.4124 13.291 19.9767C13.291 20.5422 13.7429 21.0001 14.2984 21.0001H19.9927C20.5483 21.0001 21.0001 20.5422 21.0001 19.9767C21.0001 19.4124 20.5483 18.9534 19.9927 18.9534Z"
+                            fill="currentColor"
+                          ></path>
+                          <path
+                            d="M10.309 6.90385L15.7049 11.2639C15.835 11.3682 15.8573 11.5596 15.7557 11.6929L9.35874 20.0282C8.95662 20.5431 8.36402 20.8344 7.72908 20.8452L4.23696 20.8882C4.05071 20.8903 3.88775 20.7613 3.84542 20.5764L3.05175 17.1258C2.91419 16.4915 3.05175 15.8358 3.45388 15.3306L9.88256 6.95545C9.98627 6.82108 10.1778 6.79743 10.309 6.90385Z"
+                            fill="currentColor"
+                          ></path>
+                          <path
+                            opacity="0.4"
+                            d="M18.1208 8.66544L17.0806 9.96401C16.9758 10.0962 16.7874 10.1177 16.6573 10.0124C15.3927 8.98901 12.1545 6.36285 11.2561 5.63509C11.1249 5.52759 11.1069 5.33625 11.2127 5.20295L12.2159 3.95706C13.126 2.78534 14.7133 2.67784 15.9938 3.69906L17.4647 4.87078C18.0679 5.34377 18.47 5.96726 18.6076 6.62299C18.7663 7.3443 18.597 8.0527 18.1208 8.66544Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                    </a>
+                    <a
+                      class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
+                      href="#"
+                      role="button"
+                    >
+                      <span class="btn-inner">
+                        <svg
+                          class="w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            opacity="0.4"
+                            d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
+                            fill="currentColor"
+                          ></path>
+                          <path
+                            d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+                <tr class="border border-slate-300">
+                  <td>2</td>
+                  <td class="border border-slate-300">RKVY</td>
+                  <td class="border border-slate-300">20/06/2023</td>
+                  <td class="border border-slate-300">30/06/2023</td>
+                  <td class="flex justify-center items-center">
+                    <a
+                      class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
+                      href="#"
+                      role="button"
+                    >
+                      <span class="btn-inner">
+                        <svg
+                          class="w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            opacity="0.4"
+                            d="M19.9927 18.9534H14.2984C13.7429 18.9534 13.291 19.4124 13.291 19.9767C13.291 20.5422 13.7429 21.0001 14.2984 21.0001H19.9927C20.5483 21.0001 21.0001 20.5422 21.0001 19.9767C21.0001 19.4124 20.5483 18.9534 19.9927 18.9534Z"
+                            fill="currentColor"
+                          ></path>
+                          <path
+                            d="M10.309 6.90385L15.7049 11.2639C15.835 11.3682 15.8573 11.5596 15.7557 11.6929L9.35874 20.0282C8.95662 20.5431 8.36402 20.8344 7.72908 20.8452L4.23696 20.8882C4.05071 20.8903 3.88775 20.7613 3.84542 20.5764L3.05175 17.1258C2.91419 16.4915 3.05175 15.8358 3.45388 15.3306L9.88256 6.95545C9.98627 6.82108 10.1778 6.79743 10.309 6.90385Z"
+                            fill="currentColor"
+                          ></path>
+                          <path
+                            opacity="0.4"
+                            d="M18.1208 8.66544L17.0806 9.96401C16.9758 10.0962 16.7874 10.1177 16.6573 10.0124C15.3927 8.98901 12.1545 6.36285 11.2561 5.63509C11.1249 5.52759 11.1069 5.33625 11.2127 5.20295L12.2159 3.95706C13.126 2.78534 14.7133 2.67784 15.9938 3.69906L17.4647 4.87078C18.0679 5.34377 18.47 5.96726 18.6076 6.62299C18.7663 7.3443 18.597 8.0527 18.1208 8.66544Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                    </a>
+                    <a
+                      class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
+                      href="#"
+                      role="button"
+                    >
+                      <span class="btn-inner">
+                        <svg
+                          class="w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            opacity="0.4"
+                            d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z"
+                            fill="currentColor"
+                          ></path>
+                          <path
+                            d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Directorate end  -->
+
+        <div>
+          <p>
+            &copy; 2023
+            <span class="text-primary"
+              >Integrated Statewide Scheme based cash book Management
+              System</span
+            >, All Rights Reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<!-- script -->
+<script>
+  let btn1 = document.getElementById("btn1");
+  let btn2 = document.getElementById("btn2");
+  let rightBtn = document.getElementById("rightBtn");
+  let profile = document.getElementById("profile");
+  let master = document.getElementById("master");
+  let Reports = document.getElementById("Reports");
+  let Transaction = document.getElementById("Transaction");
+  let dashlist = document.getElementById("list");
+  let dashlist2 = document.getElementById("list2");
+  let dashlist3 = document.getElementById("list3");
+  let largeSidebar = document.getElementById("large-sidebar");
+  let smallSidebar = document.getElementById("small-sidebar");
+
+  master.onclick = () => {
+    if (dashlist.style.display === "none") {
+      dashlist.style.display = "block";
+    } else {
+      dashlist.style.display = "none";
+    }
+  };
+  Reports.onclick = () => {
+    if (dashlist3.style.display === "none") {
+      dashlist3.style.display = "block";
+    } else {
+      dashlist3.style.display = "none";
+    }
+  };
+  Transaction.onclick = () => {
+    if (dashlist2.style.display === "none") {
+      dashlist2.style.display = "block";
+    } else {
+      dashlist2.style.display = "none";
+    }
+  };
+  btn1.onclick = () => {
+    if (largeSidebar.style.display === "none") {
+      largeSidebar.style.display = "block";
+      smallSidebar.style.display = "none";
+    } else {
+      largeSidebar.style.display = "none";
+      smallSidebar.style.display = "block";
+    }
+  };
+  btn2.onclick = () => {
+    if (largeSidebar.style.display === "none") {
+      largeSidebar.style.display = "block";
+      smallSidebar.style.display = "none";
+    } else {
+      largeSidebar.style.display = "none";
+      smallSidebar.style.display = "block";
+    }
+  };
+
+  rightBtn.onclick = () => {
+    if (profile.style.display === "none") {
+      profile.style.display = "block";
+    } else {
+      profile.style.display = "none";
+    }
+  };
+</script>
