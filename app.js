@@ -94,6 +94,13 @@ app.set("view engine", "ejs");
 // console.log(process.env.SECRET_KEY)
 // -------------------Session Storage --------------------------------
 // MongoDB configuration for session store
+app.use(
+  session({
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // Connect to MongoDB
 mongoose
@@ -117,13 +124,6 @@ mongoose
   store.on('error', function (error) {
     console.error('MongoDB Session Store Error:', error);
   });
-  app.use(
-    session({
-      secret: process.env.SESSION_KEY,
-      resave: false,
-      saveUninitialized: true,
-    })
-  );
   
 // Define routes
 app.get("/cas", async (req, res) => {
