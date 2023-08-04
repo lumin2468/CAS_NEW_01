@@ -25,7 +25,7 @@
           class="lg:w-96 sm:w-52 h-8"
           name="name"
           placeholder="Add directorate name"
-          value="<% directorates.name %>"
+          value="<%=directorates.name %>"
         />
       </div>
       <div class="flex flex-row w-96">
@@ -95,8 +95,8 @@
         </tr>
       </thead>
       <tbody>
+        <% for( let[index, dis] of district.entries()) { %>
         <tr>
-          <% for( let[index, dis] of district.entries()) { %>
           <td class="border border-slate-300"><%= index+1 %></td>
           <td class="border border-slate-300"><%= dis.directorate.name %></td>
           <td class="border border-slate-300"><%= dis.district.name %></td>
@@ -153,8 +153,8 @@
             </a>
           </td>
           
-          <% } %>
         </tr>
+        <% } %>
       </tbody>
     </table>
   </div>

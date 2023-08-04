@@ -19,7 +19,7 @@ const generateVoucherNumber = require("./helper/dirPayCounter");
 const generateRecVoucherNumber = require("./helper/dirRecCounter");
 const generateDisRecVoucherNumber = require("./helper/disRecCounter");
 const generateDisPayVoucherNumber = require("./helper/disPayCounter");
-const generateDisAdvVoucherNumber = require("./helper/disAdvCounter");
+const generateDisAdvVoucherNumber = require("./helper/disAdvCounter.js");
 
 // Import the Mongoose models
 const {
@@ -698,10 +698,12 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       year: financialYear,
     });
     const purposeAbbr = purpose.substring(0, 3).toUpperCase();
-
     const directorateData = await Directorate.findOne({ name: directorate })
-      .populate("bank")
-      .populate("department");
+    .populate("department");
+    
+    
+    const receiverBankDetails=await BankDetails.findOne({directorate:directorateData._id, accountNumber:receiver_bank})
+   
     const recCounter = await DirRecCounter.findOneAndUpdate(
       {
         directorate,
@@ -735,7 +737,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       source,
       directorate: directorateData._id,
       source_bank,
-      receiver_bank: directorateData.bank,
+      receiver_bank: receiverBankDetails._id,
       amount,
       desc,
       autoVoucherNo: voucherNo,
@@ -820,7 +822,7 @@ app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
       .populate("directorate")
       .populate("district");
 
-    res.render("/directorate/districtLevelOffice", {
+    res.render("directorate/districtLevelOffice", {
       directorates,
       district,
       districtName,
@@ -1258,7 +1260,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     const benificiary = beneficiary.slice(0, 4).toUpperCase();
     
 
-    const voucherNo =generateDisPayVoucherNumber(
+      const voucherNo =generateDisPayVoucherNumber(
       district_abbvr,
       benificiary,
       scheme_abbvr,
@@ -1364,7 +1366,7 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       office_name: office_Id,
     });
 
-    const counter = await DisAdvCounter.findOneAndUpdate(
+    const advCounter = await DisAdvCounter.findOneAndUpdate(
       {
         district: office_name,
         party: party,
@@ -1375,15 +1377,19 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
 
+    console.log(`counterr`,advCounter.count)
     const office_abbvr= (office_details.name).slice(0,3).toUpperCase()
-
-    const voucherNo = generateDisAdvVoucherNumber(
-      office_abbvr,
-      party,
-      purposeId.abbvr,
-      financial_year,
-      counter.count
-    );
+    
+    
+      const voucherNo = generateDisAdvVoucherNumber(
+        office_abbvr,
+        party,
+        purposeId.abbvr,
+        financial_year,
+        advCounter.count,
+      );
+    
+ 
 
     const newAdvanceVoucher = new Advance({
       date,
@@ -1398,7 +1404,7 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       partyBank,
       amount,
       financial_year,
-      autoVoucherNo: voucherNo,
+      autoVoucherNo:voucherNo,
       status: "pending",
       desc,
     });
