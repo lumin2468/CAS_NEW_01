@@ -72,7 +72,7 @@
                         <select class="form-control" id="schemeSelect" name="schemeName" >
                             <option>Select</option>
                             <% for( let sch of schemes ) { %>
-                                <option value="<%= sch.name %>" <%= schemes === sch.name ? 'selected': '' %> ><%= sch.name %></option>
+                                <option value="<%= sch._id %>" <%= schemes === sch.name ? 'selected': '' %> ><%= sch.name %></option>
                             <% } %>
                         </select>
                     </div>
@@ -121,10 +121,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label"> To office Bank <span class="text-danger">*</span></label>
-                        <select class="form-control" id="ofcBnkSelect" name="receiver_bank">
-                           
-                            
-                        </select>
+                        <input type="" class="form-control" id="ofcBnkSelect" name="receiver_bank">
+
                     </div>
                 </div> 
               
@@ -267,7 +265,7 @@
           const data = await response.json();
           console.log(`fetched data`,data.components);
           // Update the table with the fetched data
-          tableBody.innerHTML = data.components
+          tableBody.innerHTML = data?.components
             .map(
               (component) => ` <option value=${component.name}>${component.name}</option>`
             )
@@ -290,10 +288,7 @@
           const data = await response.json();
           console.log(`fetched data`,data);
         //   // Update the table with the fetched data
-        ofcBnkSelect.innerHTML = data
-            .map(
-              (bnk) => ` <option value=${bnk.bankId.bank}>${bnk.bankId.bank}</option>`
-            )
+        ofcBnkSelect.value=data.bankId.bank;
         } catch (error) {
           console.error('Error fetching data:', error);
         }

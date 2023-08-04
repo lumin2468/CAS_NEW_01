@@ -142,7 +142,7 @@ const bankDetailsSchema = new Schema({
 
   balance: {
     type: Number,
-    required: true,
+    
   },
   branch: {
     type: String,
@@ -152,6 +152,11 @@ const bankDetailsSchema = new Schema({
     type: String,
     required: true,
   },
+  scheme:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Scheme",
+    }
+  
 
   // Other bank details fields
 });
@@ -746,13 +751,12 @@ const dirOpeningBalance = Schema({
     required: true,
   },
   
-  bank: [
-    {
+  bank: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "bank",
+      ref: "BankDetails",
       required: true,
     },
-  ],
+  
   cash:{
     type:Number
   },

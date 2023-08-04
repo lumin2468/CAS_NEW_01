@@ -353,31 +353,33 @@ app.post("/cas/scheme", async (req, res) => {
 });
 // ... Define more routes for other resources ...
 
-app.get("/cas/bank", async (req, res) => {
+app.get("/cas/directorate/bank",isAuthenticated, async (req, res) => {
   try {
-    const level = ["Directorate", "District"];
-    const directorate = await Directorate.find();
-    const districts = await District.find();
-    res.render("banks", { directorate, districts, level });
+    const directorateOfc = req.user.user.directorate;
+    const directorate = await Directorate.findOne({_id:directorateOfc});
+    const districts = await District.find({directorate:directorateOfc});
+    const bankDetails= await BankDetails.find({directorate:directorateOfc}).populate('office')
+    
+    res.render("directorate/bank", { directorate, districts, bankDetails });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cas/bank", async (req, res) => {
+app.post("/cas/directorate/bank",isAuthenticated, async (req, res) => {
   try {
+    const directorateOfc = req.user.user.directorate;
     const {
       bankName,
       Ifsc_code,
       branchName,
       accountNo,
-      Balance,
       directorate,
       district_office,
       address,
     } = req.body;
-    const direcOfc = await Directorate.findOne({ name: directorate });
+    const direcOfc = await Directorate.findOne({ _id: directorateOfc });
     let distOfc = {};
     console.log(district_office);
     if (!(district_office === "Select")) {
@@ -391,21 +393,15 @@ app.post("/cas/bank", async (req, res) => {
       bank: bankName,
       accountNumber: accountNo,
       IFSCNumber: Ifsc_code,
-      balance: Balance,
       branch: branchName,
       address: address,
     });
-    if (!(directorate === "Select")) {
-      direcOfc.bank = bankMaster._id;
-      direcOfc.save();
-    }
-
     if (!(district_office === "Select")) {
       distOfc.bank.push(bankMaster._id);
       distOfc.save();
     }
     bankMaster.save();
-    res.status(200).redirect("/cas/bank");
+    res.status(200).redirect("/cas/directorate/bank");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -438,7 +434,7 @@ app.post("/cas/scheme2bank", async (req, res) => {
       req.body;
     const office_details = await District.findOne({ name: office_name });
     const scheme_details = await Scheme.findOne({ name: scheme_name });
-    const bank_details = await BankDetails.findOne({ bank: bank_name });
+    const bank_details = await BankDetails.findOne({ accountNumber: bank_name });
 
     const schemeBankDetails = new SchemeBankMaster({
       office: office_details._id,
@@ -450,6 +446,9 @@ app.post("/cas/scheme2bank", async (req, res) => {
     scheme_details.bank = schemeBankDetails.bankId;
     scheme_details.save();
     schemeBankDetails.save();
+    bank_details.scheme=schemeBankDetails._id;
+    bank_details.save();
+
     res.redirect("/cas/scheme2bank");
   } catch (error) {
     console.error(error);
@@ -630,12 +629,13 @@ app.get(
     try {
       const { officeName, schemeName } = req.params;
       console.log(officeName, schemeName);
-      const ofcId = await District.findOne({ name: officeName });
-      const schmId = await Scheme.findOne({ name: schemeName });
-      const bnkDetails = await SchemeBankMaster.find({
-        office: ofcId._id,
-        scheme: schmId._id,
-      }).populate("bankId");
+      const ofcId = await District.findOne({ name: officeName })
+      const schmId = await Scheme.findOne({ _id:schemeName })
+      
+      const bnkDetails = await SchemeBankMaster.findOne({
+        scheme:schemeName,
+      }).populate('bankId')
+      console.log(`schemeeeee`,bnkDetails)
       res.json(bnkDetails);
       //  const componentData = await Scheme.findOne({ name: schemeName }).populate('components');
       //  res.json(componentData)
@@ -761,6 +761,9 @@ app.get(
     try {
       const financialYear = await FinancialYear.find();
       const directorateOfc = req.user.user.directorate;
+      const opngBalance=await DirOpeningBalance.find({directorate:directorateOfc}).populate('bank')
+
+      console.log(`hasdhhasdgagdahda`, opngBalance.bank);
       const dirOfcDetails = await Directorate.findOne({ _id: directorateOfc });
       const bnkDetails = await BankDetails.find({
         directorate: directorateOfc,
@@ -770,6 +773,7 @@ app.get(
         dirOfcDetails,
         financialYear,
         bnkDetails,
+        opngBalance
       });
     } catch (error) {
       console.error(error);
@@ -787,7 +791,7 @@ app.post(
       const dirDetails = await Directorate.findOne({ _id: directorate });
 
       const bnkDetails = await BankDetails.findOne({
-        bank: bank_details,
+        accountNumber: bank_details,
         directorate: directorate,
       });
       console.log(bnkDetails.balance);

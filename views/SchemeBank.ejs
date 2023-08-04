@@ -569,7 +569,7 @@
                 <select name="bank_name" class="lg:w-96 sm:w-52 h-8">
                   <option>Select</option>
                      <% for( let bnk of bank_details) { %>
-                      <option value="<%= bnk?.bank %>" <%= bank_details?.bank === bnk?.bank ? 'selected': '' %> ><%= bnk?.bank %></option>
+                      <option value="<%= bnk?.accountNumber %>" <%= bank_details?.bank === bnk?.bank ? 'selected': '' %> ><%= bnk?.bank %></option>
                   <% } %>
                 </select>
               </div>
