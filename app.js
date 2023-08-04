@@ -15,11 +15,11 @@ const verifyToken = require("./helper/auth");
 const isAuthenticated = require("./helper/authenticated");
 const session = require("express-session");
 const MongoDBStore = require('connect-mongodb-session')(session);
-const generateVoucherNumber = require("./helper/dirCounter");
-const generateRecVoucherNumber = require("./helper/dirCounter");
-const generateDisRecVoucherNumber = require("./helper/dirCounter");
-const generateDisPayVoucherNumber = require("./helper/dirCounter");
-const generateDisAdvVoucherNumber = require("./helper/dirCounter");
+const generateVoucherNumber = require("./helper/dirPayCounter");
+const generateRecVoucherNumber = require("./helper/dirRecCounter");
+const generateDisRecVoucherNumber = require("./helper/disRecCounter");
+const generateDisPayVoucherNumber = require("./helper/disPayCounter");
+const generateDisAdvVoucherNumber = require("./helper/disAdvCounter");
 
 // Import the Mongoose models
 const {
@@ -1258,7 +1258,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     const benificiary = beneficiary.slice(0, 4).toUpperCase();
     
 
-    const voucherNo = generateDisPayVoucherNumber(
+    const voucherNo =generateDisPayVoucherNumber(
       district_abbvr,
       benificiary,
       scheme_abbvr,
