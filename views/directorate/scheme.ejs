@@ -13,54 +13,48 @@
 </head>
 <body>
 
-    <%- include('../Includes/sidebar.ejs')%> 
-    <%- include('../Includes/header-3.ejs')%>
+    <%-include('../Includes/sidebar.ejs')%>
+    <%-include('../Includes/header-3.ejs')%>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
-    <h4 class="mb-5">Opening Balance</h4>
+    <h4 class="mb-5">Scheme</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/openingBalance" method="post">
-            <table class="table table-bordered" id="obTable">
-                <thead>
-                    <tr>    
-                        <th>Date</th>
-                        <th>Cash</th>
-                        <th>Bank</th>
-                        <th>Bank Balance</th>
-                        <th>Advance</th>
-                       <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="date" class="form-control" name="date" ></td>
-                        <td><input type="text" class="form-control" name="cash" ></td>
-                        <td>
-                            <select class="form-control" name="bank_details">
-                                <option>Select</option>
-                                <% for( let bnk of bnkDetails ) { %>
-                                    <option value="<%= bnk.accountNumber %>" <%=bnkDetails.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank %></option>
-                                <% } %>
-                              </select>
-                                                 
-                        </td>
-                        <td><input type="text" class="form-control" name="bank_balance" ></td>
-                        <td><input type="text" class="form-control" name="advance"></td>
-                      
-                        
-                        <td>
-                            <a class="btn btn-success btn-icon btn-sm rounded-pill ms-2" href="#" role="button" id="addMore">
-                                <span class="btn-inner">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-32"><path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                </span>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+            <form action="/cas/directorate/scheme" method="post">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="schemeName">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Directorate <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="directorate" value="<%= directorates.name %>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Scheme Start Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="startDate">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Scheme End Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="endDate">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">Scheme Description</label>
+                        <textarea class="form-control" name="schemeDesc"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
+                </div>
             </div>
         </form>
         </div>
@@ -73,28 +67,22 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Date</th>
-                            <th>Cash</th>
-                            <th>Bank Account No.</th>
-                            <th>Bank opening Balance</th>
-                            <th>Total Balance</th>
-                            <th>Advance</th>
+                            <th>Directorate</th>
+                            <th>Scheme Name</th>
+                            <th>Scheme Start Date</th>
+                            <th>Scheme End Date</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for( let[index, opnB] of opngBalance.entries()) { %>
+                        <% for( let[index, schm] of schemes.entries()) { %>
                         <tr>
-                            <td><%= index+1 %></td>
-                            <td><%=(opnB.date).toLocaleString('en-GB') %></td>
-                            <td><%= opnB.cash %></td>
-                            <td><%= opnB.bank.accountNumber %></td>
-                            <td><%= opnB.cash %></td>
-                            <td><%= opnB.bank.balance %></td>
-                            <td><%= opnB.advance %></td>
-                            
+                            <td><%= index+1  %></td>
+                            <td><%=schm.directorate.name %></td>
+                            <td><%=schm.name%></td>
+                            <td><%=schm.startDate.toLocaleString()%></td>
+                            <td><%=schm.endDate.toLocaleString()%></td>
                             <td>
-                                <div>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
                                         <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -112,10 +100,9 @@
                                         </svg>
                                     </span>
                                 </a>
-                                
                             </td>
                         </tr>
-                        <% } %>
+                       <% } %>
                     </tbody>
                 </table>
             </div>
@@ -124,7 +111,6 @@
 </div>
 
 <%- include('../Includes/footer.ejs')%>
-
 
 </body>
 </html>

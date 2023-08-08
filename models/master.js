@@ -711,23 +711,27 @@ const modeofpayment = Schema({
 
 // Opening Balance Schema
 const openingBalance = Schema({
+  date:{
+    type:Date,
+   },
+  
   office:{
     type: mongoose.Schema.Types.ObjectId,
       ref: "District",
       
   },
-  date: {
-    type: Date,
-    required: true,
+  scheme: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Scheme",
   },
   
-  bank: [
+  bank:
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "bank",
+      ref: "BankDetails",
       required: true,
     },
-  ],
+  
   cash:{
     type:Number
   },
@@ -1134,7 +1138,7 @@ const districtNameSchema = new Schema({
 const schemeBankMaster = new Schema({
   office: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Distict",
+    ref: "District",
     required: true,
   },
   directorate: {
@@ -1158,6 +1162,10 @@ const schemeBankMaster = new Schema({
 });
 
 const schemeComponenetMaster = new Schema({
+  directorate:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Directorate",
+  },
   name: {
     type: String,
     required: true,

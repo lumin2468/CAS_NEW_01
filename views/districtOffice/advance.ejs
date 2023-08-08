@@ -146,28 +146,29 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Scheme Name</th>
-                            <th>Ledger</th>
-                            <th>Voucher No.</th>
-                            <th>Voucher Type</th>
-                            <th>Receipt <br> Date</th>
-                            <th>Mode of <br> Receipt</th>
+                            <th>Office Name</th>
+                            <th>Party Name</th>
+                            <th>Purpose</th>
+                            <th>Voucher No</th>
+                            <th>Sanction <br> Order No.</th>
+                            <th>Payment <br> Date</th>
+                            <th>Mode of <br>Payment</th>
                             <th> Amount</th>
-                            <th>Narration</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <% for( let[index, adv] of advanceDetails.entries()) { %>
                         <tr>
-                            <td>1</td>
-                            <td>Blue Revolution</td>
-                            <td>Party Ledger</td>
-                            <td>ASC/R/2022/00002</td>
-                            <td>Receipt</td>
-                            <td>12/06/2023</td>
-                            <td>Cash</td>
-                            <td>10,00,000</td>
-                            <td>Purpose</td>
+                            <td><%= index+1 %></td>
+                            <td><%= adv?.office?.name %></td>
+                            <td><%= adv?.party?.name %></td>
+                            <td><%= adv?.purpose?.name %></td>
+                            <td><%= adv?.autoVoucherNo%></td>
+                            <td><%= adv?.sanction_no%></td>
+                            <td><%= (adv?.date).toLocaleString("en-GB",{day:"numeric", month:"numeric", year:"numeric"}) %></td>
+                            <td><%= adv?.mode_of_payment%></td>
+                            <td><%= adv?.amount%></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="receipt-voucher-print.php" role="button" target="_blank">
                                     <span class="btn-inner">
@@ -193,6 +194,7 @@
                                 </a>
                             </td>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>

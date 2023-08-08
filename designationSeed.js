@@ -1,5 +1,7 @@
+
 const mongoose = require('mongoose');
-const { Designation } = require('./models/schema');
+const {consolidatedSchema}= require('./models/master');
+const {DistrictName}=consolidatedSchema
 
 mongoose.connect('mongodb+srv://Admin:8r2orA6FnbbZZXOS@cluster0.s121j0z.mongodb.net/', {
   useNewUrlParser: true,
@@ -7,29 +9,24 @@ mongoose.connect('mongodb+srv://Admin:8r2orA6FnbbZZXOS@cluster0.s121j0z.mongodb.
 })
   .then(() => {
     console.log('Connected to MongoDB');
-    seedDesignation();
+    seedDistrict();
   })
   .catch((error) => {
     console.error('Error connecting to MongoDB:', error);
   });
-  async function seedDesignation() {
+  async function seedDistrict() {
     try {
       // Check if the "admin" designation already exists
-      const existingDesignation = await Designation.findOne({ name: 'admin' });
-      if (existingDesignation) {
-        console.error('Designation "admin" already exists');
-        return;
-      }
+
   
       // Create a new "admin" designation
-      const adminDesignation = new Designation({
-        name: 'admin',
+      const newDistrict = new DistrictName({
+        name: 'Puri',
         // Add other fields as needed
       });
-  
+        newDistrict.save()
       // Save the "admin" designation to the database
-      const savedDesignation = await adminDesignation.save();
-      console.log('Admin designation created:', savedDesignation);
+    
   
       // Close the MongoDB connection
       mongoose.connection.close();

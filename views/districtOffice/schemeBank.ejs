@@ -13,54 +13,59 @@
 </head>
 <body>
 
-    <%- include('../Includes/sidebar.ejs')%> 
-    <%- include('../Includes/header-3.ejs')%>
+    <%-include('../Includes/sidebar2.ejs')%>
+    <%-include('../Includes/header-4.ejs')%>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
-    <h4 class="mb-5">Opening Balance</h4>
+    <h4 class="mb-5">Assign Bank with Scheme</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/openingBalance" method="post">
-            <table class="table table-bordered" id="obTable">
-                <thead>
-                    <tr>    
-                        <th>Date</th>
-                        <th>Cash</th>
-                        <th>Bank</th>
-                        <th>Bank Balance</th>
-                        <th>Advance</th>
-                       <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="date" class="form-control" name="date" ></td>
-                        <td><input type="text" class="form-control" name="cash" ></td>
-                        <td>
-                            <select class="form-control" name="bank_details">
-                                <option>Select</option>
-                                <% for( let bnk of bnkDetails ) { %>
-                                    <option value="<%= bnk.accountNumber %>" <%=bnkDetails.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank %></option>
-                                <% } %>
-                              </select>
-                                                 
-                        </td>
-                        <td><input type="text" class="form-control" name="bank_balance" ></td>
-                        <td><input type="text" class="form-control" name="advance"></td>
+            <form action="/cas/district/scheme2bank" method="post">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Directorate Name <span class="text-danger">*</span></label>
+                        <input type="text" readonly="true" class="form-control" name="directorate" value="<%= directorate_data.name %>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Office Name <span class="text-danger">*</span></label>
+                       
+                        <input type="text" class="form-control"  name="office_name" value="<%= district_office.name %>">
+                        <input type="hidden" id="selectedDist" name="office_id" value="<%= district_office._id %>">
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
+                        <select class="form-control" name="scheme_name">
+                            <option>Select</option>
+                            <% for( let schm of scheme_details) { %>
+                                <option value="<%= schm?.name %>" <%= scheme_details?.name === schm?.name ? 'selected': '' %> ><%= schm?.name %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                        <select class="form-control" name="bank_name" id="bankName">
                       
-                        
-                        <td>
-                            <a class="btn btn-success btn-icon btn-sm rounded-pill ms-2" href="#" role="button" id="addMore">
-                                <span class="btn-inner">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-32"><path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                </span>
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="form-label">Scheme Description</label>
+                        <textarea class="form-control" name="scheme_desc"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
+                </div>
             </div>
         </form>
         </div>
@@ -73,28 +78,22 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Date</th>
-                            <th>Cash</th>
-                            <th>Bank Account No.</th>
-                            <th>Bank opening Balance</th>
-                            <th>Total Balance</th>
-                            <th>Advance</th>
+                            <th>Directorate Name</th>
+                            <th>Scheme</th>
+                            <th>Office Name</th>
+                            <th>Bank</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for( let[index, opnB] of opngBalance.entries()) { %>
+                        <% for( let[index, schmbnk] of schemeBankDetails.entries()) { %>
                         <tr>
-                            <td><%= index+1 %></td>
-                            <td><%=(opnB.date).toLocaleString('en-GB') %></td>
-                            <td><%= opnB.cash %></td>
-                            <td><%= opnB.bank.accountNumber %></td>
-                            <td><%= opnB.cash %></td>
-                            <td><%= opnB.bank.balance %></td>
-                            <td><%= opnB.advance %></td>
-                            
+                            <td><%=index+1%></td>
+                            <td><%= schmbnk.directorate.name %></td>
+                            <td><%= schmbnk.scheme?.name %></td>
+                            <td><%= schmbnk.office?.name %></td>
+                            <td><%= schmbnk.bankId.bank %></td>
                             <td>
-                                <div>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
                                         <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -112,7 +111,6 @@
                                         </svg>
                                     </span>
                                 </a>
-                                
                             </td>
                         </tr>
                         <% } %>
@@ -125,6 +123,36 @@
 
 <%- include('../Includes/footer.ejs')%>
 
-
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const districtDetails=document.getElementById('selectedDist');
+    const bankData=document.getElementById('bankName')
+    
+    async function fetchDistData() {
+        const disValue=districtDetails.value;
+        // if (selectedScheme === 'Select') {
+        //    // Clear the table when 'Select' is chosen
+        //    bankData.innerHTML=""
+        //   return;
+        // }
+  
+        try {
+          const response = await fetch(`/cas/directorate/scheme2bank/${disValue}`);
+          const data = await response.json();
+          console.log(`fetched data`,data);
+          // Update the table with the fetched data
+          bankData.innerHTML = data
+            .map(
+              (bnk) => ` <option value=${bnk.accountNumber}>${bnk.bank}</option>`
+            )
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+      fetchDistData();
+    // districtDetails.addEventListener('change', fetchDistData)
+    })
+</script>
+
 </html>

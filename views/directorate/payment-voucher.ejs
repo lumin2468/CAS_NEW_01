@@ -100,7 +100,7 @@
                         <select class="form-control" id="officeSelect" name="ofc_name" >
                             <option>Select</option>
                             <% for( let ofc of directorate_data.districts ) { %>
-                                <option value="<%= ofc.name %>" <%= directorate_data.districts.name === ofc.name ? 'selected': '' %> ><%= ofc.name %></option>
+                                <option value="<%= ofc._id %>" <%= directorate_data.districts.name === ofc.name ? 'selected': '' %> ><%= ofc.name %></option>
                             <% } %>
                         </select>
                     </div>
@@ -182,8 +182,8 @@
                         <% for( let[index, pmntd] of paymentDetails.entries()) { %>
                         <tr>
                             <td><%= index+1 %></td>
-                            <td><%=pmntd.distOfcName.name  %></td>
-                            <td><%=pmntd.scheme.name  %></td>
+                            <td><%=pmntd.distOfcName?.name  %></td>
+                            <td><%=pmntd.scheme?.name  %></td>
                             <td><%=pmntd.autoVoucherNo %></td>
                             <td><%=pmntd.refVoucherNo %></td>
                             <td><%=pmntd.modeofPayment %></td>
@@ -288,7 +288,11 @@
           const data = await response.json();
           console.log(`fetched data`,data);
         //   // Update the table with the fetched data
-        ofcBnkSelect.value=data.bankId.bank;
+        if(data.bankId){
+            ofcBnkSelect.value=data.bankId.bank;
+             }else{
+                ofcBnkSelect.value="No Bank Linked"
+             }
         } catch (error) {
           console.error('Error fetching data:', error);
         }

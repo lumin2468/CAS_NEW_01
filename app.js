@@ -10,11 +10,11 @@ engine = require("ejs-mate");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
-const { consolidatedSchema } = require('./models/master');
+const { consolidatedSchema } = require("./models/master");
 const verifyToken = require("./helper/auth");
 const isAuthenticated = require("./helper/authenticated");
 const session = require("express-session");
-const MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require("connect-mongodb-session")(session);
 const generateVoucherNumber = require("./helper/dirPayCounter");
 const generateRecVoucherNumber = require("./helper/dirRecCounter");
 const generateDisRecVoucherNumber = require("./helper/disRecCounter");
@@ -94,13 +94,13 @@ app.set("view engine", "ejs");
 // -------------------Session Storage --------------------------------
 // MongoDB configuration for session store
 app.use(
-    session({
-      secret: process.env.SESSION_KEY,
-      resave: false,
-      saveUninitialized: true,
-    })
-  );
-  
+  session({
+    secret: process.env.SESSION_KEY,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 // Connect to MongoDB
 mongoose
   .connect(process.env.DB_URL, {
@@ -113,17 +113,17 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
   });
-  const store = new MongoDBStore({
-    uri: process.env.DB_URL, // Your MongoDB connection string
-    collection: 'sessions',
-    // Additional options if needed
-  });
-  
-  // Catch errors
-  store.on('error', function (error) {
-    console.error('MongoDB Session Store Error:', error);
-  });
-  
+const store = new MongoDBStore({
+  uri: process.env.DB_URL, // Your MongoDB connection string
+  collection: "sessions",
+  // Additional options if needed
+});
+
+// Catch errors
+store.on("error", function (error) {
+  console.error("MongoDB Session Store Error:", error);
+});
+
 // Define routes
 app.get("/cas", async (req, res) => {
   const designation = await Designation.find();
@@ -315,19 +315,22 @@ app.post("/cas/district", async (req, res) => {
   }
 });
 
-app.get("/cas/scheme", async (req, res) => {
+app.get("/cas/directorate/scheme", isAuthenticated, async (req, res) => {
   try {
-    const directorates = await Directorate.find();
-    const schemes = await Scheme.find().populate("directorate");
+    const directorateOfc = req.user.user.directorate;
+    const directorates = await Directorate.findOne({ _id: directorateOfc });
+    const schemes = await Scheme.find({ directorate: directorateOfc }).populate(
+      "directorate"
+    );
     console.log(schemes);
-    res.render("scheme", { directorates, schemes });
+    res.render("directorate/scheme", { directorates, schemes });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-app.post("/cas/scheme", async (req, res) => {
+app.post("/cas/directorate/scheme", async (req, res) => {
   try {
     const { schemeName, startDate, endDate, directorate, schemeDesc } =
       req.body;
@@ -353,13 +356,15 @@ app.post("/cas/scheme", async (req, res) => {
 });
 // ... Define more routes for other resources ...
 
-app.get("/cas/directorate/bank",isAuthenticated, async (req, res) => {
+app.get("/cas/directorate/bank", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
-    const directorate = await Directorate.findOne({_id:directorateOfc});
-    const districts = await District.find({directorate:directorateOfc});
-    const bankDetails= await BankDetails.find({directorate:directorateOfc}).populate('office')
-    
+    const directorate = await Directorate.findOne({ _id: directorateOfc });
+    const districts = await District.find({ directorate: directorateOfc });
+    const bankDetails = await BankDetails.find({
+      directorate: directorateOfc,
+    }).populate("office");
+
     res.render("directorate/bank", { directorate, districts, bankDetails });
   } catch (error) {
     console.error(error);
@@ -367,7 +372,7 @@ app.get("/cas/directorate/bank",isAuthenticated, async (req, res) => {
   }
 });
 
-app.post("/cas/directorate/bank",isAuthenticated, async (req, res) => {
+app.post("/cas/directorate/bank", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
     const {
@@ -393,6 +398,7 @@ app.post("/cas/directorate/bank",isAuthenticated, async (req, res) => {
       bank: bankName,
       accountNumber: accountNo,
       IFSCNumber: Ifsc_code,
+      balance: 0,
       branch: branchName,
       address: address,
     });
@@ -408,18 +414,27 @@ app.post("/cas/directorate/bank",isAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/cas/scheme2bank", async (req, res) => {
+app.get("/cas/directorate/scheme2bank", isAuthenticated, async (req, res) => {
   try {
-    const directorate_data = await Directorate.find();
-    const district_office = await District.find();
-    const bank_details = await BankDetails.find();
-    const scheme_details = await Scheme.find();
+    const direcOfc = req.user.user.directorate;
+    const directorate_data = await Directorate.findOne({ _id: direcOfc });
+    const district_office = await District.find({ directorate: direcOfc });
+    const bank_details = await BankDetails.find({ directorate: direcOfc });
+    const scheme_details = await Scheme.find({ directorate: direcOfc });
+    const schemeBankDetails = await SchemeBankMaster.find({
+      directorate: direcOfc,
+    })
+      .populate("directorate")
+      .populate("bankId")
+      .populate("office")
+      .populate("scheme");
 
-    res.render("SchemeBank.ejs", {
+    res.render("directorate/schemeBank.ejs", {
       directorate_data,
       bank_details,
       scheme_details,
       district_office,
+      schemeBankDetails,
     });
   } catch (error) {
     console.error(error);
@@ -427,14 +442,30 @@ app.get("/cas/scheme2bank", async (req, res) => {
   }
 });
 
-app.post("/cas/scheme2bank", async (req, res) => {
+app.get("/cas/directorate/scheme2bank/:id", async (req, res) => {
+  try {
+    const distId = req.params.id;
+    const bank_details = await BankDetails.find({
+      office: distId,
+      scheme: null,
+    });
+    res.json(bank_details);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/directorate/scheme2bank", async (req, res) => {
   try {
     console.log(`I am in`);
     const { directorate, office_name, scheme_name, bank_name, scheme_desc } =
       req.body;
-    const office_details = await District.findOne({ name: office_name });
+    const office_details = await District.findOne({ _id: office_name });
     const scheme_details = await Scheme.findOne({ name: scheme_name });
-    const bank_details = await BankDetails.findOne({ accountNumber: bank_name });
+    const bank_details = await BankDetails.findOne({
+      accountNumber: bank_name,
+    });
 
     const schemeBankDetails = new SchemeBankMaster({
       office: office_details._id,
@@ -446,10 +477,11 @@ app.post("/cas/scheme2bank", async (req, res) => {
     scheme_details.bank = schemeBankDetails.bankId;
     scheme_details.save();
     schemeBankDetails.save();
-    bank_details.scheme=schemeBankDetails._id;
+    bank_details.scheme = schemeBankDetails._id;
     bank_details.save();
-
-    res.redirect("/cas/scheme2bank");
+    office_details.schemes.push(scheme_details._id);
+    office_details.save();
+    res.redirect("/cas/directorate/scheme2bank");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -489,6 +521,56 @@ app.post("/cas/scheme2component", async (req, res) => {
   }
 });
 
+app.get(
+  "/cas/directorate/scheme2component",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const direcOfc = req.user.user.directorate;
+      const scheme_details = await Scheme.find({ directorate: direcOfc });
+      const schemeComponents = await SchemeComponentMaster.find({
+        directorate: direcOfc,
+      }).populate("scheme");
+
+      res.render("directorate/schemeComponent.ejs", {
+        scheme_details,
+        schemeComponents,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
+
+app.post(
+  "/cas/directorate/scheme2component",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { component_name, scheme_name, code, compo_desc } = req.body;
+      const direcOfc = req.user.user.directorate;
+      // const directorate_data= await Directorate.find()
+      // const district_office=await District.find()
+      // const bank_details=await BankDetails.find()
+      const scheme_value = await Scheme.findOne({ _id: scheme_name });
+      const new_Component = new SchemeComponentMaster({
+        directorate: direcOfc,
+        name: component_name,
+        code: code,
+        scheme: scheme_value._id,
+        desc: compo_desc,
+      });
+      new_Component.save();
+      scheme_value.components.push(new_Component._id);
+      scheme_value.save();
+      res.redirect("/cas/directorate/scheme2component");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
 
 app.get("/cas/directorate/payment", isAuthenticated, async (req, res) => {
   try {
@@ -546,13 +628,13 @@ app.post("/cas/directorate/payment", async (req, res) => {
       desc,
     } = req.body;
     const directorate_data = await Directorate.findOne({ name: directorate });
-    const district_office = await District.findOne({ name: ofc_name });
-    const scheme_details = await Scheme.findOne({ name: schemeName });
+    const district_office = await District.findOne({ _id: ofc_name });
+    const scheme_details = await Scheme.findOne({ _id: schemeName });
     const finacialYearDetails = await FinancialYear.findOne({
       year: financial_year,
     });
     const bnkDetails = await SchemeBankMaster.findOne({
-      office: district_office._id,
+      office: ofc_name,
       scheme: scheme_details._id,
     }).populate("bankId");
     console.log(`BANK MAPPING`, bnkDetails);
@@ -613,7 +695,7 @@ app.post("/cas/directorate/payment", async (req, res) => {
 app.get("/cas/directorate/payments/:schemeName", async (req, res) => {
   try {
     const schemeName = req.params.schemeName;
-    const componentData = await Scheme.findOne({ name: schemeName }).populate(
+    const componentData = await Scheme.findOne({ _id: schemeName }).populate(
       "components"
     );
     res.json(componentData);
@@ -629,13 +711,14 @@ app.get(
     try {
       const { officeName, schemeName } = req.params;
       console.log(officeName, schemeName);
-      const ofcId = await District.findOne({ name: officeName })
-      const schmId = await Scheme.findOne({ _id:schemeName })
-      
+      const ofcId = await District.findOne({ _id: officeName });
+      const schmId = await Scheme.findOne({ _id: schemeName });
+
       const bnkDetails = await SchemeBankMaster.findOne({
-        scheme:schemeName,
-      }).populate('bankId')
-      console.log(`schemeeeee`,bnkDetails)
+        scheme: schmId,
+        office: ofcId,
+      }).populate("bankId");
+      console.log(`schemeeeee`, bnkDetails);
       res.json(bnkDetails);
       //  const componentData = await Scheme.findOne({ name: schemeName }).populate('components');
       //  res.json(componentData)
@@ -657,6 +740,9 @@ app.get("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
     }
 
     const directorateOfc = req.user.user.directorate;
+    const receiptDetails = await DirReceipt.find({
+      directorate: directorateOfc,
+    });
     const financialYear = await FinancialYear.find();
     const directorateData = await Directorate.findOne({ _id: directorateOfc })
       .populate("bank")
@@ -668,6 +754,7 @@ app.get("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       modeofpmnt,
       financialYear,
       voucherNo,
+      receiptDetails,
     });
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -698,12 +785,15 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       year: financialYear,
     });
     const purposeAbbr = purpose.substring(0, 3).toUpperCase();
-    const directorateData = await Directorate.findOne({ name: directorate })
-    .populate("department");
-    
-    
-    const receiverBankDetails=await BankDetails.findOne({directorate:directorateData._id, accountNumber:receiver_bank})
-   
+    const directorateData = await Directorate.findOne({
+      name: directorate,
+    }).populate("department");
+
+    const receiverBankDetails = await BankDetails.findOne({
+      directorate: directorateData._id,
+      accountNumber: receiver_bank,
+    });
+
     const recCounter = await DirRecCounter.findOneAndUpdate(
       {
         directorate,
@@ -716,7 +806,6 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
     );
     const directorate_abbvr = directorateData.name.slice(0, 3).toUpperCase();
     const source_abbvr = source.slice(0, 3).toUpperCase();
-   
 
     const voucherNo = generateRecVoucherNumber(
       directorate_abbvr,
@@ -761,7 +850,9 @@ app.get(
     try {
       const financialYear = await FinancialYear.find();
       const directorateOfc = req.user.user.directorate;
-      const opngBalance=await DirOpeningBalance.find({directorate:directorateOfc}).populate('bank')
+      const opngBalance = await DirOpeningBalance.find({
+        directorate: directorateOfc,
+      }).populate("bank");
 
       console.log(`hasdhhasdgagdahda`, opngBalance.bank);
       const dirOfcDetails = await Directorate.findOne({ _id: directorateOfc });
@@ -773,7 +864,7 @@ app.get(
         dirOfcDetails,
         financialYear,
         bnkDetails,
-        opngBalance
+        opngBalance,
       });
     } catch (error) {
       console.error(error);
@@ -970,10 +1061,10 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
-    const directorate_abbvr =( directorate_data.name).slice(0, 3).toUpperCase();
-    const district_abbvr = (district_office.name).slice(0, 3).toUpperCase();
-    const scheme_abbvr =( scheme_details.name).slice(0, 3).toUpperCase();
-      const voucherNo = generateDisRecVoucherNumber(
+    const directorate_abbvr = directorate_data.name.slice(0, 3).toUpperCase();
+    const district_abbvr = district_office.name.slice(0, 3).toUpperCase();
+    const scheme_abbvr = scheme_details.name.slice(0, 3).toUpperCase();
+    const voucherNo = generateDisRecVoucherNumber(
       directorate_abbvr,
       district_abbvr,
       scheme_abbvr,
@@ -1085,6 +1176,21 @@ app.post("/cas/district/benificiary", isAuthenticated, async (req, res) => {
   }
 });
 
+app.get("/cas/district/payment-approval", isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+
+    const paymentDetails = await DisPayment.find({ office_name: office_Id })
+      .populate("office_name")
+      .populate("scheme")
+      .populate("beneficiary");
+    res.render("districtOffice/paymentApproval", { paymentDetails });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Failed to fetch data from the database." });
+  }
+});
+
 app.get("/cas/district/purpose", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
@@ -1193,7 +1299,7 @@ app.get("/cas/district/payment", isAuthenticated, async (req, res) => {
       .populate("beneficiary")
       .populate("financial_year");
 
-      console.log(`paymentdetails`,paymentDetails)
+    console.log(`paymentdetails`, paymentDetails);
 
     const office_details = await District.findOne({ _id: office_Id })
       .populate("bank")
@@ -1262,9 +1368,8 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     const scheme_abbvr = scheme.slice(0, 3).toUpperCase();
     const component_abbr = components_name.slice(0, 3).toUpperCase();
     const benificiary = beneficiary.slice(0, 4).toUpperCase();
-    
 
-      const voucherNo =generateDisPayVoucherNumber(
+    const voucherNo = generateDisPayVoucherNumber(
       district_abbvr,
       benificiary,
       scheme_abbvr,
@@ -1320,12 +1425,14 @@ app.get("/cas/district/advance", isAuthenticated, async (req, res) => {
     const modeofpmnt = await modeofPayment.find();
     const benificiaryData = await Beneficiary.find({ office_name: office_Id });
     const financialYear = await FinancialYear.find();
+    const advanceDetails=await Advance.find({office:office_Id }).populate('office').populate('party').populate('purpose')
 
     res.render("districtOffice/advance", {
       office_details,
       modeofpmnt,
       financialYear,
       voucherNo,
+      advanceDetails
     });
   } catch (error) {
     console.error(error);
@@ -1381,19 +1488,16 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
 
-    console.log(`counterr`,advCounter.count)
-    const office_abbvr= (office_details.name).slice(0,3).toUpperCase()
-    
-    
-      const voucherNo = generateDisAdvVoucherNumber(
-        office_abbvr,
-        party,
-        purposeId.abbvr,
-        financial_year,
-        advCounter.count,
-      );
-    
- 
+    console.log(`counterr`, advCounter.count);
+    const office_abbvr = office_details.name.slice(0, 3).toUpperCase();
+
+    const voucherNo = generateDisAdvVoucherNumber(
+      office_abbvr,
+      party,
+      purposeId.abbvr,
+      financial_year,
+      advCounter.count
+    );
 
     const newAdvanceVoucher = new Advance({
       date,
@@ -1408,7 +1512,7 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       partyBank,
       amount,
       financial_year,
-      autoVoucherNo:voucherNo,
+      autoVoucherNo: voucherNo,
       status: "pending",
       desc,
     });
@@ -1423,14 +1527,153 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
   }
 });
 
+app.get(
+  "/cas/district/opening-balance/:schemeId",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const officeDetails = req.user.user.officeId;
+      const { schemeId } = req.params;
+      const bankDetails = await SchemeBankMaster.findOne({
+        office: officeDetails,
+        scheme: schemeId,
+      }).populate("bankId");
+      res.json(bankDetails);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
+app.get("/cas/district/bank", isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+    const officeId = req.user.user.officeId;
+    const directorate = await Directorate.findOne({ _id: directorateOfc });
+    const districts = await District.find({ _id: officeId });
+    const bankDetails = await BankDetails.find({
+      office: officeId,
+    }).populate("office");
+
+    res.render("districtOffice/bank", { directorate, districts, bankDetails });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/bank", isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+    const districtOfc = req.user.user.officeId;
+    const {
+      bankName,
+      Ifsc_code,
+      branchName,
+      accountNo,
+      directorate,
+      district_office,
+      address,
+    } = req.body;
+    const direcOfc = await Directorate.findOne({ _id: directorateOfc });
+
+    distOfc = await District.findOne({ _id: districtOfc });
+
+    const bankMaster = new BankDetails({
+      directorate: direcOfc?._id,
+      office: districtOfc,
+      bank: bankName,
+      accountNumber: accountNo,
+      IFSCNumber: Ifsc_code,
+      balance: 0,
+      branch: branchName,
+      address: address,
+    });
+    distOfc.bank.push(bankMaster._id);
+    distOfc.save();
+
+    bankMaster.save();
+    res.status(200).redirect("/cas/directorate/bank");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/cas/district/scheme2bank", isAuthenticated, async (req, res) => {
+  try {
+    const direcOfc = req.user.user.directorate;
+    const distOfc = req.user.user.officeId;
+    const directorate_data = await Directorate.findOne({ _id: direcOfc });
+    const district_office = await District.findOne({ _id:distOfc});
+    const bank_details = await BankDetails.find({ office:distOfc});
+    const scheme_details = await Scheme.find({ directorate: direcOfc });
+    const schemeBankDetails = await SchemeBankMaster.find({
+      office:distOfc,
+    })
+      .populate("directorate")
+      .populate("bankId")
+      .populate("office")
+      .populate("scheme");
+
+    res.render("districtOffice/schemeBank.ejs", {
+      directorate_data,
+      bank_details,
+      scheme_details,
+      district_office,
+      schemeBankDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/scheme2bank",isAuthenticated, async (req, res) => {
+  try {
+    const direcOfc = req.user.user.directorate;
+    const distOfc = req.user.user.officeId;
+    const { directorate, office_name, scheme_name, bank_name, scheme_desc } =
+      req.body;
+    const office_details = await District.findOne({ _id: distOfc });
+    const scheme_details = await Scheme.findOne({ name: scheme_name });
+    const bank_details = await BankDetails.findOne({
+      accountNumber: bank_name,
+    });
+
+    const schemeBankDetails = new SchemeBankMaster({
+      office: distOfc,
+      directorate: direcOfc,
+      scheme: scheme_details._id,
+      bankId: bank_details._id,
+      description: scheme_desc,
+    });
+    scheme_details.bank = schemeBankDetails.bankId;
+    scheme_details.save();
+    schemeBankDetails.save();
+    bank_details.scheme = schemeBankDetails._id;
+    bank_details.save();
+    office_details.schemes.push(scheme_details._id);
+    office_details.save();
+    res.redirect("/cas/district/scheme2bank");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 app.get("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
-    const openingBal = await OpeningBalance.find({ office: office_Id });
-    const ofcDetails = await District.findOne({ _id: office_Id }).populate(
-      "bank"
-    );
-    const bnkdetails = await BankDetails.find({ _id: openingBal.bank });
+    const openingBal = await OpeningBalance.find({ office: office_Id })
+      .populate("bank")
+      .populate("scheme");
+    const ofcDetails = await District.findOne({ _id: office_Id })
+      .populate("bank")
+      .populate("schemes");
+    console.log(ofcDetails);
+    const bnkdetails = await BankDetails.findOne({ _id: openingBal.bank });
 
     res.render("districtOffice/opening-balance", {
       ofcDetails,
@@ -1445,26 +1688,44 @@ app.get("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
 
 app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
   try {
-    const { date, cash, bank, bank_balance, advance } = req.body;
-    const office_Id = req.user.user.officeId;
-    const ofcDetails = await District.findOne({ _id: office_Id }).populate(
-      "bank"
+    const office_id = req.user.user.officeId;
+    const openingBalData = req.body;
+
+    const newOpeningBalances = await Promise.all(
+      openingBalData.scheme.map(async (scheme, index) => {
+        const cash = openingBalData.cash[index];
+        const bank = openingBalData.bank[index];
+        const bank_balance = openingBalData.bank_balance[index];
+        const advance = openingBalData.advance[index];
+
+        // Process bank details and update balance
+        const bnkDetails = await BankDetails.findOne({ accountNumber: bank });
+        bnkDetails.balance =
+          parseInt(bnkDetails.balance) + parseInt(bank_balance);
+        await bnkDetails.save();
+
+        // Create and save opening balance entry
+        const newOpeningBal = new OpeningBalance({
+          date: Date.now(),
+          scheme,
+          cash: parseInt(cash),
+          office: office_id,
+          bank: bnkDetails._id,
+          advance: parseInt(advance),
+        });
+        await newOpeningBal.save();
+
+        return newOpeningBal;
+      })
     );
 
-    const bnkDetails = await BankDetails.findOne({ bank: bank });
-    console.log(bnkDetails.balance);
-    bnkDetails.balance = parseInt(bnkDetails.balance) + parseInt(bank_balance);
-    bnkDetails.save();
-    const newOpeningbal = new OpeningBalance({
-      date,
-      cash: parseInt(cash),
-      office: office_Id,
-      bank: bnkDetails._id,
-      advance: parseInt(advance),
-    });
-    newOpeningbal.save();
-    ofcDetails.openingBalance.push(newOpeningbal._id);
-    ofcDetails.save();
+    // Update office details with new opening balance IDs
+    const ofcDetails = await District.findOne({ _id: office_id });
+    ofcDetails.openingBalance.push(
+      ...newOpeningBalances.map((entry) => entry._id)
+    );
+    await ofcDetails.save();
+
     res.redirect("/cas/district/opening-balance");
   } catch (error) {
     console.error(error);
@@ -1477,6 +1738,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
-
 
 //203.193.144.19:80

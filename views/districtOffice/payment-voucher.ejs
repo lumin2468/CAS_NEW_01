@@ -63,7 +63,7 @@
                         <select class="form-control" id="schemeSelect" name='scheme'>
                             <option>Select</option>
                             <% for( let sch of office_details.schemes ) { %>
-                                <option value="<%= sch.name %>" <%=office_details.schemes.name === sch.name ? 'selected': '' %> ><%= sch.name %></option>
+                                <option value="<%= sch._id %>" <%=office_details.schemes.name === sch.name ? 'selected': '' %> ><%= sch.name %></option>
                             <% } %>
                           </select>
                        
@@ -83,7 +83,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Office Name<span class="text-danger">*</span></label>
-                        <input type="text" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                        <input type="text" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                        <input type="text" hidden="true" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details._id %>">
                     </div>
                 </div>
                 
@@ -101,10 +102,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
-                        <select class="form-control" id="ofcBnkSelect" name="from_bank">
-                            <option>Select</option>
-                            
-                          </select>
+                        <input type="text" class="form-control" id="ofcBnkSelect"  readonly="'true" >
+                        <input type="text" hidden="true" id="officeBnkId"  class="form-control" readonly="'true" name="office_name">
                     </div>
                 </div>
                 
@@ -124,7 +123,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label class="form-label"> Financial-year <span class="text-danger">*</span></label>
-                        <select class="form-control" id="officeSelect" name="financial_year" >
+                        <select class="form-control" name="financial_year" >
                             <% for( let fny of financialYear ) { %>
                                 <option value="<%= fny.year %>" <%= financialYear.year === fny.year ? 'selected': '' %> ><%= fny.year %></option>
                             <% } %>
@@ -168,7 +167,7 @@
                         <% for( let[index, paymntDtls] of paymentDetails.entries()) { %>
                         <tr>
                             <td><%= index+1 %></td>
-                            <td><%= paymntDtls.scheme.name  %></td>
+                            <td><%= paymntDtls?.scheme?.name%></td>
                             <td><%= paymntDtls.components_name %></td>
                             <td><%= paymntDtls.beneficiary.benificiary_name %></td>
                             <td><%= paymntDtls.autoVoucherNo  %>t</td>
@@ -218,6 +217,7 @@
       const tableBody = document.getElementById('componentSelect');
       const officeSelect= document.getElementById('officeSelect');
       const ofcBnkSelect = document.getElementById('ofcBnkSelect');
+      const ofcBnkId = document.getElementById('officeBnkId');
       const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('transaction_id');
       const transactionDate = document.getElementById('transaction_date');
@@ -288,8 +288,8 @@
         const data = await response.json();
         console.log(`fetched data`, data);
         // Update the select element with the fetched data
-        ofcBnkSelect.innerHTML = data
-          .map((bnk) => `<option value=${bnk.bankId.bank}>${bnk.bankId.bank}</option>`);
+        ofcBnkSelect.value=data.bankId.bank
+        ofcBnkId.value=data.bankId._id
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -20,11 +20,11 @@
     <h4 class="mb-5">Opening Balance</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/district/opening-balance" method="post">
+            <form action="/cas/district/opening-balance" method="post" id="form">
             <table class="table table-bordered" id="tableBody">
                 <thead>
                     <tr>    
-                        <th>Date</th>
+                        <th>Scheme</th>
                         <th>Cash</th>
                         <th>Bank</th>
                         <th>Bank Balance</th>
@@ -35,16 +35,18 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="date" class="form-control" name="date" ></td>
-                        <td><input type="text" class="form-control" name="cash" ></td>
                         <td>
-                            <select class="form-control" name="bank">
+                         <select class="form-control schemeDtls" name="scheme">
                                 <option>Select</option>
-                                <% for( let disbnk of ofcDetails.bank ) { %>
-                                    <option value="<%= disbnk.bank %>" <%= ofcDetails.bank === disbnk.bank ? 'selected': '' %> ><%= disbnk.bank %></option>
+                                <% for( let disScm of ofcDetails.schemes) { %>
+                                    <option value="<%= disScm?._id %>" <%= ofcDetails?.name === disScm?.name ? 'selected': '' %> ><%= disScm?.name%></option>
                                 <% } %>
                             </select>
                         </td>
+                        <td><input type="text" class="form-control" name="cash" ></td>
+                        <td> <select class="form-control bankDetails" name="bank">
+                           
+                        </select></td>
                         <td><input type="text" class="form-control" name="bank_balance" ></td>
                         <td><input type="text" class="form-control" name="advance" ></td>
                        
@@ -61,12 +63,13 @@
             </table>
             <div style="display: flex; flex-direction: row; justify-content: center; gap:15px">
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">SUBMIT</button>
+                    <button id="submitBtn" class="btn btn-primary">SUBMIT</button>
                 </div>
-                <div class="text-center">
-                    <button class="btn btn-primary" id="addMore">ADD MORE</button>
-                </div>
+                
             </form>
+            <div class="text-center">
+                <button class="btn btn-primary" id="addMore">ADD MORE</button>
+            </div>
         </div>
         </div>
     </div>
@@ -78,7 +81,7 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Date</th>
+                            <th>Scheme</th>
                             <th>Cash</th>
                             <th>Bank Name</th>
                             <th>Bank Balance</th>
@@ -87,13 +90,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <% for( let[index, oB] of openingBal.entries()) { %>
                         <tr>
-                            <% for( let[index, oB] of openingBal.entries()) { %>
-                            <td><%= index+1  %></td>
-                            <td><%= oB.date %></td>
-                            <td><%= oB.cash  %></td>
-                            <td><%= oB.bank %></td>
-                            <td></td>
+                            <td><%=index+1  %></td>
+                            <td><%=oB?.scheme?.name %></td>
+                            <td><%=oB.cash  %></td>
+                            <td><%=oB.bank.bank %></td>
+                            <td><%=oB.bank.accountNumber %></td>
                             <td><%=oB.advance %></td>
                             <td>
                                 <div>
@@ -116,8 +119,8 @@
                                 </a>
                                 
                             </td>
-                            <% } %>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
@@ -130,20 +133,74 @@
 
 </body>
 <script>
-     const tableBody = document.getElementById('tableBody');
-      const add=document.getElementById('addMore')
+    const tableBody = document.getElementById('tableBody');
+    const add = document.getElementById('addMore');
+    const submitBtn = document.getElementById('submitBtn');
+    const schemeDetails = document.querySelector('.schemeDtls');
     
-      function addNewRow() {
-      const lastRow = tableBody.lastElementChild;
-      const newRow = lastRow.cloneNode(true);
+    const addBank = async (event, bnkData, selectedScheme) => {
+        if (selectedScheme === "Select") {
+            bnkData.innerHTML = "";
+        }
+        const response = await fetch(`/cas/district/opening-balance/${selectedScheme}`);
+        const data = await response.json();
+        bnkData.innerHTML = `<option value=${data.bankId.accountNumber}>${data.bankId.bank}</option>`;
+    };
+    
+    function addNewRow(event) {
+        event.preventDefault();
+        const lastRow = tableBody.lastElementChild;
+        const newRow = lastRow.cloneNode(true);
 
-      const inputs = newRow.querySelectorAll('input[type="text"], input[type="date"]');
-      inputs.forEach((input) => (input.value = ''));
-  
-      tableBody.appendChild(newRow);
+        const inputs = newRow.querySelectorAll('input[type="text"]');
+        inputs.forEach((input) => (input.value = ''));
+        
+        const bankSelect = newRow.querySelector('.bankDetails');
+        const schmSelect = newRow.querySelector('.schemeDtls');
+        
+        schmSelect.innerHTML = `<% for( let disScm of ofcDetails.schemes) { %>
+            <option value="<%= disScm?._id %>" <%= ofcDetails?.name === disScm?.name ? 'selected': '' %> ><%= disScm?.name%></option>
+        <% } %>`;
+        
+        bankSelect.innerHTML = "";
+        tableBody.appendChild(newRow);
+        
+        const newSchemeSelect = newRow.querySelector('.schemeDtls');
+        const newBankSelect = newRow.querySelector('.bankDetails');
+        
+        newSchemeSelect.addEventListener('change', (event) => {
+            addBank(event, newBankSelect, newSchemeSelect.value);
+        });
     }
-    add.addEventListener('click',addNewRow)
-  </script>
+
+    add.addEventListener('click', addNewRow);
+    schemeDetails.addEventListener('change', (event) => {
+        const bankSelect = document.querySelector('.bankDetails');
+        addBank(event, bankSelect, schemeDetails.value);
+    });
+
+    submitBtn.addEventListener('click', async (event) => {
+        
+        try {
+            const form = document.getElementById('form');
+            const formData = new FormData(form);
+            const response = await fetch("/cas/district/opening-balance", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                // Success! You can redirect or show a success message
+                window.location.href = "/cas/district/opening-balance";
+            } else {
+                // Handle error here
+                console.error("Error submitting form");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
+</script>
   
   
 </html>
