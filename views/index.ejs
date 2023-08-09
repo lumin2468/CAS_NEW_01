@@ -1,105 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Document</title>
-  </head>
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <link rel="shortcut icon" href="assets/images/favicon.png">
+      <link rel="stylesheet" href="assets/css/core/libs.min.css">
+      <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+      <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+      <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+      <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+      <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
   <body>
-    <div class="flex flex-row h-full bg-white">
-      <!-- left side start-->
-      <div class="left w-1/2">
-        <img src="./01.png" alt="" />
+    <!-- loader Start -->
+    <div id="loading">
+      <div class="loader simple-loader">
+          <div class="loader-body ">
+              <img src="assets/images/loader.webp" alt="loader" class="image-loader img-fluid ">
+          </div>
       </div>
-      <!-- left side end-->
-
-      <!-- right side start-->
-
-      <div class="right w-1/2 flex flex-col gap-7 pt-10">
-        <!-- upper part with logo and text start -->
-        <div class="flex justify-center items-center flex-col">
-          <img src="./odisha_logo_login.png" alt="" />
-          <h2 class="text-blue-500 text-2xl">Cashbook Analytics System</h2>
-          <h6>Statewide Integrated Scheme Based Cash Book Management System</h6>
-        </div>
-        <!-- upper part with logo and text end -->
-
-        <!-- form start -->
-        <div class="form flex-col flex items-center">
-          <div class="pl-20 pr-20 pb-5 pt-5 shadow-2xl">
-            <div class="flex flex-col justify-center items-center pb-3">
-              <h2 class="text-3xl mb-2">Sign In</h2>
-              <h5>Login to stay connected.</h5>
+    </div>
+    <!-- loader END -->
+    <div class="wrapper">
+      <section class="login-content overflow-hidden">
+         <div class="row no-gutters align-items-center bg-white">
+            <div class="col-lg-6 d-lg-block d-none bg-primary p-0  overflow-hidden">
+               <img src="assets/images/01.png" class="img-fluid gradient-main" alt="images" loading="lazy" >
             </div>
-            <form action="/cas/login" method="POST" novalidate class="flex flex-col gap-4">
-              <div class="flex flex-col">
-                <label class="pb-2" for="">User Type</label>
-                <select
-                  name="userType"
-                  id="userType"
-                  class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-80 rounded-md sm:text-sm focus:ring-1"
-                >
-                <% for( let desig of designation ) { %>
+            <div class="col-md-12 col-lg-6 align-self-center">
+               <div class="navbar-brand d-flex align-items-center justify-content-center text-primary">
+                  <div class="login-logo text-center">
+                     <img src="assets/images/odisha_logo_login.png" class="img-fluid">
+                     <h2 class="text-primary mt-2">Cashbook Analytics System</h2>
+                     <h6 class="mt-2 ms-3 mb-0 text-muted">Statewide Integrated Scheme Based Cash Book Management System</h6>
+                  </div>
+               </div>
+               <div class="row justify-content-center pt-5">
+                  <div class="col-md-9">
+                     <div class="card  d-flex justify-content-center mb-0 auth-card iq-auth-form">
+                        <div class="card-body">
+                           <h2 class="mb-2 text-center">Sign In</h2>
+                           <p class="text-center">Login to stay connected.</p>
+                           <form action="/cas/login" method="POST" novalidate >
+                              <div class="row">
+                                 <div class="col-lg-12">
+                                    <div class="form-group">
+                                       <label class="form-label">User Type</label>
+                                       <select class="form-control" name="userType">
+                                       <% for( let desig of designation ) { %>
                     <option value="<%= desig.name %>" <%= designation.name === desig.name ? 'selected': '' %> ><%= desig.name %></option>
                 <% } %>
-                </select>
-              </div>
-              <div class="flex flex-col">
-                <label class="block">
-                  <span
-                    class="after:ml-0.5 after:text-red-500 block text-sm font-medium text-slate-700"
-                  >
-                    Username
-                  </span>
-                  <input
-                    type="text"
-                    name="email"
-                    class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
-                    placeholder="Enter username"
-                  />
-                </label>
-              </div>
-              <div class="flex flex-col">
-                <label class="block">
-                  <span
-                    class="after:ml-0.5 after:text-red-500 block text-sm font-medium text-slate-700"
-                  >
-                    Password
-                  </span>
-                  <input
-                    type="password"
-                    name="password"
-                    class="mt-1 px-3 py-2 bg-white border shadow-sm border-slate-300 placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full rounded-md sm:text-sm focus:ring-1"
-                    placeholder="Enter password"
-                  />
-                </label>
-              </div>
-              <div class="flex flex-row justify-between">
-                <div>
-                  <input type="checkbox" name="" id="" />
-                  <label for="">Remember Me</label>
-                </div>
-                <div>
-                  <a class="text-blue-500 hover:text-red-700" href="#"
-                    >Forgot Password?</a
-                  >
-                </div>
-              </div>
-              <div class="flex justify-center items-center pt-5">
-                  <button
-                  class="bg-blue-500 px-4 py-2 text-white border-2 rounded-md hover:bg-blue-700"
-                  >
-                  Sign In
-                </button>
+                                       </select>
+                                    </div>
+                                 </div>
+                                 <div class="col-lg-12">
+                                    <div class="form-group">
+                                       <label class="form-label">Username</label>
+                                       <input type="text" class="form-control" name="email" placeholder="Enter Username">
+                                    </div>
+                                 </div>
+                                 <div class="col-lg-12">
+                                    <div class="form-group">
+                                       <label class="form-label">Password</label>
+                                       <input type="password" name="password" class="form-control" placeholder="Enter Password">
+                                    </div>
+                                 </div>
+                                 <div class="col-lg-12 d-flex justify-content-between">
+                                    <div class="form-check mb-3">
+                                       <input type="checkbox" class="form-check-input" id="customCheck1">
+                                       <label class="form-check-label" for="customCheck1">Remember Me</label>
+                                    </div>
+                                    <a href="#">Forgot Password?</a>
+                                 </div>
+                              </div>
+                              <div class="d-flex justify-content-center">
+                                 <button type="submit" class="btn btn-primary" onclick="javascript:goToProperPage();">Sign In</button>
+                              </div>
+                           </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </div>
-        </form>
-          </div>
-        </div>
-        <!-- form end -->
-      </div>
-
-      <!-- right side end-->
+         </div>
+      </section>
     </div>
-  </body>
+
+<script src="assets/js/core/libs.min.js"></script>
+<script src="assets/js/plugins/slider-tabs.js"></script>
+<script src="assets/vendor/lodash/lodash.min.js"></script>
+<script src="assets/js/iqonic-script/utility.min.js"></script>
+<script src="assets/js/iqonic-script/setting.min.js"></script>
+<script src="assets/js/setting-init.js"></script>
+<script src="assets/js/core/external.min.js"></script>
+<script src="assets/js/charts/widgetchartsf700.js?v=1.0.1" defer></script>
+<script src="assets/js/charts/dashboardf700.js?v=1.0.1" defer></script>
+<script src="assets/js/qompac-uif700.js?v=1.0.1" defer></script>
+<script src="assets/js/sidebarf700.js?v=1.0.1" defer></script>
+
+
+
+</body>
 </html>

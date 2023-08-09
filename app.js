@@ -124,6 +124,15 @@ store.on("error", function (error) {
   console.error("MongoDB Session Store Error:", error);
 });
 
+
+app.use((req, res, next) => {
+  if (!req.session.isAuthenticated && req.path !== '/login') {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
 // Define routes
 app.get("/cas", async (req, res) => {
   const designation = await Designation.find();
@@ -224,6 +233,20 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
     // Handle other designations or unknown designation
     res.status(403).json({ message: "Forbidden" });
   }
+});
+
+
+app.get('/cas/logout', async(req, res) => {
+  const designation = await Designation.find();
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      res.status(500).send('Error logging out');
+    } else {
+      
+      res.render("index", { designation });
+    }
+  });
 });
 
 // // Example route to get all departments
