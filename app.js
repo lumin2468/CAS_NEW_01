@@ -124,12 +124,11 @@ store.on("error", function (error) {
   console.error("MongoDB Session Store Error:", error);
 });
 
-
 app.use((req, res, next) => {
-  if (!req.session.isAuthenticated && req.path !== '/login') {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+  if (!req.session.isAuthenticated && req.path !== "/login") {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
   }
   next();
 });
@@ -235,15 +234,13 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
   }
 });
 
-
-app.get('/cas/logout', async(req, res) => {
+app.get("/cas/logout", async (req, res) => {
   const designation = await Designation.find();
-  req.session.destroy(err => {
+  req.session.destroy((err) => {
     if (err) {
-      console.error('Error destroying session:', err);
-      res.status(500).send('Error logging out');
+      console.error("Error destroying session:", err);
+      res.status(500).send("Error logging out");
     } else {
-      
       res.render("index", { designation });
     }
   });
@@ -1009,7 +1006,7 @@ app.get("/cas/district/receipt", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
     const distOfc = req.user.user.officeId;
-    const distOfcRecData = await DisReceipt.find({office_name:distOfc})
+    const distOfcRecData = await DisReceipt.find({ office_name: distOfc })
       .populate("directorate")
       .populate("office_name")
       .populate("scheme")
@@ -1060,7 +1057,7 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       desc,
     } = req.body;
 
-    const officeId=req.user.user.officeId
+    const officeId = req.user.user.officeId;
     const directorate_data = await Directorate.findOne({ name: directorate });
     const district_office = await District.findOne({ _id: officeId });
     const scheme_details = await Scheme.findOne({ _id: scheme });
@@ -1078,7 +1075,7 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
     const counter = await DisRecCounter.findOneAndUpdate(
       {
         directorate,
-        district:district_office.name ,
+        district: district_office.name,
         scheme: scheme_details.name,
         financialYear: financial_year,
       },
@@ -1128,9 +1125,9 @@ app.get("/cas/district/receipt/:id", async (req, res) => {
   try {
     let voucherNo = "";
     const id = req.params.id;
-    const distOfcRecData=[]
+    const distOfcRecData = [];
     const financialYear = await FinancialYear.find();
-    const receiptDetails = await DirPayment.findOne({_id:id})
+    const receiptDetails = await DirPayment.findOne({ _id: id })
       .populate("directorate")
       .populate("distOfcName")
       .populate("scheme")
@@ -1225,7 +1222,7 @@ app.post("/cas/district/payment-approval/:paymentId", async (req, res) => {
   try {
     // Update the payment status in the database based on the paymentId
     await DisPayment.findByIdAndUpdate(paymentId, { status: newStatus });
-    res.redirect(req.get('referer'));
+    res.redirect(req.get("referer"));
   } catch (error) {
     console.error("Error updating payment status:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1396,7 +1393,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     const counter = await DisPayCounter.findOneAndUpdate(
       {
         district: districtDetails.name,
-        scheme:schemeDetails.name ,
+        scheme: schemeDetails.name,
         component: components_name,
         beneficiary: beneficiary,
         financialYear: financialYear.year,
@@ -1466,14 +1463,17 @@ app.get("/cas/district/advance", isAuthenticated, async (req, res) => {
     const modeofpmnt = await modeofPayment.find();
     const benificiaryData = await Beneficiary.find({ office_name: office_Id });
     const financialYear = await FinancialYear.find();
-    const advanceDetails=await Advance.find({office:office_Id }).populate('office').populate('party').populate('purpose')
+    const advanceDetails = await Advance.find({ office: office_Id })
+      .populate("office")
+      .populate("party")
+      .populate("purpose");
 
     res.render("districtOffice/advance", {
       office_details,
       modeofpmnt,
       financialYear,
       voucherNo,
-      advanceDetails
+      advanceDetails,
     });
   } catch (error) {
     console.error(error);
@@ -1568,6 +1568,60 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
   }
 });
 
+app.get("/cas/district/adjustment", isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+
+    let voucherNo = "";
+
+    // if (req.query.voucher) {
+    //   voucherNo = req.query.voucher;
+    // }
+    const office_details = await District.findOne({ _id: office_Id })
+      .populate("bank")
+      .populate("purpose")
+      .populate("vendor");
+    const modeofpmnt = await modeofPayment.find();
+    const financialYear = await FinancialYear.find();
+    const advanceDetails = await Advance.find({ office: office_Id })
+      .populate("office")
+      .populate("party")
+      .populate("purpose");
+
+    res.render("districtOffice/adjustment", {
+      office_details,
+      modeofpmnt,
+      financialYear,
+      advanceDetails,
+      voucherNo,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get(
+  "/cas/district/adjustment/:voucherDetails",
+  isAuthenticated,
+  async (req, res) => {
+    const voucherDetails = req.params.voucherDetails;
+    const office_Id = req.user.user.officeId;
+    const advanceData = await Advance.findOne({
+      office: office_Id,
+      autoVoucherNo: voucherDetails,
+    })
+      .populate("purpose")
+      .populate("party")
+      .populate("from_bank");
+
+    // Now you can use the voucherDetails parameter value to fetch data from your database or perform any other actions.
+    // For now, let's just send a simple response with the voucherDetails value.
+    console.log(advanceData);
+    res.json(advanceData);
+  }
+);
+
 app.get(
   "/cas/district/opening-balance/:schemeId",
   isAuthenticated,
@@ -1646,11 +1700,11 @@ app.get("/cas/district/scheme2bank", isAuthenticated, async (req, res) => {
     const direcOfc = req.user.user.directorate;
     const distOfc = req.user.user.officeId;
     const directorate_data = await Directorate.findOne({ _id: direcOfc });
-    const district_office = await District.findOne({ _id:distOfc});
-    const bank_details = await BankDetails.find({ office:distOfc});
+    const district_office = await District.findOne({ _id: distOfc });
+    const bank_details = await BankDetails.find({ office: distOfc });
     const scheme_details = await Scheme.find({ directorate: direcOfc });
     const schemeBankDetails = await SchemeBankMaster.find({
-      office:distOfc,
+      office: distOfc,
     })
       .populate("directorate")
       .populate("bankId")
@@ -1670,7 +1724,7 @@ app.get("/cas/district/scheme2bank", isAuthenticated, async (req, res) => {
   }
 });
 
-app.post("/cas/district/scheme2bank",isAuthenticated, async (req, res) => {
+app.post("/cas/district/scheme2bank", isAuthenticated, async (req, res) => {
   try {
     const direcOfc = req.user.user.directorate;
     const distOfc = req.user.user.officeId;
@@ -1702,7 +1756,6 @@ app.post("/cas/district/scheme2bank",isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 app.get("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
   try {
