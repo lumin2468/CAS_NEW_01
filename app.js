@@ -183,6 +183,7 @@ app.post(
       // Create JWT token
       const payload = {
         user: {
+          username:user.name,
           id: user._id,
           designation: user.designation,
           directorate: user.directorateId,
@@ -220,13 +221,20 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
   if (designation.name === "Admin") {
     res.render("dashboard", {
       username: req.user.username,
+      designation:req.user.designation.name
     });
   } else if (designation.name === "Director") {
-    res.render("directorate/dashboard");
-  } else if (designation.name === "DFO") {
+    const {username}=req.user
+    res.render("directorate/dashboard",{
+      username,
+      designation:req.user.designation.name
+    });
+  } else if (designation.name === "DFO" || designation.name === "CDVO") {
+    const {username}=req.user
     res.render(`districtOffice/district_office`, {
       title: "Dashboard",
-      username: req.user.username,
+      username,
+      designation:req.user.designation.name
     });
   } else {
     // Handle other designations or unknown designation
