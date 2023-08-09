@@ -88,7 +88,7 @@
                     <a
                       class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
                       href="#"
-                      onclick="acknowledgePayment('<%= pmntd._id %>')"
+                      onclick="approvePayment('<%= pmntd._id %>')"
                       role="button"
                     >
                       <span class="btn-inner">
@@ -154,9 +154,9 @@
     <%- include('../Includes/footer.ejs')%>
   </body>
   <script>
-   async function acknowledgePayment(paymentId) {
+   async function approvePayment(paymentId) {
     try {
-      const response = await fetch(`/cas/district/payment/${paymentId}`, {
+      const response = await fetch(`/cas/district/payment-approval/${paymentId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

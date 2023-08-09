@@ -643,8 +643,8 @@ app.post("/cas/directorate/payment", async (req, res) => {
     const counter = await DirCounter.findOneAndUpdate(
       {
         directorate,
-        district: ofc_name,
-        scheme: schemeName,
+        district: district_office.name,
+        scheme: scheme_details.name,
         financialYear: financial_year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
@@ -985,7 +985,8 @@ app.post("/cas/district/payment/:paymentId", async (req, res) => {
 app.get("/cas/district/receipt", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
-    const distOfcRecData = await DisReceipt.find()
+    const distOfc = req.user.user.officeId;
+    const distOfcRecData = await DisReceipt.find({office_name:distOfc})
       .populate("directorate")
       .populate("office_name")
       .populate("scheme")
@@ -1036,10 +1037,10 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       desc,
     } = req.body;
 
-    console.log(transaction_Id);
+    const officeId=req.user.user.officeId
     const directorate_data = await Directorate.findOne({ name: directorate });
-    const district_office = await District.findOne({ name: office_name });
-    const scheme_details = await Scheme.findOne({ name: scheme });
+    const district_office = await District.findOne({ _id: officeId });
+    const scheme_details = await Scheme.findOne({ _id: scheme });
     const finacialYearDetails = await FinancialYear.findOne({
       year: financial_year,
     });
@@ -1054,8 +1055,8 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
     const counter = await DisRecCounter.findOneAndUpdate(
       {
         directorate,
-        district: office_name,
-        scheme: scheme,
+        district:district_office.name ,
+        scheme: scheme_details.name,
         financialYear: financial_year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
@@ -1104,16 +1105,19 @@ app.get("/cas/district/receipt/:id", async (req, res) => {
   try {
     let voucherNo = "";
     const id = req.params.id;
+    const distOfcRecData=[]
     const financialYear = await FinancialYear.find();
-    const receiptDetails = await DirPayment.findById(id)
+    const receiptDetails = await DirPayment.findOne({_id:id})
       .populate("directorate")
       .populate("distOfcName")
       .populate("scheme")
       .populate("receiverBank")
+      .populate("senderBank")
       .populate("financialYear");
 
     res.render("districtOffice/receipt-voucher", {
       receiptDetails,
+      distOfcRecData,
       financialYear,
       voucherNo,
     });
@@ -1188,6 +1192,20 @@ app.get("/cas/district/payment-approval", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ error: "Failed to fetch data from the database." });
+  }
+});
+
+app.post("/cas/district/payment-approval/:paymentId", async (req, res) => {
+  const paymentId = req.params.paymentId;
+  const newStatus = req.body.status;
+
+  try {
+    // Update the payment status in the database based on the paymentId
+    await DisPayment.findByIdAndUpdate(paymentId, { status: newStatus });
+    res.redirect(req.get('referer'));
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -1344,7 +1362,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     } = req.body;
 
     const districtDetails = await District.findOne({ _id: office_Id });
-    const schemeDetails = await Scheme.findOne({ name: scheme });
+    const schemeDetails = await Scheme.findOne({ _id: scheme });
     const bankDetails = await SchemeBankMaster.findOne({
       office: districtDetails._id,
       scheme: schemeDetails._id,
@@ -1355,16 +1373,16 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     const counter = await DisPayCounter.findOneAndUpdate(
       {
         district: districtDetails.name,
-        scheme: scheme,
+        scheme:schemeDetails.name ,
         component: components_name,
         beneficiary: beneficiary,
-        financialYear: financialYear,
+        financialYear: financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
     );
 
-    const district_abbvr = office_name.slice(0, 3).toUpperCase();
+    const district_abbvr = districtDetails.name.slice(0, 3).toUpperCase();
     const scheme_abbvr = scheme.slice(0, 3).toUpperCase();
     const component_abbr = components_name.slice(0, 3).toUpperCase();
     const benificiary = beneficiary.slice(0, 4).toUpperCase();

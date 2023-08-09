@@ -54,12 +54,12 @@
                 <tr  data-payment-id="<%= pmntd._id %>">
                   <td><%= index+1 %></td>
                   <td><%=pmntd.distOfcName.name %></td>
-                  <td><%=pmntd.scheme.name %></td>
+                  <td><%=pmntd?.scheme?.name %></td>
                   <td><%=pmntd.autoVoucherNo %></td>
                   <td><%=pmntd.refVoucherNo %></td>
                   <td><%=pmntd.modeofPayment %></td>
                   <td><%=(pmntd.date).toLocaleDateString('en-GB') %></td>
-                  <td><%=pmntd.receiverBank.bank %></td>
+                  <td><%=pmntd?.receiverBank?.bank %></td>
                   <td><%=pmntd.amount %></td>
                   <% if (pmntd.status==='pending'){ %>
                   <td class="text-danger"><%=pmntd.status %></td>

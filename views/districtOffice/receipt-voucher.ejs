@@ -99,13 +99,14 @@
                     <div class="form-group">
                         <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
                         <% if (receiptDetails) { %>
-                        <input type="text" readonly="true" class="form-control" name="scheme" value="<%= (receiptDetails.scheme.name) %>">
+                        <input type="text" readonly="true" class="form-control" value="<%= (receiptDetails.scheme.name) %>">
+                        <input type="text" hidden="true" class="form-control" name="scheme" value="<%= (receiptDetails.scheme._id) %>">
                         <%}else{%>
                             <div class="flex flex-col p-2">
                             <select name="scheme" id="schemeSelect" class="form-control">
                                 <option>Select</option>
                                 <% for( let dis of distOfcDetails.schemes ) { %>
-                                    <option value="<%= dis.name %>" <%= distOfcDetails.schemes.name === dis.name ? 'selected': '' %> ><%= dis.name %></option>
+                                    <option value="<%= dis._id %>" <%= distOfcDetails.schemes.name === dis.name ? 'selected': '' %> ><%= dis.name %></option>
                                 <% } %>
                               </select>
                             </div>
@@ -129,7 +130,8 @@
                         <% if (receiptDetails) { %>
                         <input type="text" class="form-control" name="office_name" readonly="true" value="<%= (receiptDetails.distOfcName.name) %>" >
                         <%}else{%>
-                        <input type="text" id="officeSelect" class="form-control" name="office_name" value="<%= distOfcDetails.name %>">
+                        <input type="text"  class="form-control"  value="<%= distOfcDetails.name %>">
+                        <input type="text" hidden="true" id="officeSelect" class="form-control" name="office_name" value="<%= distOfcDetails._id %>">
                         <% } %>
                     </div>
                 </div>
@@ -137,7 +139,7 @@
                     <div class="form-group">
                         <label class="form-label"> Source Bank Details <span class="text-danger">*</span></label>
                         <% if (receiptDetails) { %>
-                            <input type="text" class="form-control" name="source_bank_details" >
+                            <input type="text" class="form-control" name="source_bank_details" value="<%= (receiptDetails.senderBank.bank)%>">
                         <%}else{%>
                             <input type="text" class="form-control" name="source_bank_details" >
 
@@ -150,10 +152,8 @@
                         <% if (receiptDetails) { %>
                         <input type="text" class="form-control" name="bankDetails" readonly="true" value="<%= (receiptDetails.receiverBank.bank) %>" >
                         <%}else{%>
-                            <select name="bankDetails" id="ofcBnkSelect" class="form-control">
-                                
-                               
-                              </select>
+                            <input type="text" id="bankDetails" class="form-control"  readonly="true"  >
+                            <input type="text" hidden="true" class="form-control" id="bankAccntNo" name="bankDetails" readonly="true"  >
                         <% } %>
                     </div>
                 </div> 
@@ -264,7 +264,8 @@
 <script>
     const schemeSelect = document.getElementById('schemeSelect');
     const officeSelect= document.getElementById('officeSelect');
-    const ofcBnkSelect = document.getElementById('ofcBnkSelect');
+    const ofcBnkSelect = document.getElementById('bankDetails');
+    const ofcBnkAccnt = document.getElementById('bankAccntNo');
     const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('transaction_Id');
       const transactionDate = document.getElementById('transaction_date');
@@ -293,10 +294,9 @@
           const response = await fetch(`/cas/directorate/payments/bank/${selectedOfc}/${schemeName}`);
           const data = await response.json();
         //   // Update the table with the fetched data
-        ofcBnkSelect.innerHTML = data
-            .map(
-              (bnk) => ` <option value=${bnk.bankId.bank}>${bnk.bankId.bank}</option>`
-            )
+        ofcBnkSelect.value = data.bankId.bank
+        ofcBnkAccnt.value=data.bankId.accountNumber
+           
         } catch (error) {
           console.error('Error fetching data:', error);
         }
