@@ -183,7 +183,7 @@ app.post(
       // Create JWT token
       const payload = {
         user: {
-          username:user.name,
+          username: user.name,
           id: user._id,
           designation: user.designation,
           directorate: user.directorateId,
@@ -221,20 +221,20 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
   if (designation.name === "Admin") {
     res.render("dashboard", {
       username: req.user.username,
-      designation:req.user.designation.name
+      designation: req.user.designation.name,
     });
   } else if (designation.name === "Director") {
-    const {username}=req.user
-    res.render("directorate/dashboard",{
+    const { username } = req.user;
+    res.render("directorate/dashboard", {
       username,
-      designation:req.user.designation.name
+      designation: req.user.designation.name,
     });
   } else if (designation.name === "DFO" || designation.name === "CDVO") {
-    const {username}=req.user
+    const { username } = req.user;
     res.render(`districtOffice/district_office`, {
       title: "Dashboard",
       username,
-      designation:req.user.designation.name
+      designation: req.user.designation.name,
     });
   } else {
     // Handle other designations or unknown designation
@@ -299,6 +299,69 @@ app.post("/cas/directorate", async (req, res) => {
     dep.save();
     dir.save();
     res.redirect("directorate");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/cas/directorate/user", isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+    const desig=[{name:"DFO"},{name:"CDVO"}]
+    const directorate = await Directorate.findOne({
+      _id: directorateOfc,
+    }).populate("districts");
+    res.render("directorate/user", {
+      directorate,
+      desig,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/directorate/user", isAuthenticated, async (req, res) => {
+  try {
+    const {directorate}=req.user.user;
+   const {username, designation,office_name,mobile_no, email, password, confirm_pswd,active}= req.body;
+   let user_pswd
+   console.log(password)
+   if(password===confirm_pswd){
+    user_pswd=password
+   }else{
+    console.error("Password do not match")
+   }
+  if(!user_pswd){
+    res.json("Password do not match")
+    return
+  }
+
+  const newPswd=await bcrypt.hash(user_pswd,10)
+  const desig= await Designation.findOne({name:designation})
+  const isUserExist= await User.findOne({
+    officeId:office_name,
+    designation:desig._id
+  })
+  if(!isUserExist){
+    const newUser= new User({
+      name:username,
+      designation:desig._id,
+      email:email,
+      mobile:mobile_no,
+      directorateId:directorate,
+      officeId:office_name,
+      password:newPswd,
+    });
+    newUser.save();
+    res.redirect("/cas/directorate/user")
+  }else{
+    res.json("USER ALREADY EXIST")
+  }
+  
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });

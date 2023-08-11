@@ -263,6 +263,7 @@ const userSchema = Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "District",
   },
+ 
   // Other user fields
 });
 
