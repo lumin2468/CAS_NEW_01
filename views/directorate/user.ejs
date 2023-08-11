@@ -95,19 +95,18 @@
                             <th>Office Name</th>
                             <th>Mobile No.</th>
                             <th>Email Id</th>
-                            <th>Active</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <% for( let[index, user] of users.entries()) { %>
                         <tr>
-                            <td>1</td>
-                            <td>Avinash</td>
-                            <td>Principal Searetary</td>
-                            <td>Directorate of Fisheries</td>
-                            <td>8234521687</td>
-                            <td>abcd@gmail.com</td>
-                            <td>No</td>
+                            <td><%= index+1 %></td>
+                            <td><%= user?.name  %></td>
+                            <td><%= user?.designation?.name %></td>
+                            <td><%= user?.officeId?.name %></td>
+                            <td><%= user?.mobile %></td>
+                            <td><%= user?.email %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
@@ -128,6 +127,7 @@
                                 </a>
                             </td>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>

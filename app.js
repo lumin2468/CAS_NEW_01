@@ -312,11 +312,13 @@ app.get("/cas/directorate/user", isAuthenticated, async (req, res) => {
     const directorate = await Directorate.findOne({
       _id: directorateOfc,
     }).populate("districts");
+    const users= await User.find({directorateId:directorateOfc, officeId:{$ne: null}}).populate("officeId").populate("designation")
     res.render("directorate/user", {
       directorate,
       desig,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
+      users
     });
   } catch (error) {
     console.error(error);
