@@ -224,16 +224,16 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
       designation: req.user.designation.name,
     });
   } else if (designation.name === "Director") {
-    const { username } = req.user;
+    
     res.render("directorate/dashboard", {
-      username,
+      username:req.user.username,
       designation: req.user.designation.name,
     });
   } else if (designation.name === "DFO" || designation.name === "CDVO") {
-    const { username } = req.user;
+    
     res.render(`districtOffice/district_office`, {
       title: "Dashboard",
-      username,
+      username:req.user.username,
       designation: req.user.designation.name,
     });
   } else {
@@ -283,7 +283,8 @@ app.get("/cas/directorate", isAuthenticated, async (req, res) => {
     const directorate = await Directorate.find().populate("department");
     const departments = await Department.find();
 
-    res.render("directorate", { departments, directorate });
+    res.render("directorate", { departments, directorate,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -408,6 +409,10 @@ app.post("/cas/district", async (req, res) => {
   }
 });
 
+
+
+
+
 app.get("/cas/directorate/scheme", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
@@ -416,7 +421,8 @@ app.get("/cas/directorate/scheme", isAuthenticated, async (req, res) => {
       "directorate"
     );
     console.log(schemes);
-    res.render("directorate/scheme", { directorates, schemes });
+    res.render("directorate/scheme", { directorates, schemes,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -458,7 +464,8 @@ app.get("/cas/directorate/bank", isAuthenticated, async (req, res) => {
       directorate: directorateOfc,
     }).populate("office");
 
-    res.render("directorate/bank", { directorate, districts, bankDetails });
+    res.render("directorate/bank", { directorate, districts, bankDetails,username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -528,6 +535,8 @@ app.get("/cas/directorate/scheme2bank", isAuthenticated, async (req, res) => {
       scheme_details,
       district_office,
       schemeBankDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -628,6 +637,8 @@ app.get(
       res.render("directorate/schemeComponent.ejs", {
         scheme_details,
         schemeComponents,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
       });
     } catch (error) {
       console.error(error);
@@ -695,6 +706,8 @@ app.get("/cas/directorate/payment", isAuthenticated, async (req, res) => {
       modeofpmnt,
       voucherNo,
       paymentDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -848,6 +861,8 @@ app.get("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       financialYear,
       voucherNo,
       receiptDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -958,6 +973,8 @@ app.get(
         financialYear,
         bnkDetails,
         opngBalance,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
       });
     } catch (error) {
       console.error(error);
@@ -1010,10 +1027,12 @@ app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
       .populate("directorate")
       .populate("district");
 
-    res.render("directorate/districtLevelOffice", {
+    res.render("directorate/districtMaster", {
       directorates,
       district,
       districtName,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1026,11 +1045,11 @@ app.post("/cas/directorate/district", isAuthenticated, async (req, res) => {
     const directorateOfc = req.user.user.directorate;
     const { directorate, districtName, office_name, office_address } = req.body;
     const directorateName = await Directorate.findOne({ _id: directorateOfc });
-    const districtRef = await DistrictName.findOne({ name: districtName });
+   
     const districtOffice = new District({
       name: office_name,
       directorate: directorateOfc,
-      district: districtRef._id,
+      district: districtName,
       address: office_address,
     });
 
@@ -1055,7 +1074,8 @@ app.get("/cas/district/acknmnt", isAuthenticated, async (req, res) => {
       .populate("scheme")
       .populate("receiverBank")
       .populate("financialYear");
-    res.render("districtOffice/payment_acknowledge", { paymentDetails });
+    res.render("districtOffice/payment_acknowledge", { paymentDetails,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ error: "Failed to fetch data from the database." });
@@ -1104,6 +1124,8 @@ app.get("/cas/district/receipt", isAuthenticated, async (req, res) => {
       financialYear,
       voucherNo,
       distOfcRecData,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1213,6 +1235,8 @@ app.get("/cas/district/receipt/:id", async (req, res) => {
       distOfcRecData,
       financialYear,
       voucherNo,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1226,7 +1250,8 @@ app.get("/cas/district/benificiary", isAuthenticated, async (req, res) => {
     const officeDetails = await District.findOne({ _id: office_Id }).populate(
       "schemes"
     );
-    res.render("districtOffice/benificiary", { officeDetails });
+    res.render("districtOffice/benificiary", { officeDetails,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1281,7 +1306,8 @@ app.get("/cas/district/payment-approval", isAuthenticated, async (req, res) => {
       .populate("office_name")
       .populate("scheme")
       .populate("beneficiary");
-    res.render("districtOffice/paymentApproval", { paymentDetails });
+    res.render("districtOffice/paymentApproval", { paymentDetails,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).json({ error: "Failed to fetch data from the database." });
@@ -1308,7 +1334,8 @@ app.get("/cas/district/purpose", isAuthenticated, async (req, res) => {
     const officeDetails = await District.findOne({ _id: office_Id }).populate(
       "schemes"
     );
-    res.render("districtOffice/purpose", { officeDetails });
+    res.render("districtOffice/purpose", { officeDetails,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1346,7 +1373,8 @@ app.get("/cas/district/vendor", isAuthenticated, async (req, res) => {
     const officeDetails = await District.findOne({ _id: office_Id }).populate(
       "schemes"
     );
-    res.render("districtOffice/vendor", { officeDetails });
+    res.render("districtOffice/vendor", { officeDetails,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1426,6 +1454,8 @@ app.get("/cas/district/payment", isAuthenticated, async (req, res) => {
       financialYear,
       voucherNo,
       paymentDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1547,6 +1577,8 @@ app.get("/cas/district/advance", isAuthenticated, async (req, res) => {
       financialYear,
       voucherNo,
       advanceDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1667,6 +1699,8 @@ app.get("/cas/district/adjustment", isAuthenticated, async (req, res) => {
       financialYear,
       advanceDetails,
       voucherNo,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1723,7 +1757,8 @@ app.get("/cas/district/bank", isAuthenticated, async (req, res) => {
       office: officeId,
     }).populate("office");
 
-    res.render("districtOffice/bank", { directorate, districts, bankDetails });
+    res.render("districtOffice/bank", { directorate, districts, bankDetails,  username: req.user.user.username,
+      designation: req.user.user.designation.name, });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1790,6 +1825,8 @@ app.get("/cas/district/scheme2bank", isAuthenticated, async (req, res) => {
       scheme_details,
       district_office,
       schemeBankDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
@@ -1846,6 +1883,8 @@ app.get("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
       ofcDetails,
       openingBal,
       bnkdetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
     });
   } catch (error) {
     console.error(error);
