@@ -279,7 +279,7 @@
           const selectedOfc = officeSelect.value;
           const schemeName=schemeSelect.value;
           if (selectedOfc === 'Select') {
-          ofcBnkSelect.innerHTML = ''; // Clear the table when 'Select' is chosen
+          ofcBnkSelect.innerHTML = 'No Bank found'; // Clear the table when 'Select' is chosen
           return;
         }
   
@@ -288,7 +288,7 @@
           const data = await response.json();
           console.log(`fetched data`,data);
         //   // Update the table with the fetched data
-        if(data.bankId){
+        if(data?.bankId){
             ofcBnkSelect.value=data.bankId.bank;
              }else{
                 ofcBnkSelect.value="No Bank Linked"

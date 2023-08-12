@@ -114,7 +114,7 @@ mongoose
     console.error("Error connecting to MongoDB:", error);
   });
 const store = new MongoDBStore({
-  uri: process.env.DB_URL, // Your MongoDB connection string
+  uri:process.env.DB_URL, // Your MongoDB connection string
   collection: "sessions",
   // Additional options if needed
 });
