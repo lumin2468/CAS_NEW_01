@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
+<body>
+
+    <%- include('../Includes/sidebar.ejs')%> 
+    <%- include('../Includes/header-3.ejs')%>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <div class="flex-wrap d-flex justify-content-between align-items-center">
+        <div><h4 class="mb-5">Cash Book Register</h4></div>
+        <div>
+            <select class="form-control">
+                <option>Select Scheme</option>
+                <option>RKVY</option>
+                <option>Blue Revolution</option>
+                <option>PMY</option>
+            </select>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th colspan="4" class="text-center">Receipt/Income</th>
+                            <th colspan="4" class="text-center">Payment/Expenditure</th>
+                        </tr>
+                        <tr>
+                            <th>Month & Date</th>
+                            <th>Particulars</th>
+                            <th>Cash</th>
+                            <th>Bank</th>
+                            <th>Particulars</th>
+                            <th>Voucher No.</th>
+                            <th>Cash</th>
+                            <th>Bank</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>01/06/2023</td>
+                            <td>Opening Balance</td>
+                            <td>10,000</td>
+                            <td>20,000</td>
+                            <td>Beneficiary</td>
+                            <td></td>
+                            <td>2,000</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>01/06/2023</td>
+                            <td>Govt.</td>
+                            <td>20,000</td>
+                            <td></td>
+                            <td>Payment to Vendor</td>
+                            <td></td>
+                            <td></td>
+                            <td>1,000</td>
+                        </tr>
+                        <tr>
+                            <td>01/06/2023</td>
+                            <td>World Bank</td>
+                            <td></td>
+                            <td>50,000</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="text-end"><strong>Total Expenses</strong></td>
+                            <td>2,000</td>
+                            <td>1,000</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="text-end"><strong>Closing Balance</strong></td>
+                            <td>28,000</td>
+                            <td>69,000</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-end"><strong>Total Receipt</strong></td>
+                            <td>30,000</td>
+                            <td>70,000</td>
+                            <td></td>
+                            <td></td>
+                            <td>30,000</td>
+                            <td>70,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+</html>

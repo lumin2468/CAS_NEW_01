@@ -1063,6 +1063,26 @@ app.post("/cas/directorate/district", isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+app.get("/cas/directorate/report", isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+
+    const directorates = await Directorate.findOne({ _id: directorateOfc });
+   
+
+    res.render("directorate/cash-book-register", {
+      directorates,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 //  ---------------DistOfc-------------------
 
 app.get("/cas/district/acknmnt", isAuthenticated, async (req, res) => {
@@ -1939,6 +1959,25 @@ app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
   }
 });
 
+
+app.get("/cas/district/report", isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+    const office_Id = req.user.user.officeId;
+    const directorates = await Directorate.findOne({ _id: directorateOfc });
+   
+
+    res.render("districtOffice/cash-book-register", {
+      directorates,
+      office_Id,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
