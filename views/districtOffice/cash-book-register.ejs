@@ -20,13 +20,47 @@
     <div class="flex-wrap d-flex justify-content-between align-items-center">
         <div><h4 class="mb-5">Cash Book Register</h4></div>
         <div>
-            <select class="form-control">
+            <select class="form-control" id="schemeSelect">
                 <option>Select Scheme</option>
-                <option>RKVY</option>
-                <option>Blue Revolution</option>
-                <option>PMY</option>
+                <% for( let sch of districtDetails.schemes ) { %>
+                    <option value="<%= sch._id %>" <%= districtDetails.schemes.name === sch.name ? 'selected': '' %> ><%= sch.name %></option>
+                <% } %>
             </select>
         </div>
+        <div>
+            <select class="form-control" id="filterType">
+                <option value="financialYear">Financial Year</option>
+                <option value="monthly">Monthly</option>
+                <option value="dateRange">Date Range</option>
+            </select>
+            <select class="form-control" id="financialYearFilter">
+                <option>Select</option>
+                <% for( let year of financialYear ) { %>
+                    <option value="<%= year._id %>"><%= year.year %></option>
+                <% } %>
+            </select>
+            <select class="form-control" id="monthFilter" style="display: none;">
+                <option>SELECT</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">Octobor</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+                <!-- Add more months as needed -->
+            </select>
+            <div style="display: flex; flex-direction: row;">
+            <input type="date" id="startDateInput" style="display: none;">
+            <input type="date" id="endDateInput" style="display: none;">
+        </div>
+        </div>
+       
     </div>
     <div class="card">
         <div class="card-body">
@@ -50,30 +84,30 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>01/06/2023</td>
+                            <td id="startDate" ></td>
                             <td>Opening Balance</td>
-                            <td>10,000</td>
-                            <td>20,000</td>
+                            <td id="cash"></td>
+                            <td id="bank"></td>
                             <td>Beneficiary</td>
                             <td></td>
-                            <td>2,000</td>
                             <td></td>
+                            <td id="pamnAmnt"></td>
                         </tr>
                         <tr>
                             <td>01/06/2023</td>
                             <td>Govt.</td>
-                            <td>20,000</td>
+                            <td id="rcvAmnt"></td>
                             <td></td>
                             <td>Payment to Vendor</td>
                             <td></td>
                             <td></td>
-                            <td>1,000</td>
+                            <td>0</td>
                         </tr>
                         <tr>
                             <td>01/06/2023</td>
-                            <td>World Bank</td>
+                            <td>Other Source</td>
                             <td></td>
-                            <td>50,000</td>
+                            <td>0</td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -107,4 +141,96 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
+<script>
+    const schemeSelect = document.getElementById('schemeSelect');
+    const filterTypeSelect = document.getElementById('filterType');
+    const financialYearFilterSelect = document.getElementById('financialYearFilter');
+    const monthFilterSelect = document.getElementById('monthFilter');
+    const startDateInput = document.getElementById('startDateInput');
+    const endDateInput = document.getElementById('endDateInput');
+    const cashBookTable = document.getElementById('cashBookTable');
+
+    const fetchData = async (schemeId, startDate, endDate, financialYearId) => {
+    let url = `/cas/district/report/${schemeId}?filterType=${filterTypeSelect.value}`;
+
+    if (financialYearId) {
+        url += `&financialYear=${financialYearId}`;
+    } else if (startDate && endDate) {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    const response = await fetch(url);
+    return response.json();
+};
+
+    schemeSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    filterTypeSelect.addEventListener('change', () => {
+        updateFilterDisplay();
+        fetchDataAndUpdateTable();
+    });
+
+    financialYearFilterSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    monthFilterSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    startDateInput.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    endDateInput.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    const fetchDataAndUpdateTable = async () => {
+        const schemeId = schemeSelect.value;
+        const selectedFilter = filterTypeSelect.value;
+
+        if (selectedFilter === 'financialYear') {
+            const financialYearId = financialYearFilterSelect.value;
+            const [data] = await fetchData(schemeId, null, null, financialYearId);
+            // Update the table or do something with the fetched data
+        } else if (selectedFilter === 'monthly') {
+            const month = monthFilterSelect.value;
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const [data] = await fetchData(schemeId, year + '-' + month + '-01', year + '-' + (parseInt(month) + 1) + '-01');
+            // Update the table or do something with the fetched data
+        } else if (selectedFilter === 'dateRange') {
+            const startDate = encodeURIComponent(startDateInput.value);
+            const endDate = encodeURIComponent(endDateInput.value);
+            const [data] = await fetchData(schemeId, startDate, endDate, null)
+            // Update the table or do something with the fetched data
+        }
+    };
+
+    const updateFilterDisplay = () => {
+        const selectedFilter = filterTypeSelect.value;
+
+        if (selectedFilter === 'financialYear') {
+            financialYearFilterSelect.style.display = 'block';
+            monthFilterSelect.style.display = 'none';
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+        } else if (selectedFilter === 'monthly') {
+            financialYearFilterSelect.style.display = 'none';
+            monthFilterSelect.style.display = 'block';
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+        } else if (selectedFilter === 'dateRange') {
+            financialYearFilterSelect.style.display = 'none';
+            monthFilterSelect.style.display = 'none';
+            startDateInput.style.display = 'block';
+            endDateInput.style.display = 'block';
+        }
+    };
+</script>
+
+
 </html>

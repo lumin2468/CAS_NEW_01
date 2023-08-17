@@ -96,8 +96,12 @@
                             <td><%=oB?.scheme?.name %></td>
                             <td><%=oB.cash  %></td>
                             <td><%=oB.bank.bank %></td>
-                            <td><%=oB.bank.accountNumber %></td>
+                            <td><%=oB.bank.balance %></td>
+                            <% if (!oB.advance) {%>
+                             <td>0</td> 
+                             <% }else{ %>  
                             <td><%=oB.advance %></td>
+                            <% } %>
                             <td>
                                 <div>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">

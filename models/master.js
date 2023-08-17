@@ -979,7 +979,31 @@ const advanceSchema = Schema({
  desc:{
   type:String,
   required:true,
- }
+ },
+ remaining_amount: {
+  type: Number,
+  
+},
+});
+
+const adjustmentSchema = new mongoose.Schema({
+  advance: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Advance',
+    required: true,
+  },
+  adjDate: {
+    type: Date,
+    required: true,
+  },
+  adjAmount: {
+    type: Number,
+    required: true,
+  },
+  desc: {
+    type: String,
+    required: true,
+  },
 });
 
 // Journal Schema
@@ -1224,6 +1248,7 @@ const consolidatedSchema = {
   Vendor: mongoose.model("Vendor", vendorSchema),
   Beneficiary: mongoose.model("Beneficiary", beneficiarySchema),
   Advance: mongoose.model("Advance", advanceSchema),
+  Adjustment: mongoose.model("Adjustment", adjustmentSchema),
   Journal: mongoose.model("Journal", journalSchema),
   rtgs: mongoose.model("RTGS", rtgsSchema),
   neft: mongoose.model("NEFT", neftSchema),

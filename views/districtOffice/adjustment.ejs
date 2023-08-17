@@ -36,6 +36,12 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
+                        <label class="form-label">Adjustment Date<span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="adjDate" >
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
                         <label class="form-label">Sanction Order Ref. No.<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="sanction_ord_no" name="sanction_no" >
                     </div>
@@ -111,7 +117,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label class="form-label"> Amount to be Adjusted <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="amount">
+                        <input type="text" class="form-control" id="adjAmount" name="adjAmount">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -131,7 +137,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 text-center">
-                    <button type="button" class="btn btn-primary next action-button">Submit</button>
+                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
                 </div>
             </div>
         </div>
@@ -222,6 +228,8 @@
       const party = document.getElementById("party");
       const officeBank = document.getElementById("officeBank");
       const amount = document.getElementById("amount");
+      const amountAdjustedInput = document.getElementById('adjAmount');
+      const form = document.querySelector('form');
 
       // Function to fetch data from the backend API and update the table
      async function autoVoucherNoDetails(){
@@ -310,8 +318,27 @@
 //     }
 //   }
       
-  
-  
+function handleSubmit(event) {
+    event.preventDefault();
+
+    const amountPaid = parseFloat(amount.value);
+    const amountAdjusted = parseFloat(amountAdjustedInput.value);
+
+    if (isNaN(amountPaid) || isNaN(amountAdjusted)) {
+      alert('Please enter valid numeric values for Amount Paid and Amount Adjusted.');
+      return;
+    }
+
+    if (amountAdjusted > amountPaid) {
+      alert('Amount Adjusted cannot be greater than Amount Paid.');
+      return;
+    }
+    event.target.submit();
+    }
+
+    
+    form.addEventListener('submit', handleSubmit);
+
       // Event listener to trigger data fetching when the scheme select value changes
 
      
