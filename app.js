@@ -694,7 +694,7 @@ app.get("/cas/directorate/payment", isAuthenticated, async (req, res) => {
     const schemes = await Scheme.find({
       directorate: directorate_data._id,
     }).populate("components");
-    const paymentDetails = await DirPayment.find()
+    const paymentDetails = await DirPayment.find({directorate:directorateOfc})
       .populate("distOfcName")
       .populate("scheme")
       .populate("receiverBank")
@@ -1965,6 +1965,15 @@ app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
     const office_id = req.user.user.officeId;
     const openingBalData = req.body;
 
+    if (!Array.isArray(openingBalData.scheme)) {
+      // Handle the case when a single entry is submitted
+      openingBalData.scheme = [openingBalData.scheme];
+      openingBalData.cash = [openingBalData.cash];
+      openingBalData.bank = [openingBalData.bank];
+      openingBalData.bank_balance = [openingBalData.bank_balance];
+      openingBalData.advance = [openingBalData.advance];
+    }
+
     const newOpeningBalances = await Promise.all(
       openingBalData.scheme.map(async (scheme, index) => {
         const cash = openingBalData.cash[index];
@@ -1974,6 +1983,9 @@ app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
 
         // Process bank details and update balance
         const bnkDetails = await BankDetails.findOne({ accountNumber: bank });
+        if (!bnkDetails) {
+          throw new Error("Bank details not found");
+        }
         bnkDetails.balance =
           parseInt(bnkDetails.balance) + parseInt(bank_balance);
         await bnkDetails.save();
@@ -2003,9 +2015,10 @@ app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
     res.redirect("/cas/district/opening-balance");
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
 });
+
 
 
 app.get("/cas/district/report", isAuthenticated, async (req, res) => {
