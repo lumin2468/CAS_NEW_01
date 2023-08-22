@@ -74,16 +74,6 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label"> Financial-year <span class="text-danger">*</span></label>
-                        <select class="form-control" id="officeSelect" name="financialYear" >
-                            <% for( let fny of financialYear ) { %>
-                                <option value="<%= fny.year %>" <%= financialYear.year === fny.year ? 'selected': '' %> ><%= fny.year %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
                         <label class="form-label"> Source <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="source" value="<%= directorateData.department.name%>">
                     </div>

@@ -20,6 +20,11 @@ const generateRecVoucherNumber = require("./helper/dirRecCounter");
 const generateDisRecVoucherNumber = require("./helper/disRecCounter");
 const generateDisPayVoucherNumber = require("./helper/disPayCounter");
 const generateDisAdvVoucherNumber = require("./helper/disAdvCounter.js");
+const multer = require('multer');
+const xlsx = require('xlsx'); // Import 'xlsx' library
+const upload = multer({ dest: 'uploads/' });
+const fs= require('fs');
+const { log } = require("console");
 
 // Import the Mongoose models
 const {
@@ -278,7 +283,33 @@ app.get("/cas/logout", async (req, res) => {
     }
   });
 });
-
+app.get("/cas/financialYear", async (req, res) => {
+  try {
+    const financial_year=await FinancialYear.find()
+    res.render("financial-year",{financial_year})
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.post("/cas/financialYear", async (req, res) => {
+  try {
+    const {year, startDate, endDate} =req.body
+    const isFinancialYearExist =await FinancialYear.findOne({year:year})
+    console.log(isFinancialYearExist)
+    if(isFinancialYearExist){
+     return res.json("Year Already Exist")
+    }
+    const newFinancialYear = new FinancialYear({year,startDate,endDate})
+    console.log(newFinancialYear)
+    newFinancialYear.save()
+    res.redirect("/cas/financialYear")
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 // // Example route to get all departments
 app.get("/cas/departments", async (req, res) => {
   try {
@@ -768,12 +799,25 @@ app.post("/cas/directorate/payment", async (req, res) => {
       financial_year,
       desc,
     } = req.body;
+
+    const paymentDate = new Date(date); // Assuming "date" is the payment date
+    const paymentYear = paymentDate.getFullYear();
+
+    // Find the financial year that corresponds to the payment date
+    const financialYear = await FinancialYear.findOne({
+      startDate: { $lte: paymentDate },
+      endDate: { $gte: paymentDate },
+    });
+
+    if (!financialYear) {
+      // Financial year not found, handle the error accordingly
+      res.status(400).json({ error: "Financial Year not found" });
+      return;
+    }
+
     const directorate_data = await Directorate.findOne({ name: directorate });
     const district_office = await District.findOne({ _id: ofc_name });
     const scheme_details = await Scheme.findOne({ _id: schemeName });
-    const finacialYearDetails = await FinancialYear.findOne({
-      year: financial_year,
-    });
     const bnkDetails = await SchemeBankMaster.findOne({
       office: ofc_name,
       scheme: scheme_details._id,
@@ -786,7 +830,7 @@ app.post("/cas/directorate/payment", async (req, res) => {
         directorate,
         district: district_office.name,
         scheme: scheme_details.name,
-        financialYear: financial_year,
+        financialYear:financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
@@ -799,7 +843,7 @@ app.post("/cas/directorate/payment", async (req, res) => {
       directorate_abbvr,
       district_abbvr,
       scheme_abbvr,
-      financial_year,
+      financialYear.year,
       counter.count
     );
     const payment = new DirPayment({
@@ -815,7 +859,7 @@ app.post("/cas/directorate/payment", async (req, res) => {
       senderBank: directorate_data.bank,
       receiverBank: bnkDetails.bankId._id,
       amount: p_amount,
-      financialYear: finacialYearDetails._id,
+      financialYear:financialYear._id,
       autoVoucherNo: voucherNo,
       narration: desc,
       status: "pending",
@@ -921,12 +965,24 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       receiver_bank,
       amount,
       desc,
-      financialYear,
     } = req.body;
 
-    const financialYearDetails = await FinancialYear.findOne({
-      year: financialYear,
+
+    const paymentDate = new Date(date); // Assuming "date" is the payment date
+    const paymentYear = paymentDate.getFullYear();
+
+    // Find the financial year that corresponds to the payment date
+    const financialYear = await FinancialYear.findOne({
+      startDate: { $lte: paymentDate },
+      endDate: { $gte: paymentDate },
     });
+
+    if (!financialYear) {
+      // Financial year not found, handle the error accordingly
+      res.status(400).json({ error: "Financial Year not found" });
+      return;
+    }
+   
     const purposeAbbr = purpose.substring(0, 3).toUpperCase();
     const directorateData = await Directorate.findOne({
       name: directorate,
@@ -942,7 +998,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
         directorate,
         source: source,
         purpose: purpose,
-        financialYear: financialYear,
+        financialYear: financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
@@ -954,7 +1010,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       directorate_abbvr,
       source_abbvr,
       purposeAbbr,
-      financialYear,
+      financialYear.year,
       recCounter.count
     );
 
@@ -973,7 +1029,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       amount,
       desc,
       autoVoucherNo: voucherNo,
-      financialYear: financialYearDetails._id,
+      financialYear: financialYear._id,
     });
     console.log(receiptDetails);
     receiptDetails.save();
@@ -1205,17 +1261,29 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       source_bank_details,
       bankDetails,
       amount,
-      financial_year,
       desc,
     } = req.body;
 
+
+
+    const paymentDate = new Date(date); // Assuming "date" is the payment date
+    const paymentYear = paymentDate.getFullYear();
+
+    // Find the financial year that corresponds to the payment date
+    const financialYear = await FinancialYear.findOne({
+      startDate: { $lte: paymentDate },
+      endDate: { $gte: paymentDate },
+    });
+
+    if (!financialYear) {
+      // Financial year not found, handle the error accordingly
+      res.status(400).json({ error: "Financial Year not found" });
+      return;
+    }
     const officeId = req.user.user.officeId;
     const directorate_data = await Directorate.findOne({ name: directorate });
     const district_office = await District.findOne({ _id: officeId });
     const scheme_details = await Scheme.findOne({ _id: scheme });
-    const finacialYearDetails = await FinancialYear.findOne({
-      year: financial_year,
-    });
     console.log(scheme_details);
     const bnkDetails = await SchemeBankMaster.findOne({
       office: district_office._id,
@@ -1229,7 +1297,7 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
         directorate,
         district: district_office.name,
         scheme: scheme_details.name,
-        financialYear: financial_year,
+        financialYear: financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
@@ -1241,7 +1309,7 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       directorate_abbvr,
       district_abbvr,
       scheme_abbvr,
-      financial_year,
+      financialYear.year,
       counter.count
     );
 
@@ -1258,7 +1326,7 @@ app.post("/cas/district/receipt", isAuthenticated, async (req, res) => {
       source_bank_details,
       receiver_bank: bnkDetails.bankId._id,
       amount,
-      financial_year: finacialYearDetails._id,
+      financial_year: financialYear._id,
       desc,
       autoVoucherNo: voucherNo,
     });
@@ -1307,8 +1375,11 @@ app.get("/cas/district/benificiary", isAuthenticated, async (req, res) => {
     const officeDetails = await District.findOne({ _id: office_Id }).populate(
       "schemes"
     );
+    const beneficiaries= await Beneficiary.find({office_name:office_Id}).populate("office_name")
     res.render("districtOffice/benificiary", { officeDetails,  username: req.user.user.username,
-      designation: req.user.user.designation.name, });
+      designation: req.user.user.designation.name, 
+      beneficiaries
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1347,6 +1418,56 @@ app.post("/cas/district/benificiary", isAuthenticated, async (req, res) => {
     office_details.beneficiary.push(newBenificiary);
     office_details.save();
     newBenificiary.save();
+
+    res.redirect("/cas/district/benificiary");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.post("/cas/district/benificiary/upload", isAuthenticated, upload.single('excelFile'), async (req, res) => {
+  try {
+    const officeId=req.user.user.officeId
+    const { path: filePath, originalname } = req.file;
+
+    // Check if the uploaded file is an Excel file
+    if (!originalname.match(/\.(xlsx|xls)$/i)) {
+      fs.unlinkSync(filePath); // Delete the uploaded file
+      return res.status(400).json({ error: "Invalid file format. Please upload an Excel file." });
+    }
+
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const excelData = xlsx.utils.sheet_to_json(sheet);
+console.log(excelData);
+    // Validate and sanitize the Excel data
+    const beneficiaries = [];
+    for (const row of excelData) {
+      // Implement validation and sanitation logic here
+      // You can use libraries like Joi for validation
+
+      // Example validation: Ensure required fields are present
+      if (!row.benificiary_name || !row.office_name || !row.dob || !row.Gender || !row.Aadhar_No || !row.Bnk_Acc_No|| !row.Ifsc_code||!row.branch_details||!row.desc) {
+        fs.unlinkSync(filePath); // Delete the uploaded file
+        return res.status(400).json({ error: "Invalid data in Excel file. Required fields are missing." });
+      }
+
+      // Sanitize data if needed
+
+      beneficiaries.push(row);
+    }
+console.log(beneficiaries)
+//     // Process and create beneficiaries
+    for (let beneficiary of beneficiaries) {
+//       // Create and save the beneficiary using your existing logic
+          beneficiary.office_name=officeId
+      const newBeneficiary = new Beneficiary(beneficiary);
+      await newBeneficiary.save();
+    }
+
+    fs.unlinkSync(filePath); // Delete the uploaded file
 
     res.redirect("/cas/district/benificiary");
   } catch (error) {
@@ -1609,10 +1730,23 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       from_bank,
       benifBank,
       amount,
-      financial_year,
       desc,
     } = req.body;
 
+    const paymentDate = new Date(date); // Assuming "date" is the payment date
+    const paymentYear = paymentDate.getFullYear();
+
+    // Find the financial year that corresponds to the payment date
+    const financialYear = await FinancialYear.findOne({
+      startDate: { $lte: paymentDate },
+      endDate: { $gte: paymentDate },
+    });
+
+    if (!financialYear) {
+      // Financial year not found, handle the error accordingly
+      res.status(400).json({ error: "Financial Year not found" });
+      return;
+    }
     const districtDetails = await District.findOne({ _id: office_Id });
     const schemeDetails = await Scheme.findOne({ _id: scheme });
     const bankDetails = await SchemeBankMaster.findOne({
@@ -1620,7 +1754,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       scheme: schemeDetails._id,
     });
 
-    const financialYear = await FinancialYear.findOne({ year: financial_year });
+  
 
     const counter = await DisPayCounter.findOneAndUpdate(
       {
@@ -1628,7 +1762,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
         scheme: schemeDetails.name,
         component: components_name,
         beneficiary: beneficiary,
-        financialYear: financialYear.year,
+        financialYear:financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
@@ -1644,7 +1778,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       benificiary,
       scheme_abbvr,
       component_abbr,
-      financial_year,
+      financialYear.year,
       counter.count
     );
     const benifData = await Beneficiary.findOne({
@@ -1731,10 +1865,23 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       from_bank,
       partyBank,
       amount,
-      financial_year,
       desc,
     } = req.body;
 
+    const paymentDate = new Date(date); // Assuming "date" is the payment date
+    const paymentYear = paymentDate.getFullYear();
+
+    // Find the financial year that corresponds to the payment date
+    const financialYear = await FinancialYear.findOne({
+      startDate: { $lte: paymentDate },
+      endDate: { $gte: paymentDate },
+    });
+
+    if (!financialYear) {
+      // Financial year not found, handle the error accordingly
+      res.status(400).json({ error: "Financial Year not found" });
+      return;
+    }
     const office_details = await District.findOne({ _id: office_Id })
       .populate("bank")
       .populate("purpose")
@@ -1757,7 +1904,7 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
         district: office_name,
         party: party,
         purpose: purpose,
-        financialYear: financial_year,
+        financialYear: financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
       { upsert: true, new: true } // Create a new document if it doesn't exist
@@ -1770,7 +1917,7 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       office_abbvr,
       party,
       purposeId.abbvr,
-      financial_year,
+      financialYear.year,
       advCounter.count
     );
 
@@ -1786,7 +1933,7 @@ app.post("/cas/district/advance", isAuthenticated, async (req, res) => {
       from_bank: bank._id,
       partyBank,
       amount,
-      financial_year,
+      financial_year:financialYear._id,
       autoVoucherNo: voucherNo,
       status: "pending",
       desc,
