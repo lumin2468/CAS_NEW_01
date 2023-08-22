@@ -13,7 +13,7 @@
 </head>
 <body>
 
-    <%-   include('../Includes/sidebar2.ejs')%>
+    <%- include('../Includes/sidebar2.ejs')%>
 
     <%- include('../Includes/header-4.ejs')%>
 
@@ -89,11 +89,32 @@
                     </div>
                 </div>
                 
-                <div class="col-md-12 text-center">
+            </div>
+            <div style="display: flex; flex-direction: row; margin: 0 auto; align-items: center; justify-content: center; gap: 10px;" class="col-md-7">
+                <div class="text-center">
                     <button type="submit" class="btn btn-primary next action-button">Submit</button>
                 </div>
+                
             </div>
+            
+        </div>
         </form>
+        <div class="col-md-4">
+            <form id="upload" action="/cas/district/benificiary/upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+
+                <div class="col-md-4">
+                <label class="form-label">File <span class="text-danger">*</span></label>
+                <button type="button" class="btn btn-primary next action-button" id="uploadButton">Choose</button>
+            </div>
+                <input type="file" name="excelFile" accept=".xlsx, .xls" class="form-control" style="display: none;">
+                <p id="fileAlert" style="color: red; display: none;">Please choose only Excel files (.xlsx, .xls)</p>
+            </div>
+                <div class="text-center col-md-4">
+                    <button type="submit" class="btn btn-primary next action-button" id="uploadSubmitButton">Upload</button>
+                </div>
+            </form>
+        </div>
         </div>
     </div>
 
@@ -106,7 +127,6 @@
                             <th>Sl. No.</th>
                             <th>Benificiary Name</th>
                             <th>Office Name</th>
-                            <th>Scheme Name</th>
                             <th>Aadhar No.</th>
                             <th>Bank Acc. No.</th>
                             <th>DOB</th>
@@ -114,14 +134,14 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <% for( let[index, bnf] of beneficiaries.entries()) { %>
                         <tr>
-                            <td>1</td>
-                            <td>Avinash</td>
-                            <td>Principal Searetary</td>
-                            <td>Directorate of Fisheries</td>
-                            <td>8234521687</td>
-                            <td>abcd@gmail.com</td>
-                            <td>No</td>
+                            <td><%= index+1 %></td>
+                            <td><%= bnf.benificiary_name %></td>
+                            <td><%= bnf.office_name.name %></td>
+                            <td><%= bnf.Aadhar_No %></td>
+                            <td><%=bnf.Bnk_Acc_No %></td>
+                            <td><%= (bnf.dob).toLocaleString("en-GB",{day:"numeric", month:"numeric",year:"numeric"}) %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
@@ -142,6 +162,7 @@
                                 </a>
                             </td>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
@@ -152,4 +173,32 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
+<script>
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadInput = document.querySelector('input[name="excelFile"]');
+    const uploadSubmitButton = document.getElementById('uploadSubmitButton');
+    const fileAlert = document.getElementById('fileAlert');
+    const uploadForm = document.getElementById('upload');
+
+    uploadButton.addEventListener('click', () => {
+        uploadInput.style.display = 'block';
+        uploadSubmitButton.removeAttribute('disabled');
+        fileAlert.style.display = 'none';
+    });
+
+    uploadInput.addEventListener('change', (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile && (selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || selectedFile.type === 'application/vnd.ms-excel')) {
+            fileAlert.style.display = 'none';
+        } else {
+            fileAlert.style.display = 'block';
+        }
+    });
+    
+    uploadSubmitButton.addEventListener('click', () => {
+        console.log('Upload',)
+        // Submit the upload form when the "Upload" button is clicked
+        uploadForm.submit();
+    });
+</script>
 </html>

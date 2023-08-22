@@ -273,6 +273,14 @@ const financialYearSchema = Schema({
     type: String,
     required: true,
   },
+  startDate:{
+    type: Date,
+    required: true,
+  },
+  endDate:{
+    type: Date,
+    required: true, 
+  },
   // Other financial year fields
 });
 
