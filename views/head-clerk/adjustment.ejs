@@ -12,19 +12,19 @@
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
 <body>
-
-    <!-- <%- include('../Includes/sidebar2.ejs')%> 
-    <%- include('../Includes/header-4.ejs')%> -->
-    
-    <%if(designation==="ACCOUNTANT"){%>
-        <%-include('../Includes/sidebar3.ejs')%>
-        <%-include('../Includes/header-5.ejs')%>
-        
-        <% }else{ %>
-
+    <%if(designation==="HEAD-CLERK"){%>
+    <%- include('../Includes/sidebar4.ejs')%> 
+    <%- include('../Includes/header-6.ejs')%>
+    <% if(designation ==="ACCOUNTANT"){ %>
+    <%-include('../Includes/sidebar3.ejs')%>
+    <%-include('../Includes/header-5.ejs')%>
+    <% }else{ %>
     <%-include('../Includes/sidebar2.ejs')%>
     <%-include('../Includes/header-4.ejs')%>
     <% } %>
+
+
+   
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
     <h4 class="mb-5">Adjustment</h4>

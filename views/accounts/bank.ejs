@@ -13,66 +13,66 @@
 </head>
 <body>
 
-
-    <%if(designation==="ACCOUNTANT"){%>
-        <%-include('../Includes/sidebar3.ejs')%>
-        <%-include('../Includes/header-5.ejs')%>
-        
-        <% }else{ %>
-
-    <%-include('../Includes/sidebar2.ejs')%>
-    <%-include('../Includes/header-4.ejs')%>
-    <% } %>
+    <%-include('../Includes/sidebar3.ejs')%>
+    <%-include('../Includes/header-5.ejs')%>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
-    <h4 class="mb-5">Assign Bank with Scheme</h4>
+    <h4 class="mb-5">Bank</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/district/scheme2bank" method="post">
+            <form action="/cas/district/bank" method="post">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Directorate Name <span class="text-danger">*</span></label>
-                        <input type="text" readonly="true" class="form-control" name="directorate" value="<%= directorate_data.name %>">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Office Name <span class="text-danger">*</span></label>
-                       
-                        <input type="text" class="form-control"  name="office_name" value="<%= district_office.name %>">
-                        <input type="hidden" id="selectedDist" name="office_id" value="<%= district_office._id %>">
-
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
-                        <select class="form-control" name="scheme_name">
-                            <option>Select</option>
-                            <% for( let schm of scheme_details) { %>
-                                <option value="<%= schm?.name %>" <%= scheme_details?.name === schm?.name ? 'selected': '' %> ><%= schm?.name %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
                         <label class="form-label">Bank Name <span class="text-danger">*</span></label>
-                        <select class="form-control" name="bank_name" id="bankName">
-                      
-                        </select>
+                        <input type="text" class="form-control"name="bankName">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="Ifsc_code">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Branch Name<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="branchName">
+                    </div>
+                </div>
+               
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Account No.<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="accountNo">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Directorate Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name='directorate' value="<%= directorate.name %>">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">District Office Name</label>
+                        <select class="form-control" name="district_office">
+                            <% for( let dis of districts ) { %>
+                                <option value="<%= dis.name %>" <%= districts?.name === dis.name ? 'selected': '' %> ><%= dis.name %></option>
+                                <% } %>
+                          </select>
                     </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label class="form-label">Scheme Description</label>
-                        <textarea class="form-control" name="scheme_desc"></textarea>
+                        <label class="form-label">Branch Address <span class="text-danger">*</span></label>
+                        <textarea class="form-control" name="address"></textarea>
                     </div>
                 </div>
+                
                 <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
+                    <button type="submit" name="next" class="btn btn-primary next action-button">Submit</button>
                 </div>
             </div>
         </form>
@@ -86,21 +86,23 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Directorate Name</th>
-                            <th>Scheme</th>
-                            <th>Office Name</th>
-                            <th>Bank</th>
+                            <th>Bank Name</th>
+                            <th>IFSC Code</th>
+                            <th>Account No.</th>
+                            <th>Branch Name</th>
+                            <th>Office</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for( let[index, schmbnk] of schemeBankDetails.entries()) { %>
+                        <% for( let[index, bnk] of bankDetails.entries()) { %>
                         <tr>
-                            <td><%=index+1%></td>
-                            <td><%= schmbnk.directorate.name %></td>
-                            <td><%= schmbnk.scheme?.name %></td>
-                            <td><%= schmbnk.office?.name %></td>
-                            <td><%= schmbnk.bankId.bank %></td>
+                            <td><%= index+1 %></td>
+                            <td><%= bnk.bank  %></td>
+                            <td><%= bnk.IFSCNumber %></td>
+                            <td><%= bnk.accountNumber%></td>
+                            <td><%= bnk.branch %></td>
+                            <td><%= bnk?.office?bnk?.office?.name : bnk?.directorate.name %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
@@ -132,35 +134,4 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const districtDetails=document.getElementById('selectedDist');
-    const bankData=document.getElementById('bankName')
-    
-    async function fetchDistData() {
-        const disValue=districtDetails.value;
-        // if (selectedScheme === 'Select') {
-        //    // Clear the table when 'Select' is chosen
-        //    bankData.innerHTML=""
-        //   return;
-        // }
-  
-        try {
-          const response = await fetch(`/cas/directorate/scheme2bank/${disValue}`);
-          const data = await response.json();
-          console.log(`fetched data`,data);
-          // Update the table with the fetched data
-          bankData.innerHTML = data
-            .map(
-              (bnk) => ` <option value=${bnk.accountNumber}>${bnk.bank}</option>`
-            )
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      }
-      fetchDistData();
-    // districtDetails.addEventListener('change', fetchDistData)
-    })
-</script>
-
 </html>
