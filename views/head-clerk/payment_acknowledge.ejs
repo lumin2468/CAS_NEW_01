@@ -15,19 +15,22 @@
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1" />
   </head>
   <body>
- 
-    <%if(designation==="ACCOUNTANT"){%>
-      <%-include('../Includes/sidebar3.ejs')%>
-      <%-include('../Includes/header-5.ejs')%>
-      
-      <% }else{ %>
-
-  <%-include('../Includes/sidebar2.ejs')%>
-  <%-include('../Includes/header-4.ejs')%>
-  <% } %>
+    <%if(designation==="HEAD-CLERK"){%>
+      <%- include('../Includes/sidebar4.ejs')%> 
+      <%- include('../Includes/header-6.ejs')%>
+  
+          <% }else if(designation==="ACCOUNTANT"){ %>
+              <%-include('../Includes/sidebar3.ejs')%>
+          <%-include('../Includes/header-5.ejs')%>
+  
+          <% }else{ %>
+  
+      <%-include('../Includes/sidebar2.ejs')%>
+      <%-include('../Includes/header-4.ejs')%>
+      <% } %>
 
     <div class="content-inner container-fluid pb-0" id="page_layout">
-      <h4 class="mb-5">Payment Approval</h4>
+      <h4 class="mb-5">Payment Acknowledgement</h4>
 
       <div class="card">
         <div class="card-body">
@@ -36,30 +39,39 @@
               <thead>
                 <tr>
                   <th>Sl. No.</th>
-                  <th>Scheme Name</th>
-                  <th>Component</th>
-                  <th>Beneficiary</th>
+                  <th>Office Name</th>
+                  <th>scheme Name</th>
                   <th>Voucher No.</th>
-                  <th>Sanction <br> Order No.</th>
-                  <th>Mode of <br> Payment</th>
-                  <th>Payment <br> Date</th>
-                  <th> Amount</th>
+                  <th>
+                    Ref.<br />
+                    Voucher No
+                  </th>
+                  <th>mode of Payment</th>
+                  <th>
+                    Payment <br />
+                    Date
+                  </th>
+                  <th>
+                    Receiver<br />
+                    Bank Name
+                  </th>
+                  <th>Amount</th>
                   <th>Status</th>
                   <th>Action</th>
-              </tr>
+                </tr>
               </thead>
               <tbody>
                 <% for( let[index, pmntd] of paymentDetails.entries()) { %>
                 <tr  data-payment-id="<%= pmntd._id %>">
                   <td><%= index+1 %></td>
+                  <td><%=pmntd.distOfcName.name %></td>
                   <td><%=pmntd?.scheme?.name %></td>
-                  <td><%=pmntd?.components_name %></td>
-                  <td><%=pmntd?.beneficiary?.benificiary_name%></td>
-                  <td><%=pmntd?.autoVoucherNo%></td>
-                  <td><%=pmntd?.sanction_ord_no %></td>
-                  <td><%=pmntd?.mode_of_payment %></td>
-                  <td><%=(pmntd?.date).toLocaleDateString('en-GB') %></td>
-                  <td><%=pmntd?.amount %></td>
+                  <td><%=pmntd.autoVoucherNo %></td>
+                  <td><%=pmntd.refVoucherNo %></td>
+                  <td><%=pmntd.modeofPayment %></td>
+                  <td><%=(pmntd.date).toLocaleDateString('en-GB') %></td>
+                  <td><%=pmntd?.receiverBank?.bank %></td>
+                  <td><%=pmntd.amount %></td>
                   <% if (pmntd.status==='pending'){ %>
                   <td class="text-danger"><%=pmntd.status %></td>
                   <% }else{ %>
@@ -68,7 +80,7 @@
                   <td>
                     <a
                       class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
-                      href="#"
+                      href="/cas/district/receipt/<%= pmntd._id %>"
                       role="button"
                       target="_blank"
                     >
@@ -96,7 +108,7 @@
                     <a
                       class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
                       href="#"
-                      onclick="approvePayment('<%= pmntd._id %>')"
+                      onclick="acknowledgePayment('<%= pmntd._id %>')"
                       role="button"
                     >
                       <span class="btn-inner">
@@ -162,14 +174,14 @@
     <%- include('../Includes/footer.ejs')%>
   </body>
   <script>
-   async function approvePayment(paymentId) {
+   async function acknowledgePayment(paymentId) {
     try {
-      const response = await fetch(`/cas/district/payment-approval/${paymentId}`, {
+      const response = await fetch(`/cas/district/payment/${paymentId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status: 'Approved' }), // Send the new status
+        body: JSON.stringify({ status: 'acknowledged' }), // Send the new status
       });
 
       if (!response.ok) {

@@ -13,16 +13,9 @@
 </head>
 <body>
 
+    <%-   include('../Includes/sidebar3.ejs')%>
 
-    <%if(designation==="ACCOUNTANT"){%>
-        <%-include('../Includes/sidebar3.ejs')%>
-        <%-include('../Includes/header-5.ejs')%>
-        
-        <% }else{ %>
-
-    <%-include('../Includes/sidebar2.ejs')%>
-    <%-include('../Includes/header-4.ejs')%>
-    <% } %>
+    <%- include('../Includes/header-5.ejs')%>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
     <div class="flex-wrap d-flex justify-content-between align-items-center">

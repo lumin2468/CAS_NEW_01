@@ -56,6 +56,7 @@ const {
   User,
   modeofPayment,
   Designation,
+  Accountant,
 } = consolidatedSchema;
 
 // Create the Express app
@@ -242,7 +243,30 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
       username:req.user.username,
       designation: req.user.designation.name,
     });
-  } else {
+
+  } else if (designation.name === "District") {
+    
+    res.render("district/dashboard", {
+      username:req.user.username,
+      designation: req.user.designation.name,
+    });
+  } else if (designation.name === "ACCOUNTANT") {
+    console.log("I am IN")
+    res.render(`accounts/district_office`, {
+      title: "Dashboard",
+      username:req.user.username,
+      designation: req.user.designation.name,
+    });
+  }
+  else if (designation.name === "HEAD-CLERK") {
+    console.log("I am IN")
+    res.render(`head-clerk/district_office`, {
+      title: "Dashboard",
+      username:req.user.username,
+      designation: req.user.designation.name,
+    });
+  }
+  else {
     // Handle other designations or unknown designation
     res.status(403).json({ message: "Forbidden" });
   }
@@ -440,6 +464,16 @@ app.post("/cas/district", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1338,7 +1372,7 @@ app.get("/cas/district/receipt/:id",isAuthenticated, async (req, res) => {
 
 app.get("/cas/district/benificiary", isAuthenticated, async (req, res) => {
   try {
-    const office_Id = req.user.user.officeId;
+    const office_Id = req.user.user.officeId; 
     const officeDetails = await District.findOne({ _id: office_Id }).populate(
       "schemes"
     );
@@ -1567,6 +1601,78 @@ app.post("/cas/district/purpose", isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+
+
+app.get("/cas/district/user", isAuthenticated, async (req, res) => {
+  try {
+    const {officeId, directorate} = req.user.user;
+    const desig=[{name:"ACCOUNTANT"},{name:"HEAD-CLERK"}]
+    const district = await District.findOne({_id: officeId})
+    console.log("districtOfcDtls",district)
+    const users= await User.find({ officeId:officeId}).populate("officeId").populate("designation")
+  
+    res.render("districtOffice/user", {
+      district,
+      desig,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+      users
+    });
+    
+   
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/user", isAuthenticated, async (req, res) => {
+  try {
+    const {officeId,directorate}=req.user.user;
+   const {username, designation,office_name,mobile_no, email, password, confirm_pswd}= req.body;
+   let user_pswd
+   console.log(password)
+   if(password===confirm_pswd){
+    user_pswd=password
+   }else{
+    console.error("Password do not match")
+   }
+  if(!user_pswd){
+    res.json("Password do not match")
+    return
+  }
+
+  const newPswd=await bcrypt.hash(user_pswd,10)
+  const desig= await Designation.findOne({name:designation})
+  const isUserExist= await User.findOne({
+    officeId:office_name,
+    designation:desig._id
+  })
+  if(!isUserExist){
+    const newUser= new User({
+      name:username,
+      designation:desig._id,
+      email:email,
+      mobile:mobile_no,
+      directorateId:directorate,
+      officeId:officeId,
+      password:newPswd,
+    });
+    console.log("userdetails",newUser);
+     newUser.save();
+    res.redirect("/cas/district/user")
+  }else{
+    res.json("USER ALREADY EXIST")
+  }
+  
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 app.get("/cas/district/vendor", isAuthenticated, async (req, res) => {
   try {

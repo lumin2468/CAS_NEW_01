@@ -12,80 +12,86 @@
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
 <body>
-
-   
-    <%if(designation==="ACCOUNTANT"){%>
-        <%-include('../Includes/sidebar3.ejs')%>
-        <%-include('../Includes/header-5.ejs')%>
-        
-        <% }else{ %>
-
+    <%if(designation==="HEAD-CLERK"){%>
+    <%- include('../Includes/sidebar4.ejs')%> 
+    <%- include('../Includes/header-6.ejs')%>
+    <% if(designation ==="ACCOUNTANT"){ %>
+    <%-include('../Includes/sidebar3.ejs')%>
+    <%-include('../Includes/header-5.ejs')%>
+    <% }else{ %>
     <%-include('../Includes/sidebar2.ejs')%>
     <%-include('../Includes/header-4.ejs')%>
     <% } %>
 
+
+   
+
 <div class="content-inner container-fluid pb-0" id="page_layout">
-    <h4 class="mb-5">Advance</h4>
+    <h4 class="mb-5">Adjustment</h4>
     <div class="card">
-        <form action="/cas/district/advance" method="post">
+        <form action="/cas/district/adjustment" method="post">
         <div class="card-body">
             <div class="row">
-            <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="date">
-                    </div>
-                </div>
+                
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
-                        <select class="form-control" id="MOP"  name="mode_of_payment">
+                        <label class="form-label">Voucher No <span class="text-danger">*</span></label>
+                        <select class="form-control" name="autoVoucherNo" id="autoVoucherNo">
                             <option>Select</option>
-                            <% for( let mop of modeofpmnt ) { %>
-                                <option value="<%= mop.name %>" <%=modeofpmnt.name === mop.name ? 'selected': '' %> ><%= mop.name %></option>
+                            <% for( let adv of advanceDetails ) { %>
+                                <option value="<%= adv.autoVoucherNo %>" <%= advanceDetails.autoVoucherNo === adv.autoVoucherNo ? 'selected': '' %> ><%= adv.autoVoucherNo %></option>
                             <% } %>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
+                        <label class="form-label">Adjustment Date<span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" name="adjDate" >
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Sanction Order Ref. No.<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="sanction_ord_no" name="sanction_no" >
+                    </div>
+                </div>
+            <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label"> Date <span class="text-danger">*</span></label>
+                        <input type="text" id="dateValue" class="form-control" >
+                        <input type="text" hidden="true" id="date" class="form-control" name="date">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
+                        <input type="text" id="MOP" class="form-control"  name="mode_of_payment">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
                         <label id="transaction_id" class="form-label">CHEQUE/DRAFT No. <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" name="transaction_id">
+                        <input type="" class="form-control" id="transaction_id_val" name="transaction_id">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label id="transaction_date" class="form-label">CHEQUE/DRAFT Date.  <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="transaction_date">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Voucher/Sanction Order Ref. No.<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="sanction_no">
+                        <input type="text" class="form-control" readonly="true" id="transaction_date_val" name="transaction_date">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Pupose Name <span class="text-danger">*</span></label>
-                        <select class="form-control" id="schemeSelect" name='purpose'>
-                            <option>Select</option>
-                            <% for( let pur of office_details.purpose ) { %>
-                                <option value="<%= pur.name %>" <%= office_details.purpose.name === pur.name ? 'selected': '' %> ><%= pur.name %></option>
-                            <% } %>
-                          </select>
+                        <input type="text" class="form-control" readonly="true" id="purpose" name="purpose">
                        
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Party Name <span class="text-danger">*</span></label>
-                        <select class="form-control" id="beneficiarySelect" name="party">
-                            <option>Select</option>
-                            <% for( let ven of office_details.vendor ) { %>
-                                <option value="<%= ven.name %>" <%= office_details.vendor.name === ven.name ? 'selected': '' %> ><%= ven.name %></option>
-                            <% } %>
-                        </select>
+                        <input type="text" class="form-control" readonly="true" id="party" name="party">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -98,12 +104,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
-                        <select class="form-control" id="ofcBnkSelect" name="from_bank">
-                            <option>Select</option>
-                            <% for( let bnk of office_details.bank ) { %>
-                                <option value="<%= bnk.accountNumber %>" <%= office_details.bank.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank %></option>
-                            <% } %>
-                          </select>
+                        <input type="text" id="officeBank" class="form-control" readonly="'true" name="office_bank">
 
                     </div>
                 </div>
@@ -112,15 +113,31 @@
                 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label"> To Party Bank  <span class="text-danger">*</span></label>
+                        <label class="form-label"> To Party Bank Account  <span class="text-danger">*</span></label>
                         <input type="text"  id="benifBank" class="form-control" name="partyBank">
                     </div>
                 </div>
 
                 <div class="col-md-2">
                     <div class="form-group">
-                        <label class="form-label"> Amount <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="amount">
+                        <label class="form-label"> Amount Paid <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="amount" name="amount">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="form-label"> Amount to be Adjusted <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="adjAmount" name="adjAmount">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="form-label"> Financial-year <span class="text-danger">*</span></label>
+                        <select class="form-control" id="officeSelect" name="financial_year" >
+                            <% for( let fny of financialYear ) { %>
+                                <option value="<%= fny.year %>" <%= financialYear.year === fny.year ? 'selected': '' %> ><%= fny.year %></option>
+                            <% } %>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -156,17 +173,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% for( let[index, adv] of advanceDetails.entries()) { %>
+                       
                         <tr>
-                            <td><%= index+1 %></td>
-                            <td><%= adv?.office?.name %></td>
-                            <td><%= adv?.party?.name %></td>
-                            <td><%= adv?.purpose?.name %></td>
-                            <td><%= adv?.autoVoucherNo%></td>
-                            <td><%= adv?.sanction_no%></td>
-                            <td><%= (adv?.date).toLocaleString("en-GB",{day:"numeric", month:"numeric", year:"numeric"}) %></td>
-                            <td><%= adv?.mode_of_payment%></td>
-                            <td><%= adv?.amount%></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="receipt-voucher-print.php" role="button" target="_blank">
                                     <span class="btn-inner">
@@ -192,7 +209,7 @@
                                 </a>
                             </td>
                         </tr>
-                        <% } %>
+                     
                     </tbody>
                 </table>
             </div>
@@ -207,22 +224,49 @@
     document.addEventListener('DOMContentLoaded', function () {
       const ofcBnkSelect = document.getElementById('ofcBnkSelect');
       const mop = document.getElementById('MOP');
+      const autoVoucherNo = document.getElementById('autoVoucherNo');
+      const sanction_no = document.getElementById('sanction_ord_no');
       const transactionId = document.getElementById('transaction_id');
       const transactionDate = document.getElementById('transaction_date');
       const beneficiarySelect = document.getElementById('beneficiarySelect');
       const benifBank = document.getElementById('benifBank');
+      const date = document.getElementById('date');
+      const dateValue = document.getElementById('dateValue');
+      const transactionIdValue = document.getElementById('transaction_id_val');
+      const transactionDateValue = document.getElementById("transaction_date_val");
+      const purpose = document.getElementById("purpose");
+      const party = document.getElementById("party");
+      const officeBank = document.getElementById("officeBank");
+      const amount = document.getElementById("amount");
+      const amountAdjustedInput = document.getElementById('adjAmount');
+      const form = document.querySelector('form');
 
       // Function to fetch data from the backend API and update the table
-            
+     async function autoVoucherNoDetails(){
+        const voucherDetails=autoVoucherNo.value;
+        const response= await fetch(`/cas/district/adjustment/${encodeURIComponent(voucherDetails)}`)
+        const data=await response.json();
+        if(response.ok){
+            sanction_no.value=data?.sanction_no
+            date.value=data?.date
+            dateValue.value=data?.date.toLocaleString("en-GB",{day:"numeric", month:"numeric", year:"numeric"})
+            mop.value=data?.mode_of_payment
+            transactionIdValue.value=data?.transction_id
+            transactionDateValue.value=(data?.transaction_date)
+            purpose.value=data?.purpose.name
+            party.value=data?.party.name
+            officeBank.value=data?.from_bank?.bank
+            benifBank.value=data?.party?.Bnk_Acc_No
+            amount.value=data?.amount
+        }
+
+     }
 
       async function modeofPmnts(){
         const selectedMode=mop.value
-        if(selectedMode === 'Select'){
+        if(!selectedMode){
             transactionId.innerHTML='Tansaction ID <span class="text-danger">*</span>'
             transactionDate.innerHTML='Transaction Date <span class="text-danger">*</span>'
-        }else{
-            transactionId.innerHTML=`${selectedMode} ID <span class="text-danger">*</span>`
-            transactionDate.innerHTML=`${selectedMode} Date <span class="text-danger">*</span>`
         }
       }
 
@@ -284,15 +328,35 @@
 //     }
 //   }
       
-  
-  
+function handleSubmit(event) {
+    event.preventDefault();
+
+    const amountPaid = parseFloat(amount.value);
+    const amountAdjusted = parseFloat(amountAdjustedInput.value);
+
+    if (isNaN(amountPaid) || isNaN(amountAdjusted)) {
+      alert('Please enter valid numeric values for Amount Paid and Amount Adjusted.');
+      return;
+    }
+
+    if (amountAdjusted > amountPaid) {
+      alert('Amount Adjusted cannot be greater than Amount Paid.');
+      return;
+    }
+    event.target.submit();
+    }
+
+    
+    form.addEventListener('submit', handleSubmit);
+
       // Event listener to trigger data fetching when the scheme select value changes
 
      
     //   schemeSelect.addEventListener('change', fetchOfcData);
     //   schemeSelect.addEventListener('change', fetchTableData);
-      mop.addEventListener('change', modeofPmnts);
-     
+      
+      autoVoucherNo.addEventListener('change',autoVoucherNoDetails)
+        modeofPmnts()
       // Initially, call the fetch function to populate the table based on the default selected scheme (Select)
     //   fetchTableData();
       

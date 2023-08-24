@@ -1,3 +1,4 @@
+<!-- --------------------accountant--------------------------- -->
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
@@ -12,65 +13,70 @@
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
 <body>
-
-
-    <%if(designation==="ACCOUNTANT"){%>
+    <%if(user.designation.name==="ACCOUNTANT"){%>
         <%-include('../Includes/sidebar3.ejs')%>
         <%-include('../Includes/header-5.ejs')%>
         
-        <% }else{ %>
+     <% }else{ %>
 
     <%-include('../Includes/sidebar2.ejs')%>
     <%-include('../Includes/header-4.ejs')%>
     <% } %>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
-    <h4 class="mb-5">Assign Bank with Scheme</h4>
+    <h4 class="mb-5">User Master</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/district/scheme2bank" method="post">
+            <form action="/cas/district/user" method="post">
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Directorate Name <span class="text-danger">*</span></label>
-                        <input type="text" readonly="true" class="form-control" name="directorate" value="<%= directorate_data.name %>">
+                        <label class="form-label"> UserName <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="username">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Designation <span class="text-danger">*</span></label>
+                        <select class="form-control" name="designation">
+                            <option>Select</option>
+                            <% for( let des of desig) { %>
+                                <option value="<%= des.name %>" <%= desig?.name === des?.name ? 'selected': '' %> ><%= des.name %></option>
+                            <% } %>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Office Name <span class="text-danger">*</span></label>
-                       
-                        <input type="text" class="form-control"  name="office_name" value="<%= district_office.name %>">
-                        <input type="hidden" id="selectedDist" name="office_id" value="<%= district_office._id %>">
-
+                        <input type="text" class="form-control" name="districtOfc", value="<%= district.name%>">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
-                        <select class="form-control" name="scheme_name">
-                            <option>Select</option>
-                            <% for( let schm of scheme_details) { %>
-                                <option value="<%= schm?.name %>" <%= scheme_details?.name === schm?.name ? 'selected': '' %> ><%= schm?.name %></option>
-                            <% } %>
-                        </select>
+                        <label class="form-label">Mobile No. <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="mobile_no">
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
-                        <select class="form-control" name="bank_name" id="bankName">
-                      
-                        </select>
+                        <label class="form-label">Email Id <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="email">
                     </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Scheme Description</label>
-                        <textarea class="form-control" name="scheme_desc"></textarea>
+                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="password">
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                        <input type="password" class="form-control" name="confirm_pswd">
+                    </div>
+                </div>
+                
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary next action-button">Submit</button>
                 </div>
@@ -86,21 +92,23 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Directorate Name</th>
-                            <th>Scheme</th>
+                            <th>User Name</th>
+                            <th>Designation</th>
                             <th>Office Name</th>
-                            <th>Bank</th>
+                            <th>Mobile No.</th>
+                            <th>Email Id</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for( let[index, schmbnk] of schemeBankDetails.entries()) { %>
+                        <% for( let[index, user] of users.entries()) { %>
                         <tr>
-                            <td><%=index+1%></td>
-                            <td><%= schmbnk.directorate.name %></td>
-                            <td><%= schmbnk.scheme?.name %></td>
-                            <td><%= schmbnk.office?.name %></td>
-                            <td><%= schmbnk.bankId.bank %></td>
+                            <td><%= index+1 %></td>
+                            <td><%= user?.name  %></td>
+                            <td><%= user?.designation?.name %></td>
+                            <td><%= user?.officeId?.name %></td>
+                            <td><%= user?.mobile %></td>
+                            <td><%= user?.email %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
@@ -132,35 +140,4 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-    const districtDetails=document.getElementById('selectedDist');
-    const bankData=document.getElementById('bankName')
-    
-    async function fetchDistData() {
-        const disValue=districtDetails.value;
-        // if (selectedScheme === 'Select') {
-        //    // Clear the table when 'Select' is chosen
-        //    bankData.innerHTML=""
-        //   return;
-        // }
-  
-        try {
-          const response = await fetch(`/cas/directorate/scheme2bank/${disValue}`);
-          const data = await response.json();
-          console.log(`fetched data`,data);
-          // Update the table with the fetched data
-          bankData.innerHTML = data
-            .map(
-              (bnk) => ` <option value=${bnk.accountNumber}>${bnk.bank}</option>`
-            )
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      }
-      fetchDistData();
-    // districtDetails.addEventListener('change', fetchDistData)
-    })
-</script>
-
 </html>
