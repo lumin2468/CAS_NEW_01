@@ -38,12 +38,6 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="dob">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
                         <label class="form-label">Gst Number </span></label>
                         <input type="text" class="form-control" name="gst">
 
@@ -91,6 +85,22 @@
                 </div>
             </div>
         </form>
+        <div class="col-md-4">
+            <form id="upload" action="/cas/district/vendor/upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+
+                <div class="col-md-4">
+                <label class="form-label">File <span class="text-danger">*</span></label>
+                <button type="button" class="btn btn-primary next action-button" id="uploadButton">Choose</button>
+            </div>
+                <input type="file" name="excelFile" accept=".xlsx, .xls" class="form-control" style="display: none;">
+                <p id="fileAlert" style="color: red; display: none;">Please choose only Excel files (.xlsx, .xls)</p>
+            </div>
+                <div class="text-center col-md-4">
+                    <button type="submit" class="btn btn-primary next action-button" id="uploadSubmitButton">Upload</button>
+                </div>
+            </form>
+        </div>
         </div>
     </div>
 
@@ -101,24 +111,25 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Benificiary Name</th>
+                            <th>Vendor Name</th>
                             <th>Office Name</th>
-                            <th>Scheme Name</th>
                             <th>Aadhar No.</th>
+                            <th>Branch Details</th>
                             <th>Bank Acc. No.</th>
-                            <th>DOB</th>
+                            <th>GST</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <% for( let[index, ven] of vendorDetails.entries()) { %>
                         <tr>
-                            <td>1</td>
-                            <td>Avinash</td>
-                            <td>Principal Searetary</td>
-                            <td>Directorate of Fisheries</td>
-                            <td>8234521687</td>
-                            <td>abcd@gmail.com</td>
-                            <td>No</td>
+                            <td><%= index+1 %></td>
+                            <td><%= ven.name %></td>
+                            <td><%= ven.office_name.name %></td>
+                            <td><%= ven.Aadhar_No %></td>
+                            <td><%= ven.branch_details %></td>
+                            <td><%= ven.Bnk_Acc_No %></td>
+                            <td><%= ven.gst %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
                                     <span class="btn-inner">
@@ -139,6 +150,7 @@
                                 </a>
                             </td>
                         </tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
@@ -149,4 +161,32 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
+<script>
+    const uploadButton = document.getElementById('uploadButton');
+    const uploadInput = document.querySelector('input[name="excelFile"]');
+    const uploadSubmitButton = document.getElementById('uploadSubmitButton');
+    const fileAlert = document.getElementById('fileAlert');
+    const uploadForm = document.getElementById('upload');
+
+    uploadButton.addEventListener('click', () => {
+        uploadInput.style.display = 'block';
+        uploadSubmitButton.removeAttribute('disabled');
+        fileAlert.style.display = 'none';
+    });
+
+    uploadInput.addEventListener('change', (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile && (selectedFile.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || selectedFile.type === 'application/vnd.ms-excel')) {
+            fileAlert.style.display = 'none';
+        } else {
+            fileAlert.style.display = 'block';
+        }
+    });
+    
+    uploadSubmitButton.addEventListener('click', () => {
+        console.log('Upload',)
+        // Submit the upload form when the "Upload" button is clicked
+        uploadForm.submit();
+    });
+</script>
 </html>

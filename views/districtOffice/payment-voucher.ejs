@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
 </head>
 <body>
 
@@ -69,21 +71,11 @@
                        
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Benificiary Name <span class="text-danger">*</span></label>
-                        <select class="form-control" id="beneficiarySelect" name="beneficiary">
-                            <option>Select</option>
-                            <% for( let ben of office_details.beneficiary ) { %>
-                                <option value="<%= ben.benificiary_name %>" <%=office_details.beneficiary.benificiary_name === ben.benificiary_name ? 'selected': '' %> ><%= ben.benificiary_name %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
+            
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Office Name<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                        <input type="text" class="form-control" readonly="'true" value="<%= office_details.name %>">
                         <input type="text" hidden="true" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details._id %>">
                     </div>
                 </div>
@@ -92,7 +84,7 @@
                     <div class="form-group">
                         <label class="form-label">Component <span class="text-danger">*</span></label>
                         <select class="form-control" id="componentSelect" name="components_name">
-                            
+                          
                         
                         </select>
                     
@@ -106,26 +98,59 @@
                         <input type="text" hidden="true" id="officeBnkId"  class="form-control" readonly="'true" name="office_name">
                     </div>
                 </div>
-                
+                <table class="table table-bordered" id="tableBody">
+                    <thead>
+                        <tr>    
+                            <th>BENEFICIARY</th>
+                            <th>BANK ACCOUNT NO.</th>
+                            <th>AMOUNT</th>
+    
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody class="data-row">
+                        <tr>
+                            <td>
+                             <select class="form-control beneficiarySelect" name="beneficiaries">
+                                    <option>Select</option>
+                                    <% for( let bnf of benificiaryData ) { %>
+                                        <option value="<%= bnf._id %>" <%= benificiaryData.benificiary_name === bnf.benificiary_name ? 'selected': '' %> ><%= bnf.benificiary_name%></option>
+                                    <% } %>
+                                </select>
+                            </td>
+                           
+                            <td><input type="text" class="form-control benifBank bank_Acc " name="bank_Acc" ></td>
+                            <td><input type="text" class="form-control amount" name="amount" ></td>
+                           
+                            <td>
+                                
+                                    <button class="toggle-row btn btn-primary addRowBtn" >
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="delete-row btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                
+                            </td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label"> To Benificiary Bank  <span class="text-danger">*</span></label>
-                        <input type="text"  id="benifBank" class="form-control" name="benifBank">
+                        <label class="form-label">Total Amount <span class="text-danger">*</span></label>
+                        <input type="text" id="totalAmount" class="form-control" readonly="'true" name="totalAmount">
+                    
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label  class="form-label">Naration <span class="text-danger">*</span></label>
+                        <textarea style="height: 160px; width: 320px;" class="form-control" name="desc"></textarea>
 
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="form-label"> Amount <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="amount">
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Naration <span class="text-danger">*</span></label>
-                        <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
-                    </div>
-                </div>
+                
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary next action-button">Submit</button>
                 </div>
@@ -144,7 +169,6 @@
                             <th>Sl. No.</th>
                             <th>Scheme Name</th>
                             <th>Component</th>
-                            <th>Beneficiary</th>
                             <th>Voucher No.</th>
                             <th>Payment <br> Date</th>
                             <th>Mode of <br> Payment</th>
@@ -159,9 +183,8 @@
                             <td><%= index+1 %></td>
                             <td><%= paymntDtls?.scheme?.name%></td>
                             <td><%= paymntDtls.components_name %></td>
-                            <td><%= paymntDtls.beneficiary.benificiary_name %></td>
-                            <td><%= paymntDtls.autoVoucherNo  %>t</td>
-                            <td><%= (paymntDtls.date).toLocaleString('en-GB') %></td>
+                            <td><%= paymntDtls.autoVoucherNo %></td>
+                            <td><%= (paymntDtls.date).toLocaleString('en-GB',{day:"numeric",month:"numeric",year:"numeric"}) %></td>
                             <td><%=paymntDtls.mode_of_payment %></td>
                             <td><%= paymntDtls.amount %></td>
                             <td><%= paymntDtls.status %></td>
@@ -204,15 +227,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
       const schemeSelect = document.getElementById('schemeSelect');
-      const tableBody = document.getElementById('componentSelect');
+      const compSelect=document.getElementById('componentSelect')
       const officeSelect= document.getElementById('officeSelect');
       const ofcBnkSelect = document.getElementById('ofcBnkSelect');
       const ofcBnkId = document.getElementById('officeBnkId');
       const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('transaction_id');
       const transactionDate = document.getElementById('transaction_date');
-      const beneficiarySelect = document.getElementById('beneficiarySelect');
-      const benifBank = document.getElementById('benifBank');
+      
 
       // Function to fetch data from the backend API and update the table
             
@@ -230,48 +252,33 @@
 
       async function fetchTableData() {
         const selectedScheme = schemeSelect.value;
-        if (beneficiarySelect === 'Select') {
-          tableBody.innerHTML = ''; // Clear the table when 'Select' is chosen
+        
+        if (selectedScheme === 'Select') {
+            compSelect.innerHTML = ''; // Clear the table when 'Select' is chosen
           return;
         }
   
         try {
           const response = await fetch(`/cas/directorate/payments/${selectedScheme}`);
-          const data = await response.json();
-          console.log(`fetched data`,data.components);
+          const data1 = await response.json();
           // Update the table with the fetched data
-          tableBody.innerHTML = data.components
+          compSelect.innerHTML = data1.components
             .map(
-              (component) => ` <option value=${component.name}>${component.name}</option>`
+              (component) =>` <option value=${component.name}>${component.name}</option>`
             )
         } catch (error) {
           console.error('Error fetching data:', error);
         }
       }
-      beneficiarySelect.addEventListener('change', populateBeneficiaryBank)
-     
-      function populateBeneficiaryBank() {
-            // const selectedBeneficiary = beneficiarySelect.value;
-            if (selectedBeneficiary === 'Select') {
-                benifBank.value = ''; // Clear the field when 'Select' is chosen
-                return;
-            }
 
-            // Find the selected beneficiary in the office_details data
-            const selectedBeneficiaryData =benificiaryData.find(f=>f.benificiary_name===beneficiarySelect.value)
-            console.log(`hjh`, selectedBeneficiaryData)
-            
-            // If the selected beneficiary data is found, populate the "To Beneficiary Bank" input field with the bank name
-           
-                benifBank.innerText = selectedBeneficiaryData.Bnk_Acc_No; // Assuming the bank name is available in the 'bank_name' property
-            
-            
-        }
       
       async function fetchOfcData() {
     const selectedScheme = schemeSelect.value;
     const selectedOffice = officeSelect.value;
-
+    if (selectedScheme === 'Select') {
+        ofcBnkSelect.value = ''; // Clear the table when 'Select' is chosen
+          return;
+        }
     if (selectedScheme && selectedOffice) {
       try {
         const response = await fetch(`/cas/directorate/payments/bank/${selectedOffice}/${selectedScheme}`);
@@ -289,17 +296,123 @@
   
   
       // Event listener to trigger data fetching when the scheme select value changes
-
+    const fetchAction = ()=>{
+        fetchTableData();
+        fetchOfcData();
+    }
      
-      schemeSelect.addEventListener('change', fetchOfcData);
-      schemeSelect.addEventListener('change', fetchTableData);
+
+    schemeSelect.addEventListener('change', fetchAction);
+      
       mop.addEventListener('change', modeofPmnts);
      
       // Initially, call the fetch function to populate the table based on the default selected scheme (Select)
-      fetchTableData();
+
+      const tableBody = document.getElementById('tableBody');
+
+            // Clone function
+            function cloneRow() {
+                const newRow = event.currentTarget.closest('.data-row').cloneNode(true);
+                newRow.querySelector('.toggle-row').classList.add('addRowBtn');
+                tableBody.appendChild(newRow);
+                updateRowEventListeners(newRow);
+                
+            }
+
+
+            // Delete Row
+            function deleteRow(event) {
+                const row = event.currentTarget.closest('.data-row');
+                const deletedAmount = parseFloat(row.querySelector('.amount').value);
+
+                // Subtract the deleted amount from the total amount
+                const totalAmountInput = document.getElementById('totalAmount');
+                const currentTotalAmount = parseInt(totalAmountInput.value);
+                if(deletedAmount){
+                const newTotalAmount = currentTotalAmount - deletedAmount;
+                totalAmountInput.value = newTotalAmount.toFixed(0);
+                }
+
+                // Update the total amount input field with the new total
+                row.remove();
+            }
+
+            // Attach initial event listeners
+                function updateRowEventListeners(row) {
+                    const deleteButton = row.querySelector('.delete-row');
+                    deleteButton.addEventListener('click', deleteRow);
+                    const addButton = row.querySelector('.toggle-row');
+                    addButton.addEventListener('click',function(e){
+                        e.preventDefault();
+                        cloneRow();
+                    })
+                    const beneficiarySelect = row.querySelector('.beneficiarySelect');
+                    beneficiarySelect.addEventListener('input', fetchBeneficiaryData);
+                    const bankDtls=row.querySelector('.benifBank')
+                    bankDtls.value =""
+
+                    const amountInputs = row.querySelector(".amount");
+                    amountInputs.addEventListener('change', updateTotalAmount);
+                    amountInputs.value=""
+                }
+
+            // Attach initial event listeners
+            updateRowEventListeners(tableBody.querySelector('.data-row'));  
+
+
+            const beneficiarySelects = document.querySelectorAll('.beneficiarySelect');
+            
+
+  // Add event listeners to all beneficiary select elements
+
+
+  async function fetchBeneficiaryData(event) {
+    const selectedBeneficiary = event.target.value;
+    const row = event.target.closest('tr');
+  const bankInput = row.querySelector('.benifBank');
+  console.log('Bank Input:', bankInput);
+  
+
+    if (selectedBeneficiary!=='Select') {
+      try {
+        const response = await fetch(`/cas/district/payments/beneficiary/${selectedBeneficiary}`);
+        const data = await response.json();
+        if(data){
+            bankInput.value = data
+        }
+      } catch (error) {
+        console.error('Error fetching beneficiary data:', error);
+      }
+    } else {
+      // Clear the bank account input if "Select" is chosen
+      bankInput.value = '';
+    }
+  }
+
+
+        // Calculate and update the total amount
+        function updateTotalAmount() {
+        let totalAmount = 0;
+        const amountInputs = document.querySelectorAll('input[name="amount"]');
+        amountInputs.forEach((input) => {
+            if (input.value) {
+            totalAmount += parseFloat(input.value);
+            }
+        });
+
+        const totalAmountInput = document.getElementById('totalAmount');
+        totalAmountInput.value = totalAmount.toFixed(0); // Format the total amount with 2 decimal places
+        }
+
+        // Attach event listeners to the amount inputs
+        
+
+// Initially update the total amount
+        updateTotalAmount();
+        
+        });
       
-      
-    });
+    
     
 
       // Check if the voucher number exists
@@ -308,6 +421,8 @@
       // Display the voucher number in a popup
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
+
+    
   </script>
  
 </html>

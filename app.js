@@ -24,7 +24,7 @@ const multer = require('multer');
 const xlsx = require('xlsx'); // Import 'xlsx' library
 const upload = multer({ dest: 'uploads/' });
 const fs= require('fs');
-const { log } = require("console");
+const { log, Console } = require("console");
 
 // Import the Mongoose models
 const {
@@ -849,6 +849,7 @@ app.get("/cas/directorate/payments/:schemeName", async (req, res) => {
     const componentData = await Scheme.findOne({ _id: schemeName }).populate(
       "components"
     );
+    console.log("componentData",componentData)
     res.json(componentData);
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -1395,7 +1396,7 @@ app.post("/cas/district/benificiary/upload", isAuthenticated, upload.single('exc
   try {
     const officeId=req.user.user.officeId
     const { path: filePath, originalname } = req.file;
-
+    officeDetails = await District.findOne({_id: officeId})
     // Check if the uploaded file is an Excel file
     if (!originalname.match(/\.(xlsx|xls)$/i)) {
       fs.unlinkSync(filePath); // Delete the uploaded file
@@ -1431,11 +1432,66 @@ console.log(beneficiaries)
           beneficiary.office_name=officeId
       const newBeneficiary = new Beneficiary(beneficiary);
       await newBeneficiary.save();
+      officeDetails.beneficiary.push(newBeneficiary._id);
+
     }
 
     fs.unlinkSync(filePath); // Delete the uploaded file
 
     res.redirect("/cas/district/benificiary");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/vendor/upload", isAuthenticated, upload.single('excelFile'), async (req, res) => {
+  try {
+    const officeId=req.user.user.officeId
+    const { path: filePath, originalname } = req.file;
+    officeDetails = await District.findOne({_id: officeId})
+    // Check if the uploaded file is an Excel file
+    if (!originalname.match(/\.(xlsx|xls)$/i)) {
+      fs.unlinkSync(filePath); // Delete the uploaded file
+      return res.status(400).json({ error: "Invalid file format. Please upload an Excel file." });
+    }
+
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const excelData = xlsx.utils.sheet_to_json(sheet);
+console.log(excelData);
+    // Validate and sanitize the Excel data
+    const vendors = [];
+    for (const row of excelData) {
+      // Implement validation and sanitation logic here
+      // we can use libraries like Joi for validation
+
+      // Example validation: Ensure required fields are present
+      if (!row.name || !row.office_name || !row.Gender || !row.Aadhar_No || !row.Bnk_Acc_No|| !row.Ifsc_code||!row.branch_details||!row.desc||!row.gst) {
+        fs.unlinkSync(filePath); // Delete the uploaded file
+        return res.status(400).json({ error: "Invalid data in Excel file. Required fields are missing." });
+      }
+
+      // Sanitize data if needed
+
+      vendors.push(row);
+    }
+console.log(vendors)
+//     // Process and create beneficiaries
+    for (let vendor of vendors) {
+//       // Create and save the beneficiary using your existing logic
+          vendor.office_name=officeId
+      const newVendor = new Vendor(vendor);
+      await newVendor.save();
+      officeDetails.vendor.push(newVendor._id);
+
+    }
+
+    fs.unlinkSync(filePath); // Delete the uploaded file
+
+    res.redirect("/cas/district/vendor");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1460,6 +1516,7 @@ app.get("/cas/district/payment-approval", isAuthenticated, async (req, res) => {
 
 app.post("/cas/district/payment-approval/:paymentId", async (req, res) => {
   const paymentId = req.params.paymentId;
+
   const newStatus = req.body.status;
 
   try {
@@ -1517,8 +1574,9 @@ app.get("/cas/district/vendor", isAuthenticated, async (req, res) => {
     const officeDetails = await District.findOne({ _id: office_Id }).populate(
       "schemes"
     );
+    const vendorDetails=await Vendor.find({ office_name: office_Id }).populate("office_name")
     res.render("districtOffice/vendor", { officeDetails,  username: req.user.user.username,
-      designation: req.user.user.designation.name, });
+      designation: req.user.user.designation.name,vendorDetails });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1579,10 +1637,9 @@ app.get("/cas/district/payment", isAuthenticated, async (req, res) => {
     const paymentDetails = await DisPayment.find({ office_name: office_Id })
       .populate("office_name")
       .populate("scheme")
-      .populate("beneficiary")
       .populate("financial_year");
 
-    console.log(`paymentdetails`, paymentDetails);
+    // console.log(`paymentdetails`, paymentDetails);
 
     const office_details = await District.findOne({ _id: office_Id })
       .populate("bank")
@@ -1598,6 +1655,7 @@ app.get("/cas/district/payment", isAuthenticated, async (req, res) => {
       financialYear,
       voucherNo,
       paymentDetails,
+      benificiaryData,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
     });
@@ -1607,9 +1665,21 @@ app.get("/cas/district/payment", isAuthenticated, async (req, res) => {
   }
 });
 
+app.get("/cas/district/payments/beneficiary/:selectedBeneficiary",async (req, res) => {
+  try {
+    const benifData = req.params.selectedBeneficiary;
+    const benificiaryData = await Beneficiary.findOne({ _id:benifData});
+    res.json(benificiaryData.Bnk_Acc_No);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Failed to fetch data from the database." });
+  }
+});
+
 app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
+    console.log(req.body);
 
     const {
       date,
@@ -1618,17 +1688,16 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       transaction_date,
       sanction_ord_no,
       scheme,
-      beneficiary,
-      office_name,
+      beneficiaries, // Array of beneficiary objects with name and amount
       components_name,
-      from_bank,
-      benifBank,
-      amount,
+      amount, //
+      totalAmount,
+      bank_Acc, // Array of beneficiary bank account numbers
       desc,
     } = req.body;
 
+
     const paymentDate = new Date(date); // Assuming "date" is the payment date
-    const paymentYear = paymentDate.getFullYear();
 
     // Find the financial year that corresponds to the payment date
     const financialYear = await FinancialYear.findOne({
@@ -1648,14 +1717,12 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       scheme: schemeDetails._id,
     });
 
-  
 
-    const counter = await DisPayCounter.findOneAndUpdate(
+    const discounter = await DisPayCounter.findOneAndUpdate(
       {
         district: districtDetails.name,
         scheme: schemeDetails.name,
         component: components_name,
-        beneficiary: beneficiary,
         financialYear:financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
@@ -1663,44 +1730,48 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     );
 
     const district_abbvr = districtDetails.name.slice(0, 3).toUpperCase();
-    const scheme_abbvr = scheme.slice(0, 3).toUpperCase();
+    const scheme_abbvr = schemeDetails.name.slice(0, 3).toUpperCase();
     const component_abbr = components_name.slice(0, 3).toUpperCase();
-    const benificiary = beneficiary.slice(0, 4).toUpperCase();
+    
 
     const voucherNo = generateDisPayVoucherNumber(
       district_abbvr,
-      benificiary,
       scheme_abbvr,
       component_abbr,
       financialYear.year,
-      counter.count
+      discounter.count
     );
-    const benifData = await Beneficiary.findOne({
-      benificiary_name: beneficiary,
-    });
-    const disOfcPayment = new DisPayment({
-      date,
-      mode_of_payment,
-      transaction_Id,
-      transaction_date,
-      sanction_ord_no,
-      scheme: schemeDetails._id,
-      beneficiary: benifData._id,
-      office_name: districtDetails._id,
-      components_name,
-      from_bank: bankDetails.bankId,
-      benifBank,
-      autoVoucherNo: voucherNo,
-      status: "pending",
-      amount,
-      financial_year: financialYear._id,
-      desc,
-    });
-
-    disOfcPayment.save();
-    res.redirect(
-      `/cas/district/payment?voucher=${encodeURIComponent(voucherNo)}`
-    );
+  // Create an array to store beneficiary data
+  const beneficiaryData = beneficiaries.map((beneficiary, index) => ({
+    name: beneficiary,
+    amount: parseFloat(amount[index] || 0),
+    bankAcc: bank_Acc[index],
+  }));
+  
+console.log(beneficiaryData)
+  // Create and save the combined payment entry
+  const disOfcPayment = new DisPayment({
+    date,
+    mode_of_payment,
+    transaction_Id,
+    transaction_date,
+    sanction_ord_no,
+    scheme: schemeDetails._id,
+    beneficiaries: beneficiaryData,
+    office_name: districtDetails._id,
+    components_name,
+    from_bank: bankDetails.bankId,
+    autoVoucherNo: voucherNo,
+    status: "pending",
+    amount: totalAmount,
+    financial_year: financialYear._id,
+    desc,
+  });
+console.log(disOfcPayment)
+  // disOfcPayment.save();
+  res.redirect(
+    `/cas/district/payment?voucher=${encodeURIComponent(voucherNo)}`
+  );
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });

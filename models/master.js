@@ -533,61 +533,66 @@ const DisPayment = Schema({
     type: Date,
     required: true,
   },
-
   sanction_ord_no: {
     type: String,
     required: true,
   },
-  beneficiary:{
-  type: mongoose.Schema.Types.ObjectId,
-  ref:'Beneficiary',
-  },
- scheme: {
+  beneficiaries: [
+    {
+      name: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Beneficiary',
+      },
+      amount: {
+        type: Number,
+        required: true,
+      },
+      bankAcc:{
+        type: String,
+        required: true,
+      }
+    },
+  ],
+  scheme: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Scheme",
+    ref: 'Scheme',
   },
-  components_name:{
-    type:String,
-    required: true,
-  },
-  office_name:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "District",
-  },
-  
-  source_bank_details:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "BankDetails",
-  },
-
-  benifBank:{
+  components_name: {
     type: String,
     required: true,
   },
-amount:{
+  office_name: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'District',
+  },
+  from_bank: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BankDetails',
+  },
+  amount: {
     type: Number,
-    required:true
+    required: true,
   },
-  financial_year:{
+  financial_year: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "FinancialYear",
+    ref: 'FinancialYear',
   },
-  autoVoucherNo:{
-    type:String,
-    required:true,
-    unique:true,
-  },
-  status:{
-    type:String,
-    required:true,
-  },
- 
- desc:{
+  autoVoucherNo: {
     type: String,
-    
-  }
-
+    required: true,
+    unique: true,
+  },
+  status: {
+    type: String,
+    required: true,
+  },
+  desc: {
+    type: String,
+  },
 });
+
+// Rest of your schema and code...
+
 
 const DisOfcPayment = Schema({
   date: {
@@ -692,7 +697,6 @@ const dirRecCounterSchema =Schema({
     district: String,
     scheme: String,
     component: String,
-    beneficiary:String,
     financialYear: String,
     count: { type: Number, default: 1 },
   });
@@ -860,10 +864,6 @@ const vendorSchema = Schema({
   office_name: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "District",
-    required: true,
-  },
-  dob: {
-    type: Date,
     required: true,
   },
   Gender: {
