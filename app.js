@@ -1854,7 +1854,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     bankAcc: bank_Acc[index],
   }));
   
-console.log(beneficiaryData)
+
   // Create and save the combined payment entry
   const disOfcPayment = new DisPayment({
     date,
@@ -1874,7 +1874,7 @@ console.log(beneficiaryData)
     desc,
   });
 console.log(disOfcPayment)
-  // disOfcPayment.save();
+  disOfcPayment.save();
   res.redirect(
     `/cas/district/payment?voucher=${encodeURIComponent(voucherNo)}`
   );
