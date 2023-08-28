@@ -2594,6 +2594,144 @@ app.get("/cas/district/schemewise", isAuthenticated, async (req, res) => {
     }
 });
 
+app.get("/cas/district/fy-closing", isAuthenticated, async (req, res) => {
+  try {
+      const directorateOfc = req.user.user.directorate;
+      const office_Id = req.user.user.officeId;
+      const financialYear=await FinancialYear.find()
+      const districtDetails = await District.findOne({ _id: office_Id }).populate("schemes")
+  
+  
+      res.render("districtOffice/fy-closing-report", {
+       districtDetails,
+       financialYear,
+       office_Id,
+       username: req.user.user.username,
+       designation: req.user.user.designation.name,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+  });
+  
+  app.get('/cas/district/fy-closing/:schemeId', isAuthenticated, async (req, res) => {
+    try {
+      const office_Id = req.user.user.officeId;
+      const schemeId = req.params.schemeId;
+      const filterType = req.query.filterType;
+      let startDate, endDate;
+      const scheme_id= await Scheme.findOne({_id:schemeId})
+      const bankSchemeDtls= await BankDetails.findOne({office:office_Id, scheme:schemeId })
+       console.log(`bnkdtlsssss`,bankSchemeDtls)
+      function getFinancialYearDates(financialYear) {
+        const [startYear, endYear] = financialYear.split('-').map(Number);
+      
+        const startDate = new Date(startYear, 3, 1); // Assuming the financial year starts in April (month 3)
+        const endDate = new Date((startYear + 1), 2, 31); // Convert endYear to "2024" and set the month to 2 for March
+      
+        return { startDate, endDate };
+      }
+  
+      if (filterType === 'financialYear') {
+        const financialYear = req.query.financialYear;
+        if (financialYear !== 'Select') {
+          const financialYearValue = await FinancialYear.findOne({ _id: financialYear });
+          startDate = financialYearValue.startDate;
+          endDate = financialYearValue.endDate;
+          console.log(startDate, endDate);
+        }
+      } else if (filterType === 'monthly') {
+        const selectedMonth = req.query.month; // Get selected month from query parameter
+        const year = new Date().getFullYear(); // Get current year
+        startDate = new Date(req.query.startDate); // Month is 0-indexed
+        endDate = new Date(req.query.endDate);
+      } else if (filterType === 'dateRange') {
+        startDate = new Date(req.query.startDate); // Get start date from query parameter
+        endDate = new Date(req.query.endDate);
+      }
+  
+      // Fetch Opening Balance
+      const openingBalance = await OpeningBalance.findOne({ scheme: scheme_id._id, office: office_Id }).populate("bank");
+      console.log(`QUERY`,req.query)
+  
+      // Fetch Payments
+      const paymentPipeline = [
+        { $match: { scheme: scheme_id._id, date: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: null,
+            totalBankPayment: { $sum: '$amount' },
+          },
+        },
+      ];
+      const payments = await DisPayment.aggregate([
+        {
+          $match: { 
+            scheme: scheme_id._id,
+            date: { $gte: startDate, $lte: endDate }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalBankPayment: { $sum: '$amount' }
+          }
+        }
+      ]);
+  
+      // Fetch Receipts
+      const receiptPipeline = [
+        { $match: { scheme:scheme_id._id, date: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: null,
+            totalBankReceipt: { $sum: '$amount' },
+          },
+        },
+      ];
+      const receipts = await DisReceipt.aggregate([
+        { $match: { scheme:scheme_id._id, date: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: null,
+            totalBankReceipt: { $sum: '$amount' },
+          },
+        },
+      ]);
+  
+      // Fetch Advances
+      const advancePipeline = [
+        { $match: { scheme:new mongoose.Types.ObjectId(scheme_id._id),office:new mongoose.Types.ObjectId(office_Id), date:{ $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: null,
+            totalAdvance: { $sum: '$amount' },
+          },
+        },
+      ];
+      const advances = await Advance.aggregate([
+        { $match: {  from_bank:new mongoose.Types.ObjectId(bankSchemeDtls._id),office:new mongoose.Types.ObjectId(office_Id), date: { $gte: startDate, $lte: endDate } } },
+        {
+          $group: {
+            _id: null,
+            totalAdvance: { $sum: '$amount' },
+          },
+        },
+      ]);
+  console.log(`paymentsssssssss`,advances)
+      res.json({
+        openingBalance,
+        payments: payments[0] || {},
+        receipts: receipts[0] || {},
+        advances: advances[0] || {},
+      });
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

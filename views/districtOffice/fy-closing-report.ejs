@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
+<body>
+
+
+    <%if(designation==="ACCOUNTANT"){%>
+        <%-include('../Includes/sidebar3.ejs')%>
+        <%-include('../Includes/header-5.ejs')%>
+        
+        <% }else{ %>
+
+    <%-include('../Includes/sidebar2.ejs')%>
+    <%-include('../Includes/header-4.ejs')%>
+    <% } %>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <div class="flex-wrap d-flex justify-content-between align-items-center">
+        <div><h4 class="mb-5">FY-Closing Report</h4></div>
+        <div>
+            <select class="form-control" id="schemeSelect">
+                <option>Select Scheme</option>
+                <% for( let sch of districtDetails.schemes ) { %>
+                    <option value="<%= sch._id %>" <%= districtDetails.schemes.name === sch.name ? 'selected': '' %> ><%= sch.name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
+            <select class="form-control" id="filterType">
+                <option value="financialYear">Financial Year</option>
+                <option value="monthly">Monthly</option>
+                <option value="dateRange">Date Range</option>
+            </select>
+            <select class="form-control" id="financialYearFilter">
+                <option>Select</option>
+                <% for( let year of financialYear ) { %>
+                    <option value="<%= year._id %>"><%= year.year %></option>
+                <% } %>
+            </select>
+            <select class="form-control" id="monthFilter" style="display: none;">
+                <option>SELECT</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">Octobor</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+                <!-- Add more months as needed -->
+            </select>
+            <div style="display: flex; flex-direction: row;">
+            <input type="date" id="startDateInput" style="display: none;">
+            <input type="date" id="endDateInput" style="display: none;">
+        </div>
+        </div>
+       
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th colspan="2" class="text-center">opening-balance</th>
+                            <th>Receipt</th>
+                            <th>Total</th>
+                            <th colspan="2" class="text-center">payment</th>
+                            <th>Closing Balance</th>
+                           
+                        </tr>
+                        <tr>
+                            
+                            <th>Cash</th>
+                            <th>Bank</th>
+                            <th></th>
+                            <th></th>
+                            <th>Benificiary</th>
+                            <th>Party</th>
+                            <th></th>
+                          
+                            
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td ></td>
+                            <td></td>
+                            <td ></td>
+                            <td ></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td ></td>
+                            <td></td>
+                            <td ></td>
+                            <td ></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td ></td>
+                            <td></td>
+                            <td ></td>
+                            <td ></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+<script>
+    const schemeSelect = document.getElementById('schemeSelect');
+    const filterTypeSelect = document.getElementById('filterType');
+    const financialYearFilterSelect = document.getElementById('financialYearFilter');
+    const monthFilterSelect = document.getElementById('monthFilter');
+    const startDateInput = document.getElementById('startDateInput');
+    const endDateInput = document.getElementById('endDateInput');
+    const cashBookTable = document.getElementById('cashBookTable');
+
+    const fetchData = async (schemeId, startDate, endDate, financialYearId) => {
+    let url = `/cas/district/fy-closing/${schemeId}?filterType=${filterTypeSelect.value}`;
+
+    if (financialYearId) {
+        url += `&financialYear=${financialYearId}`;
+    } else if (startDate && endDate) {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    const response = await fetch(url);
+    return response.json();
+};
+
+    schemeSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    filterTypeSelect.addEventListener('change', () => {
+        updateFilterDisplay();
+        fetchDataAndUpdateTable();
+    });
+
+    financialYearFilterSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    monthFilterSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    startDateInput.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    endDateInput.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    const fetchDataAndUpdateTable = async () => {
+        const schemeId = schemeSelect.value;
+        const selectedFilter = filterTypeSelect.value;
+
+        if (selectedFilter === 'financialYear') {
+            const financialYearId = financialYearFilterSelect.value;
+            const [data] = await fetchData(schemeId, null, null, financialYearId);
+            // Update the table or do something with the fetched data
+        } else if (selectedFilter === 'monthly') {
+            const month = monthFilterSelect.value;
+            const currentDate = new Date();
+            const year = currentDate.getFullYear();
+            const [data] = await fetchData(schemeId, year + '-' + month + '-01', year + '-' + (parseInt(month) + 1) + '-01');
+            // Update the table or do something with the fetched data
+        } else if (selectedFilter === 'dateRange') {
+            const startDate = encodeURIComponent(startDateInput.value);
+            const endDate = encodeURIComponent(endDateInput.value);
+            const [data] = await fetchData(schemeId, startDate, endDate, null)
+            // Update the table or do something with the fetched data
+        }
+    };
+
+    const updateFilterDisplay = () => {
+        const selectedFilter = filterTypeSelect.value;
+
+        if (selectedFilter === 'financialYear') {
+            financialYearFilterSelect.style.display = 'block';
+            monthFilterSelect.style.display = 'none';
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+        } else if (selectedFilter === 'monthly') {
+            financialYearFilterSelect.style.display = 'none';
+            monthFilterSelect.style.display = 'block';
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+        } else if (selectedFilter === 'dateRange') {
+            financialYearFilterSelect.style.display = 'none';
+            monthFilterSelect.style.display = 'none';
+            startDateInput.style.display = 'block';
+            endDateInput.style.display = 'block';
+        }
+    };
+</script>
+
+
+</html>
