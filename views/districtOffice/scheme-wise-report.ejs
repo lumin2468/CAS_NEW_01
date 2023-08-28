@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
+<body>
+
+
+    <%if(designation==="ACCOUNTANT"){%>
+        <%-include('../Includes/sidebar3.ejs')%>
+        <%-include('../Includes/header-5.ejs')%>
+        
+        <% }else{ %>
+
+    <%-include('../Includes/sidebar2.ejs')%>
+    <%-include('../Includes/header-4.ejs')%>
+    <% } %>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <div class="flex-wrap d-flex justify-content-between align-items-center">
+        <div><h4 class="mb-5">Scheme Wise Day Book Register</h4></div>
+        <div>
+            <select class="form-control" id="schemeSelect">
+                <option>Select Scheme</option>
+                <% for( let sch of districtDetails.schemes ) { %>
+                    <option value="<%= sch._id %>" <%= districtDetails.schemes.name === sch.name ? 'selected': '' %> ><%= sch.name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
+            <select class="form-control" id="schemeSelect">
+                <option>Financial Year</option>
+                <% for( let year of financialYear ) { %>
+                    <option value="<%= year._id %>"><%= year.year %></option>
+                <% } %>
+            </select>
+        </div>
+        
+            <div class="col-md-4">
+                <div class="form-group" style="display:flex; gap: 15px; align-items: center; justify-content: center;">
+                    <div style="display: flex; flex-direction: column;"> 
+                    <label class="form-label"> From Date</label>
+                    <input type="date" id="startDateInput" >
+                    </div>
+                    <div style="display: flex; flex-direction: column;">
+                    <label class="form-label"> To Date</label>
+                    <input type="date" id="endDateInput">
+                </div>
+                </div>
+            </div>
+        
+       
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                       
+                        <tr>
+                            <th>Opening Balance</th>
+                            <th>Receipt</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Closing Balance</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="startDate" ></td>
+                            <td></td>
+                            <td ></td>
+                            <td ></td>
+                            <td></td>
+                       
+                        </tr>
+                        <tr>
+                            <td id="startDate" ></td>
+                            <td></td>
+                            <td ></td>
+                            <td ></td>
+                            <td></td>
+                       
+                        </tr>
+                        <tr>
+                            <td id="startDate" ></td>
+                            <td></td>
+                            <td ></td>
+                            <td ></td>
+                            <td></td>
+                       
+                        </tr>
+
+                    </tbody>
+                   
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const schemeSelect = document.getElementById('schemeSelect');
+        const startDateInput = document.getElementById('startDateInput');
+        const endDateInput = document.getElementById('endDateInput');
+        const cashBookTable = document.getElementById('cashBookTable');
+
+        const fetchData = async (schemeId, startDate, endDate) => {
+            const url = `/cas/district/schemewise/${schemeId}/${startDate}/${endDate}`;
+
+            const response = await fetch(url);
+            return response.json();
+        };
+
+        const updateTable = (data) => {
+            // Update the table or perform any other operations with the fetched data
+        };
+
+        const fetchDataAndUpdateTable = async () => {
+            const schemeId = schemeSelect.value;
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            if (schemeId && startDate && endDate) {
+                try {
+                    const data = await fetchData(schemeId, startDate, endDate);
+                    updateTable(data);
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            }
+        };
+
+        schemeSelect.addEventListener('change', fetchDataAndUpdateTable);
+        startDateInput.addEventListener('change', fetchDataAndUpdateTable);
+        endDateInput.addEventListener('change', fetchDataAndUpdateTable);
+    });
+</script>
+
+
+</html>

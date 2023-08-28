@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+</head>
+<body>
+
+
+    <%if(designation==="ACCOUNTANT" || designation==="HEAD-CLERK"){%>
+        <%-include('../Includes/sidebar3.ejs')%>
+        <%-include('../Includes/header-5.ejs')%>
+    <% }else{ %>
+
+    <%-include('../Includes/sidebar2.ejs')%>
+    <%-include('../Includes/header-4.ejs')%>
+    <% } %>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <h4 class="mb-5">Payment Details</h4>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+            <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label"> Date <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" readonly="true" name="date" value="<%= paymentDetails.date.toLocaleString("en-GB",{day:"numeric",month:"numeric",year:"numeric"}) %>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" readonly="true" name="date" value="<%= paymentDetails.mode_of_payment%>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label id="transaction_id" class="form-label">CHEQUE/DRAFT No. <span class="text-danger">*</span></label>
+                        <input type="" class="form-control" name="transaction_Id" readonly="true" value="<%= paymentDetails.transaction_Id %>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label id="transaction_date" class="form-label">CHEQUE/DRAFT Date.  <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" readonly="true" name="date" value="<%= paymentDetails.transaction_date.toLocaleString("en-GB",{day:"numeric",month:"numeric",year:"numeric"}) %>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Voucher/Sanction Order Ref. No.<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="sanction_ord_no" readonly="true" value="<%= paymentDetails.sanction_ord_no %>">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
+                        <input type="" class="form-control" name="schemeName" readonly="true" value="<%= paymentDetails.scheme.name%>">
+
+                       
+                    </div>
+                </div>
+            
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Office Name<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" readonly="'true"  value="<%= paymentDetails.office_name.name %>">
+                        
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Component <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" readonly="'true"  value="<%= paymentDetails.components_name %>">
+                    
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="ofcBnkSelect"  readonly="'true" value="<%= paymentDetails.from_bank.bank %>" >
+                        
+                    </div>
+                </div>
+                <table class="table table-bordered" id="tableBody">
+                    <thead>
+                        <tr>    
+                            <th style="width:20px;">SERIAL NO.</th>
+                            <th>BENEFICIARY</th>
+                            <th>BANK ACCOUNT NO.</th>
+                            <th>AMOUNT</th>
+                        </tr>
+                    </thead>
+                    <tbody class="data-row">
+                        <% for( let[index, bnf] of paymentDetails.beneficiaries.entries()) { %>
+                        <tr>
+                            <td><%= index+1 %></td>
+                             <td><input type="text" class="form-control amount" name="name" value="<%= bnf.name.benificiary_name %>" ></td>
+                           
+                            <td><input type="text" class="form-control benifBank bank_Acc " name="bank_Acc" value="<%= bnf.bankAcc %>" ></td>
+                            <td><input type="text" class="form-control amount" name="amount" value="<%= bnf.amount %>"  ></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Total Amount <span class="text-danger">*</span></label>
+                        <input type="text" id="totalAmount" class="form-control" readonly="'true" name="totalAmount" value="<%= paymentDetails.amount %>">
+                    
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label  class="form-label">Naration <span class="text-danger">*</span></label>
+                        <textarea style="height: 160px; width: 320px;" class="form-control" name="desc" readonly="true"><%= paymentDetails.desc %></textarea>
+
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    
+    </div>
+</div>
+
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+
+</html>

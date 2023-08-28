@@ -818,7 +818,6 @@ const beneficiarySchema = Schema({
   },
   dob: {
     type: Date,
-    required: true,
   },
   Gender: {
     type: String,
@@ -922,7 +921,7 @@ const beneficiaryBankSchema = Schema({
 });
 
 // Advance Schema
-const advanceSchema = Schema({
+const advanceSchema = Schema({  
   date: {
     type: Date,
     required: true,
@@ -999,6 +998,10 @@ const adjustmentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Advance',
     required: true,
+  },
+  office:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'District',
   },
   adjDate: {
     type: Date,

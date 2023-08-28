@@ -68,6 +68,7 @@ const pages = [
   "/cas/directorate/assets",
   "/cas/district/assets",
   "/cas/district/receipt/assets",
+  "/cas/district/paymentDetails/assets",
 ];
 // app.use(
 //   "/cas/assets",
@@ -1884,6 +1885,30 @@ console.log(disOfcPayment)
   }
 });
 
+app.get("/cas/district/paymentDetails/:paymentId",isAuthenticated,async (req, res) => {
+  try {
+      const office_Id = req.user.user.officeId;
+      const paymentId=req.params.paymentId;
+      
+
+      const paymentDetails = await DisPayment.findOne({_id:paymentId})
+        .populate("office_name")
+        .populate("scheme")
+        .populate("from_bank")
+        .populate("financial_year")
+        .populate("beneficiaries.name")
+    
+      res.render("districtOffice/paymentDetails", {
+        paymentDetails,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
+      });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Failed to fetch data from the database." });
+  }
+});
+
 app.get("/cas/district/advance", isAuthenticated, async (req, res) => {
   try {
     const office_Id = req.user.user.officeId;
@@ -2040,6 +2065,8 @@ app.get("/cas/district/adjustment", isAuthenticated, async (req, res) => {
       .populate("party")
       .populate("purpose");
 
+      const adjData=await Adjustment.find({office: office_Id }).populate("advance")
+
     res.render("districtOffice/adjustment", {
       office_details,
       modeofpmnt,
@@ -2048,6 +2075,7 @@ app.get("/cas/district/adjustment", isAuthenticated, async (req, res) => {
       voucherNo,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
+      adjData
     });
   } catch (error) {
     console.error(error);
@@ -2087,6 +2115,7 @@ app.post('/cas/district/adjustment', isAuthenticated, async (req, res) => {
       adjDate,
       adjAmount,
       desc,
+      office:office_id
     });
 
     // Save the adjustment
@@ -2373,7 +2402,8 @@ app.get('/cas/district/report/:schemeId', isAuthenticated, async (req, res) => {
     const filterType = req.query.filterType;
     let startDate, endDate;
     const scheme_id= await Scheme.findOne({_id:schemeId})
-     
+    const bankSchemeDtls= await BankDetails.findOne({office:office_Id, scheme:schemeId })
+     console.log(`bnkdtlsssss`,bankSchemeDtls)
     function getFinancialYearDates(financialYear) {
       const [startYear, endYear] = financialYear.split('-').map(Number);
     
@@ -2387,9 +2417,8 @@ app.get('/cas/district/report/:schemeId', isAuthenticated, async (req, res) => {
       const financialYear = req.query.financialYear;
       if (financialYear !== 'Select') {
         const financialYearValue = await FinancialYear.findOne({ _id: financialYear });
-        const { startDate: fyStartDate, endDate: fyEndDate } = getFinancialYearDates(financialYearValue.year);
-        startDate = fyStartDate;
-        endDate = fyEndDate;
+        startDate = financialYearValue.startDate;
+        endDate = financialYearValue.endDate;
       }
     } else if (filterType === 'monthly') {
       const selectedMonth = req.query.month; // Get selected month from query parameter
@@ -2460,25 +2489,109 @@ app.get('/cas/district/report/:schemeId', isAuthenticated, async (req, res) => {
         },
       },
     ];
-    // const advances = await Advance.aggregate([
-    //   { $match: { scheme:scheme_id._id, date: { $gte: startDate, $lte: endDate } } },
-    //   {
-    //     $group: {
-    //       _id: null,
-    //       totalAdvance: { $sum: '$amount' },
-    //     },
-    //   },
-    // ]);
-console.log(`paymentsssssssss`,payments, receipts,openingBalance)
+    const advances = await Advance.aggregate([
+      { $match: { from_bank:bankSchemeDtls._id,office:office_Id, date: { $gte: startDate, $lte: endDate } } },
+      {
+        $group: {
+          _id: null,
+          totalAdvance: { $sum: '$amount' },
+        },
+      },
+    ]);
+console.log(`paymentsssssssss`,advances)
     res.json({
       openingBalance,
       payments: payments[0] || {},
       receipts: receipts[0] || {},
+      advances: advances[0] || {},
     });
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+app.get("/cas/district/schemewise", isAuthenticated, async (req, res) => {
+  try {
+      const directorateOfc = req.user.user.directorate;
+      const office_Id = req.user.user.officeId;
+      const financialYear=await FinancialYear.find()
+      const districtDetails = await District.findOne({ _id: office_Id }).populate("schemes")
+  
+  
+      res.render("districtOffice/scheme-wise-report", {
+       districtDetails,
+       financialYear,
+       office_Id,
+       username: req.user.user.username,
+       designation: req.user.user.designation.name,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+  });
+  
+  
+
+
+  app.get('/cas/district/schemewise/:schemeId/:startDate/:endDate', isAuthenticated, async (req, res) => {
+    try {
+        const office_Id = req.user.user.officeId;
+        const { schemeId, startDate, endDate } = req.params;
+
+        // Fetch Opening Balance
+        const openingBalance = await OpeningBalance.findOne({ scheme: schemeId, office: office_Id }).populate("bank");
+
+        // Convert start and end date strings to Date objects
+        const startDateTime = new Date(startDate);
+        const endDateTime = new Date(endDate);
+
+        // Fetch Payments
+        const payments = await DisPayment.aggregate([
+            {
+                $match: {
+                    scheme: new mongoose.Types.ObjectId(schemeId),
+                    date: { $gte: startDateTime, $lte: endDateTime },
+                    office_name: new mongoose.Types.ObjectId(office_Id)
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalBankPayment: { $sum: '$amount' }
+                }
+            }
+        ]);
+
+        // Fetch Receipts
+        const receipts = await DisReceipt.aggregate([
+            {
+                $match: {
+                    scheme: new mongoose.Types.ObjectId(schemeId),
+                    date: { $gte: startDateTime, $lte: endDateTime },
+                    office_name: new mongoose.Types.ObjectId(office_Id)
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalBankReceipt: { $sum: '$amount' }
+                }
+            }
+        ]);
+
+        console.log('receipt', receipts, payments);
+
+        res.json({
+            openingBalance,
+            payments: payments[0] ? payments[0].totalBankPayment : 0,
+            receipts: receipts[0] ? receipts[0].totalBankReceipt : 0
+        });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 // Start the server
