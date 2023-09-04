@@ -193,9 +193,9 @@ app.post(
         user: {
           username: user.name,
           id: user._id,
+          officeId: user.officeId,
           designation: user.designation,
           directorate: user.directorateId,
-          officeId: user.officeId,
         },
       };
 
@@ -234,6 +234,7 @@ app.get("/cas/dashboard", verifyToken, (req, res) => {
   } else if (designation.name === "Director") {
     
     res.render("directorate/dashboard", {
+
       username:req.user.username,
       designation: req.user.designation.name,
     });
@@ -386,7 +387,7 @@ app.get("/cas/directorate/user", isAuthenticated, async (req, res) => {
 
 app.post("/cas/directorate/user", isAuthenticated, async (req, res) => {
   try {
-    const {directorate}=req.user.user;
+    const {directorate,officeId}=req.user.user;
    const {username, designation,office_name,mobile_no, email, password, confirm_pswd,active}= req.body;
    let user_pswd
    console.log(password)
@@ -1378,7 +1379,9 @@ app.get("/cas/district/benificiary", isAuthenticated, async (req, res) => {
       "schemes"
     );
     const beneficiaries= await Beneficiary.find({office_name:office_Id}).populate("office_name")
-    res.render("districtOffice/benificiary", { officeDetails,  username: req.user.user.username,
+    res.render("districtOffice/benificiary", { 
+      officeDetails,  
+      username: req.user.user.username,
       designation: req.user.user.designation.name, 
       beneficiaries
     });
@@ -1403,6 +1406,7 @@ app.post("/cas/district/benificiary", isAuthenticated, async (req, res) => {
       desc,
     } = req.body;
     const office_Id = req.user.user.officeId;
+    
     const office_details = await District.findOne({ _id: office_Id });
     const schemeDetails = await Scheme.findOne({});
     const newBenificiary = new Beneficiary({
