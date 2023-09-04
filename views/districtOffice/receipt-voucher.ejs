@@ -104,6 +104,25 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
+                        <label class="form-label">Receipt Mode</label>
+                            <div class="flex flex-col p-2">
+                            <select name="scheme" id="receipt_mode" class="form-control">
+                                <option>Select</option>
+                                <option>Schemewise</option>
+                                <option>Others</option>
+                              </select>
+                            </div>
+                    </div>
+                </div>
+                <div class="col-md-4" id="othersTypeSection" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Define Others-Type</label>
+                        <input type="text" class="form-control" name="others_type" >
+                        
+                    </div>
+                </div>
+                <div class="col-md-4" id="schemeNameSection" style="display: none;">
+                    <div class="form-group">
                         <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
                         <% if (receiptDetails) { %>
                         <input type="text" readonly="true" class="form-control" value="<%= (receiptDetails.scheme.name) %>">
@@ -159,7 +178,7 @@
                         <% if (receiptDetails) { %>
                         <input type="text" class="form-control" name="bankDetails" readonly="true" value="<%= (receiptDetails.receiverBank.bank) %>" >
                         <%}else{%>
-                            <input type="text" id="bankDetails" class="form-control"  readonly="true"  >
+                            <input type="text" id="bankDetails" class="form-control"  >
                             <input type="text" hidden="true" class="form-control" id="bankAccntNo" name="bankDetails" readonly="true"  >
                         <% } %>
                     </div>
@@ -266,7 +285,25 @@
     const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('transaction_Id');
       const transactionDate = document.getElementById('transaction_date');
+      const receiptMode = document.getElementById('receipt_mode');
+      const othersTypeSection = document.getElementById('othersTypeSection');
+    const schemeNameSection = document.getElementById('schemeNameSection');
       // Function to fetch data from the backend API and update the table
+
+      function handleReceiptModeChange() {
+    const selectedValue = receiptMode.value;
+    console.log(receiptMode.value)
+   if (selectedValue === 'Others') {
+        othersTypeSection.style.display = 'block';
+        schemeNameSection.style.display = 'none';
+    } else if (selectedValue === 'Schemewise') {
+        othersTypeSection.style.display = 'none';
+        schemeNameSection.style.display = 'block';
+    } else {
+        othersTypeSection.style.display = 'none';
+        schemeNameSection.style.display = 'none';
+    }
+}
 
       async function modeofPmnts(){
         const selectedMode=mop.value
@@ -300,6 +337,7 @@
       }
       schemeSelect.addEventListener('change', fetchOfcData);
       mop.addEventListener('change', modeofPmnts);
+      receiptMode.addEventListener('change',handleReceiptModeChange )
 
       const voucherNo = '<%= voucherNo %>';
     if (voucherNo) {
