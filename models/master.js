@@ -726,6 +726,7 @@ const modeofpayment = Schema({
 const openingBalance = Schema({
   date:{
     type:Date,
+    required:true,
    },
   
   office:{

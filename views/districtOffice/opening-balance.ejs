@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -31,7 +32,8 @@
             <form action="/cas/district/opening-balance" method="post" id="form">
             <table class="table table-bordered" id="tableBody">
                 <thead>
-                    <tr>    
+                    <tr> 
+                        <th>Date</th>   
                         <th>Scheme</th>
                         <th>Cash</th>
                         <th>Bank</th>
@@ -43,6 +45,7 @@
                 </thead>
                 <tbody>
                     <tr>
+                        <td><input type="date" class="form-control" name="date"></td>
                         <td>
                          <select class="form-control schemeDtls" name="scheme">
                                 <option>Select</option>
@@ -53,15 +56,15 @@
                         </td>
                         <td><input type="text" class="form-control" name="cash" ></td>
                         <td> <select class="form-control bankDetails" name="bank">
-                           
-                        </select></td>
+                            </select>
+                        </td>
                         <td><input type="text" class="form-control" name="bank_balance" ></td>
                         <td><input type="text" class="form-control" name="advance" ></td>
                        
                         <td>
-                            <a class="btn btn-success btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
+                            <a class="btn btn-danger btn-icon btn-sm rounded-pill ms-2 delete-row" href="#" role="button">
                                 <span class="btn-inner">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-32"><path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                    <i class="fas fa-minus"></i>
                                 </span>
                             </a>
                         </td>
@@ -145,6 +148,7 @@
 
 </body>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
     const tableBody = document.getElementById('tableBody');
     const add = document.getElementById('addMore');
     const submitBtn = document.getElementById('submitBtn');
@@ -156,36 +160,14 @@
         }
         const response = await fetch(`/cas/district/opening-balance/${selectedScheme}`);
         const data = await response.json();
-        bnkData.innerHTML = `<option value=${data.bankId.accountNumber}>${data.bankId.bank}</option>`;
+        console.log(data);
+        if(!data){  
+            bnkData.innerHTML = "no bank linked";
+        }
+        bnkData.innerHTML = `<option value=${data.bankId.accountNumber}>${data.bankId.bank} / ${ data.bankId.accountNumber} / ${ data.bankId.IFSCNumber} </option>`;
     };
     
-    function addNewRow(event) {
-        event.preventDefault();
-        const lastRow = tableBody.lastElementChild;
-        const newRow = lastRow.cloneNode(true);
-
-        const inputs = newRow.querySelectorAll('input[type="text"]');
-        inputs.forEach((input) => (input.value = ''));
-        
-        const bankSelect = newRow.querySelector('.bankDetails');
-        const schmSelect = newRow.querySelector('.schemeDtls');
-        
-        schmSelect.innerHTML = `<% for( let disScm of ofcDetails.schemes) { %>
-            <option value="<%= disScm?._id %>" <%= ofcDetails?.name === disScm?.name ? 'selected': '' %> ><%= disScm?.name%></option>
-        <% } %>`;
-        
-        bankSelect.innerHTML = "";
-        tableBody.appendChild(newRow);
-        
-        const newSchemeSelect = newRow.querySelector('.schemeDtls');
-        const newBankSelect = newRow.querySelector('.bankDetails');
-        
-        newSchemeSelect.addEventListener('change', (event) => {
-            addBank(event, newBankSelect, newSchemeSelect.value);
-        });
-    }
-
-    add.addEventListener('click', addNewRow);
+    
     schemeDetails.addEventListener('change', (event) => {
         const bankSelect = document.querySelector('.bankDetails');
         addBank(event, bankSelect, schemeDetails.value);
@@ -211,6 +193,63 @@
         } catch (error) {
             console.error(error);
         }
+    });
+
+    function cloneRow(e) {
+        e.preventDefault();
+        const lastRow = tableBody.children[1];
+        const newRow = lastRow.cloneNode(true);
+        const inputs = newRow.querySelectorAll('input[type="text"]');
+        inputs.forEach((input) => (input.value = ''));
+        tableBody.appendChild(newRow);
+
+        // Attach event listeners to the new row
+        attachRowEventListeners(newRow);
+    }
+
+    function deleteRow(event) {
+        event.preventDefault();
+        const rows = tableBody.querySelectorAll('tr');
+console.log(rows.length)
+        // Check if there's only one row left; don't remove it
+        if (rows.length > 2) {
+            const row = event.target.closest('tr');
+            const tbody = row.parentElement;
+            tbody.removeChild(row);
+        } else {
+            // If there's only one row left, clear the inputs instead of removing it
+            const inputs = rows[1].querySelectorAll('input[type="text"]');
+            inputs.forEach((input) => (input.value = ''));
+        }
+    }
+
+    function attachRowEventListeners(row) {
+        const schemeSelect = row.querySelector('.schemeDtls');
+        const bankSelect = row.querySelector('.bankDetails');
+
+        schemeSelect.addEventListener('change', (event) => {
+            addBank(event, bankSelect, schemeSelect.value);
+        });
+
+        // Add more event listeners as needed for your specific functionality
+    }
+
+    // Attach event listener to the "Add More" button
+    add.addEventListener('click', (e)=>{
+        cloneRow(e)
+    });
+
+    // Attach event listener to the table body to handle delete rows
+    tableBody.addEventListener('click', (event) => {
+        if (event.target.classList.contains('delete-row')) {
+            deleteRow(event);
+        }
+    });
+
+    // Initial attachment of event listeners for the first row
+    const firstRow = tableBody.querySelector('tr');
+    attachRowEventListeners(firstRow);
+    
     });
 </script>
   

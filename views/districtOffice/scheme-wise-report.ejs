@@ -36,7 +36,7 @@
             </select>
         </div>
         <div>
-            <select class="form-control" id="schemeSelect">
+            <select class="form-control">
                 <option>Financial Year</option>
                 <% for( let year of financialYear ) { %>
                     <option value="<%= year._id %>"><%= year.year %></option>
@@ -75,32 +75,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td id="startDate" ></td>
-                            <td></td>
-                            <td ></td>
-                            <td ></td>
-                            <td></td>
-                       
-                        </tr>
-                        <tr>
-                            <td id="startDate" ></td>
-                            <td></td>
-                            <td ></td>
-                            <td ></td>
-                            <td></td>
-                       
-                        </tr>
-                        <tr>
-                            <td id="startDate" ></td>
-                            <td></td>
-                            <td ></td>
-                            <td ></td>
-                            <td></td>
-                       
-                        </tr>
-
-                    </tbody>
+                            
+                        </tbody>
+                        
                    
                 </table>
             </div>
@@ -136,7 +113,7 @@
             if (schemeId && startDate && endDate) {
                 try {
                     const data = await fetchData(schemeId, startDate, endDate);
-                    updateTable(data);
+                    console.log(data)
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }

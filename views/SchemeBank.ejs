@@ -696,12 +696,16 @@
                     </a>
                   </td>
                 </tr>
-                <tr class="border border-slate-300">
-                  <td>2</td>
-                  <td class="border border-slate-300">RKVY</td>
-                  <td class="border border-slate-300">20/06/2023</td>
-                  <td class="border border-slate-300">30/06/2023</td>
-                  <td class="flex justify-center items-center">
+                
+                  <% dateData.forEach((dayData) => { %>
+                    <tr class="border border-slate-300">
+                        <td><%= dayData.openingBalance %></td>
+                        <td><%= dayData.receipts %></td>
+                        <td><%= dayData.openingBalance + dayData.receipts %></td>
+                        <td><%= dayData.payments %></td>
+                        <td><%= dayData.openingBalance + dayData.receipts - dayData.payments %></td>
+                   
+                
                     <a
                       class="btn btn-primary btn-icon btn-sm rounded-pill ms-2"
                       href="#"
@@ -756,6 +760,7 @@
                       </span>
                     </a>
                   </td>
+                  <% }); %>
                 </tr>
               </tbody>
             </table>

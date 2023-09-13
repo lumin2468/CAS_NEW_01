@@ -24,129 +24,149 @@
     <%-include('../Includes/header-4.ejs')%>
     <% } %>
 
-<div class="content-inner container-fluid pb-0" id="page_layout">
-    <div class="flex-wrap d-flex justify-content-between align-items-center">
-        <div><h4 class="mb-5">Cash Book Register</h4></div>
-        <div>
-            <select class="form-control" id="schemeSelect">
-                <option>Select Scheme</option>
-                <% for( let sch of districtDetails.schemes ) { %>
-                    <option value="<%= sch._id %>" <%= districtDetails.schemes.name === sch.name ? 'selected': '' %> ><%= sch.name %></option>
-                <% } %>
-            </select>
-        </div>
-        <div>
-            <select class="form-control" id="filterType">
-                <option value="financialYear">Financial Year</option>
-                <option value="monthly">Monthly</option>
-                <option value="dateRange">Date Range</option>
-            </select>
-            <select class="form-control" id="financialYearFilter">
-                <option>Select</option>
-                <% for( let year of financialYear ) { %>
-                    <option value="<%= year._id %>"><%= year.year %></option>
-                <% } %>
-            </select>
-            <select class="form-control" id="monthFilter" style="display: none;">
-                <option>SELECT</option>
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">Octobor</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-                <!-- Add more months as needed -->
-            </select>
-            <div style="display: flex; flex-direction: row;">
-            <input type="date" id="startDateInput" style="display: none;">
-            <input type="date" id="endDateInput" style="display: none;">
-        </div>
-        </div>
-       
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th colspan="4" class="text-center">Receipt/Income</th>
-                            <th colspan="4" class="text-center">Payment/Expenditure</th>
-                        </tr>
-                        <tr>
-                            <th>Month & Date</th>
-                            <th>Particulars</th>
-                            <th>Cash</th>
-                            <th>Bank</th>
-                            <th>Particulars</th>
-                            <th>Voucher No.</th>
-                            <th>Cash</th>
-                            <th>Bank</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td id="startDate" ></td>
-                            <td>Opening Balance</td>
-                            <td id="cash"></td>
-                            <td id="bank"></td>
-                            <td>Beneficiary</td>
-                            <td></td>
-                            <td></td>
-                            <td id="pamnAmnt"></td>
-                        </tr>
-                        <tr>
-                            <td>01/06/2023</td>
-                            <td>Govt.</td>
-                            <td id="rcvAmnt"></td>
-                            <td></td>
-                            <td>Payment to Vendor</td>
-                            <td></td>
-                            <td></td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>01/06/2023</td>
-                            <td>Other Source</td>
-                            <td></td>
-                            <td>0</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td colspan="6" class="text-end"><strong>Total Expenses</strong></td>
-                            <td>2,000</td>
-                            <td>1,000</td>
-                        </tr>
-                        <tr>
-                            <td colspan="6" class="text-end"><strong>Closing Balance</strong></td>
-                            <td>28,000</td>
-                            <td>69,000</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="text-end"><strong>Total Receipt</strong></td>
-                            <td>30,000</td>
-                            <td>70,000</td>
-                            <td></td>
-                            <td></td>
-                            <td>30,000</td>
-                            <td>70,000</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="content-inner container-fluid pb-0" id="page_layout">
+            <div class="flex-wrap d-flex justify-content-between align-items-center">
+                <div><h4 class="mb-5">Cash Book Register</h4></div>
+                <div>
+                    <select class="form-control" id="schemeSelect">
+                        <option>Select Scheme</option>
+                        <% for (let sch of districtDetails.schemes) { %>
+                            <option value="<%= sch._id %>"><%= sch.name %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div>
+                    <select class="form-control" id="filterType">
+                        <option value="financialYear">Financial Year</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="dateRange">Date Range</option>
+                    </select>
+                    <select class="form-control" id="financialYearFilter">
+                        <option>Select</option>
+                        <% for (let year of financialYear) { %>
+                            <option value="<%= year._id %>"><%= year.year %></option>
+                        <% } %>
+                    </select>
+                    <select class="form-control" id="monthFilter" style="display: none;">
+                        <option>SELECT</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                        <!-- Add more months as needed -->
+                    </select>
+                    <div style="display: flex; flex-direction: row;">
+                        <input type="date" id="startDateInput" style="display: none;">
+                        <input type="date" id="endDateInput" style="display: none;">
+                    </div>
+                </div>
+            </div>
+    
+            <!-- Add a container to display selected schemes -->
+            <div>
+                <h5>Selected Schemes:</h5>
+                <ul id="selectedSchemesList">
+                    <!-- Selected schemes will be displayed here -->
+                </ul>
+            </div>
+    
+            <div>
+                <!-- Add a checkbox for selecting all schemes -->
+                <input type="checkbox" id="selectAllSchemes"> Select All Schemes
+            </div>
+    
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th colspan="4" class="text-center">Receipt/Income</th>
+                                    <th colspan="4" class="text-center">Payment/Expenditure</th>
+                                </tr>
+                                <tr>
+                                    <th>Month & Date</th>
+                                    <th>Particulars</th>
+                                    <th>Cash</th>
+                                    <th>Bank</th>
+                                    <th>Particulars</th>
+                                    <th>Voucher No.</th>
+                                    <th>Cash</th>
+                                    <th>Bank</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="startDate" ></td>
+                                    <td>Opening Balance</td>
+                                    <td id="cash"></td>
+                                    <td id="bank"></td>
+                                    <td>Beneficiary</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td id="pamnAmnt"></td>
+                                </tr>
+                                <tr>
+                                    <td>01/06/2023</td>
+                                    <td>Govt.</td>
+                                    <td id="rcvAmnt"></td>
+                                    <td></td>
+                                    <td>Payment to Vendor</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>01/06/2023</td>
+                                    <td>Other Source</td>
+                                    <td></td>
+                                    <td>0</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="text-end"><strong>Total Receipt </strong></td>
+                                    <td>30,000</td>
+                                    <td>70,000</td>
+                                    <td></td>
+                                    <td colspan="1" class="text-end"><strong>Total Expenses</strong></td>
+                                    <td>2,000</td>
+                                    <td>1,000</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" class="text-end"><strong>Closing Balance</strong></td>
+                                    <td>28,000</td>
+                                    <td>69,000</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="text-end"><strong>Grant Total </strong></td>
+                                    <td>30,000</td>
+                                    <td>70,000</td>
+                                    <td></td>
+                                    <td colspan="1" class="text-end"><strong>Grant Total </strong></td>
+                                    <td>30,000</td>
+                                    <td>70,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-<%- include('../Includes/footer.ejs')%>
+        <%- include('../Includes/footer.ejs')%>
+        
+        <%- include('../Includes/footer.ejs') %>
+    
 
 </body>
 <script>
@@ -156,23 +176,80 @@
     const monthFilterSelect = document.getElementById('monthFilter');
     const startDateInput = document.getElementById('startDateInput');
     const endDateInput = document.getElementById('endDateInput');
-    const cashBookTable = document.getElementById('cashBookTable');
+    const selectedSchemesList = document.getElementById('selectedSchemesList');
+    const selectAllSchemes = document.getElementById('selectAllSchemes');
 
-    const fetchData = async (schemeId, startDate, endDate, financialYearId) => {
-    let url = `/cas/district/report/${schemeId}?filterType=${filterTypeSelect.value}`;
-
-    if (financialYearId) {
-        url += `&financialYear=${financialYearId}`;
-    } else if (startDate && endDate) {
-        url += `&startDate=${startDate}&endDate=${endDate}`;
-    }
-
-    const response = await fetch(url);
-    return response.json();
-};
+    // Store selected schemes in an array
+    const selectedSchemes = [];
 
     schemeSelect.addEventListener('change', () => {
-        fetchDataAndUpdateTable();
+        const selectedSchemeId = schemeSelect.value;
+        const selectedSchemeName = schemeSelect.options[schemeSelect.selectedIndex].text;
+
+        // Check if the scheme is already selected
+        if (!selectedSchemes.includes(selectedSchemeId)) {
+            selectedSchemes.push(selectedSchemeId);
+            // Add the selected scheme to the list
+            const listItem = document.createElement('li');
+            listItem.textContent = selectedSchemeName;
+            // Add a click event to remove the scheme when clicked
+            listItem.addEventListener('click', () => {
+                removeScheme(selectedSchemeId, listItem);
+            });
+            selectedSchemesList.appendChild(listItem);
+        }
+    });
+
+    // Function to remove a selected scheme
+    function removeScheme(schemeId, listItem) {
+        const index = selectedSchemes.indexOf(schemeId);
+        if (index !== -1) {
+            selectedSchemes.splice(index, 1);
+            selectedSchemesList.removeChild(listItem);
+        }
+    }
+
+    async function fetchData(schemeIds, startDate, endDate, financialYearId) {
+  let url = `/cas/district/report/data?selectedSchemes=${schemeIds}&filterType=${filterTypeSelect.value}`;
+
+  if (financialYearId) {
+    url += `&financialYear=${financialYearId}`;
+  } else if (startDate && endDate) {
+    url += `&startDate=${startDate}&endDate=${endDate}`;
+  }
+
+  const response = await fetch(url);
+  return response.json();
+}
+
+    // Handle the "Select All Schemes" checkbox
+    selectAllSchemes.addEventListener('change', () => {
+        if (selectAllSchemes.checked) {
+            // Clear the selected schemes array and the list
+            selectedSchemes.length = 0;
+            selectedSchemesList.innerHTML = '';
+
+            // Select all schemes from the dropdown
+            const schemeOptions = schemeSelect.options;
+            for (let i = 1; i < schemeOptions.length; i++) {
+                const schemeId = schemeOptions[i].value;
+                const schemeName = schemeOptions[i].text;
+                selectedSchemes.push(schemeId);
+
+                // Add the selected scheme to the list
+                const listItem = document.createElement('li');
+                listItem.textContent = schemeName;
+                // Add a click event to remove the scheme when clicked
+                listItem.addEventListener('click', () => {
+                    removeScheme(schemeId, listItem);
+                });
+                selectedSchemesList.appendChild(listItem);
+            }
+        } else {
+            // Uncheck "Select All Schemes"
+            selectedSchemes.length = 0;
+            selectedSchemesList.innerHTML = '';
+        }
     });
 
     filterTypeSelect.addEventListener('change', () => {
@@ -197,7 +274,7 @@
     });
 
     const fetchDataAndUpdateTable = async () => {
-        const schemeId = schemeSelect.value;
+        const schemeId = selectedSchemes.join(','); // Comma-separated list of selected schemes
         const selectedFilter = filterTypeSelect.value;
 
         if (selectedFilter === 'financialYear') {
@@ -213,7 +290,7 @@
         } else if (selectedFilter === 'dateRange') {
             const startDate = encodeURIComponent(startDateInput.value);
             const endDate = encodeURIComponent(endDateInput.value);
-            const [data] = await fetchData(schemeId, startDate, endDate, null)
+            const [data] = await fetchData(schemeId, startDate, endDate, null);
             // Update the table or do something with the fetched data
         }
     };
@@ -238,7 +315,7 @@
             endDateInput.style.display = 'block';
         }
     };
-</script>
+</script>   
 
 
 </html>
