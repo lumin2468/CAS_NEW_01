@@ -13,12 +13,10 @@
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
 <body>
-    <%if(user.designation.name==="ACCOUNTANT"){%>
+    <%if(desig.name==="ACCOUNTANT"){%>
         <%-include('../Includes/sidebar3.ejs')%>
         <%-include('../Includes/header-5.ejs')%>
-        
-     <% }else{ %>
-
+    <% }else{ %>
     <%-include('../Includes/sidebar2.ejs')%>
     <%-include('../Includes/header-4.ejs')%>
     <% } %>
