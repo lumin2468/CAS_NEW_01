@@ -111,7 +111,7 @@ app.use(
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.DB_dev_url, {
+  .connect(process.env.DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -122,7 +122,7 @@ mongoose
     console.error("Error connecting to MongoDB:", error);
   });
 const store = new MongoDBStore({
-  uri:process.env.DB_dev_url, // Your MongoDB connection string
+  uri:process.env.DB_URL, // Your MongoDB connection string
   collection: "sessions",
   // Additional options if needed
 });
