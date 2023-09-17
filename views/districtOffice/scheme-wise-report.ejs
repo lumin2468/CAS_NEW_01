@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    
 </head>
 <body>
 
@@ -35,14 +36,7 @@
                 <% } %>
             </select>
         </div>
-        <div>
-            <select class="form-control">
-                <option>Financial Year</option>
-                <% for( let year of financialYear ) { %>
-                    <option value="<%= year._id %>"><%= year.year %></option>
-                <% } %>
-            </select>
-        </div>
+      
         
             <div class="col-md-4">
                 <div class="form-group" style="display:flex; gap: 15px; align-items: center; justify-content: center;">
@@ -62,10 +56,12 @@
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
+                
                 <table class="table table-bordered table-striped">
                     <thead>
                        
-                        <tr>
+                        <tr style="text-align: center;">
+                            <th>mm/dd/yy</th>
                             <th>Opening Balance</th>
                             <th>Receipt</th>
                             <th>Total</th>
@@ -73,15 +69,19 @@
                             <th>Closing Balance</th>
                             
                         </tr>
-                    </thead>
-                    <tbody>
-                            
-                        </tbody>
+                    <tbody id="tbody" style="text-align: center;">
+                        
+                    </tbody>
                         
                    
                 </table>
+               
             </div>
+            <div  style="display: none; margin-left: 45%;" id="loader">
+                <img src="assets/images/loading.png" width="150px" height="150px"/>
+             </div>
         </div>
+        
     </div>
 </div>
 <%- include('../Includes/footer.ejs')%>
@@ -93,19 +93,19 @@
         const startDateInput = document.getElementById('startDateInput');
         const endDateInput = document.getElementById('endDateInput');
         const cashBookTable = document.getElementById('cashBookTable');
+        const tableBody = document.getElementById('tbody');
+        const loader = document.getElementById('loader');
 
         const fetchData = async (schemeId, startDate, endDate) => {
             const url = `/cas/district/schemewise/${schemeId}/${startDate}/${endDate}`;
-
             const response = await fetch(url);
-            return response.json();
-        };
-
-        const updateTable = (data) => {
-            // Update the table or perform any other operations with the fetched data
+            const data=response.json()
+            return data;
+            
         };
 
         const fetchDataAndUpdateTable = async () => {
+            loader.style.display = 'block';
             const schemeId = schemeSelect.value;
             const startDate = startDateInput.value;
             const endDate = endDateInput.value;
@@ -113,18 +113,30 @@
             if (schemeId && startDate && endDate) {
                 try {
                     const data = await fetchData(schemeId, startDate, endDate);
-                    console.log(data)
+                    loader.style.display = 'none'
+                    data.forEach(entry => {
+                    const row = updateTable(entry.date, entry.openingBalance, entry.payments, entry.receipts);
+                    tableBody.appendChild(row);
+                    });
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 }
             }
         };
+        function updateTable(date, openingBalance, payments, receipts) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${date.toLocaleString("en-US",{ year: '2-digit', month: '2-digit', day: '2-digit' })}</td>
+                <td>${openingBalance}</td>
+                <td>${receipts}</td>
+                <td>${openingBalance + receipts}</td>
+                <td>${payments}</td>
+                <td>${(openingBalance + receipts) - payments}</td>
+            `;
+            return row;
+        }
 
-        schemeSelect.addEventListener('change', fetchDataAndUpdateTable);
-        startDateInput.addEventListener('change', fetchDataAndUpdateTable);
         endDateInput.addEventListener('change', fetchDataAndUpdateTable);
     });
 </script>
-
-
 </html>

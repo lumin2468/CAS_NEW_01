@@ -8,8 +8,16 @@
     <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
-    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <style>
+        .bold-row {
+            font-weight: bold;
+          
+        }
+      
+        
+    </style>
 </head>
 <body>
 
@@ -102,6 +110,52 @@
                     </thead>
                     <tbody id="cashBookTableBody">
                         <!-- Rows for displaying data will be added here dynamically -->
+                        <tr>
+                            <td id="start">01/06/2023</td>
+                            <td>Opening Balance</td>
+                            <td id="cash">10,000</td>
+                            <td id="bank">20,000</td>
+                            
+                        </tr>
+                        <tr>
+                            <td>01/06/2023</td>
+                            <td>Govt.</td>
+                            <td>20,000</td>
+                            <td></td>
+                            <td>Payment to Vendor</td>
+                            <td></td>
+                            <td></td>
+                            <td>1,000</td>
+                        </tr>
+                        <tr>
+                            <td>01/06/2023</td>
+                            <td>World Bank</td>
+                            <td></td>
+                            <td>50,000</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="text-end"><strong>Total Expenses</strong></td>
+                            <td>2,000</td>
+                            <td>1,000</td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="text-end"><strong>Closing Balance</strong></td>
+                            <td>28,000</td>
+                            <td>69,000</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-end"><strong>Total Receipt</strong></td>
+                            <td>30,000</td>
+                            <td>70,000</td>
+                            <td></td>
+                            <td></td>
+                            <td>30,000</td>
+                            <td>70,000</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -110,8 +164,7 @@
 </div>
 <%- include('../Includes/footer.ejs') %>
 
-<%- include('../Includes/footer.ejs') %>
-
+</body>
 <script>
     const schemeSelect = document.getElementById('schemeSelect');
     const filterTypeSelect = document.getElementById('filterType');
@@ -217,28 +270,184 @@
         fetchDataAndUpdateTable();
     });
 
-    const fetchDataAndUpdateTable = async () => {
-        const schemeId = selectedSchemes.join(','); // Comma-separated list of selected schemes
-        const selectedFilter = filterTypeSelect.value;
+    // Function to create a table row for an entry
+    function createAndAppendRow(dateKey, desc, cash, bank) {
+        const row = document.createElement('tr');
+        const dateCell = document.createElement('td');
+        dateCell.textContent = dateKey;
+        row.appendChild(dateCell);
 
-        if (selectedFilter === 'financialYear') {
-            const financialYearId = financialYearFilterSelect.value;
-            const response = await fetchData(schemeId, null, null, financialYearId);
-            console.log(response);
-            populateCashBookTable(response);
-        } else if (selectedFilter === 'monthly') {
-            const month = monthFilterSelect.value;
-            const currentDate = new Date();
-            const year = currentDate.getFullYear();
-            const response = await fetchData(schemeId, year + '-' + month + '-01', year + '-' + (parseInt(month) + 1) + '-01');
-            populateCashBookTable(response);
-        } else if (selectedFilter === 'dateRange') {
-            const startDate = encodeURIComponent(startDateInput.value);
-            const endDate = encodeURIComponent(endDateInput.value);
-            const response = await fetchData(schemeId, startDate, endDate, null);
-            populateCashBookTable(response);
+        const descCell = document.createElement('td');
+        descCell.textContent = desc;
+        row.appendChild(descCell);
+
+        const cashCell = document.createElement('td');
+        cashCell.textContent = cash || '';
+        row.appendChild(cashCell);
+
+        const bankCell = document.createElement('td');
+        bankCell.textContent = bank || '';
+        row.appendChild(bankCell);
+
+        cashBookTableBody.appendChild(row);
+    }
+
+    // Function to update the table with the provided data
+    // ...
+
+// Function to create a table row for a payment entry
+// Function to create a row for receipt
+   // Function to create a row for payment and receipt entries
+   function createPaymentAndReceiptRow(dateKey, receiptParticulars, receiptCash, receiptBank, paymentParticulars, voucherNo, paymentCash, paymentBank) {
+    const row = document.createElement('tr');
+
+    // Date Column (Month & Date)
+    const dateCell = document.createElement('td');
+    dateCell.textContent = dateKey;
+    row.appendChild(dateCell);
+
+    // Receipt Particulars Column
+    const receiptParticularsCell = document.createElement('td');
+    receiptParticularsCell.textContent = receiptParticulars;
+    row.appendChild(receiptParticularsCell);
+
+    // Receipt Cash Column
+    const receiptCashCell = document.createElement('td');
+    receiptCashCell.textContent = receiptCash || ''; // Display an empty string if cash is not provided
+    row.appendChild(receiptCashCell);
+
+    // Receipt Bank Column
+    const receiptBankCell = document.createElement('td');
+    receiptBankCell.textContent = receiptBank || ''; // Display an empty string if bank is not provided
+    row.appendChild(receiptBankCell);
+
+    // Payment Particulars Column
+    const paymentParticularsCell = document.createElement('td');
+    paymentParticularsCell.textContent = paymentParticulars || ''; // Display an empty string if paymentParticulars is not provided
+    row.appendChild(paymentParticularsCell);
+
+    // Voucher No. Column
+    const voucherNoCell = document.createElement('td');
+    voucherNoCell.textContent = voucherNo || ''; // Display an empty string if voucherNo is not provided
+    row.appendChild(voucherNoCell);
+
+    // Payment Cash Column
+    const paymentCashCell = document.createElement('td');
+    paymentCashCell.textContent = paymentCash || ''; // Display an empty string if paymentCash is not provided
+    row.appendChild(paymentCashCell);
+
+    // Payment Bank Column
+    const paymentBankCell = document.createElement('td');
+    paymentBankCell.textContent = paymentBank || ''; // Display an empty string if paymentBank is not provided
+    row.appendChild(paymentBankCell);
+
+    // Append the row to the table body
+    cashBookTableBody.appendChild(row);
+    if (receiptParticulars === 'TOTAL RECEIPTS' || voucherNo === 'TOTAL EXPENSES') {
+        row.classList.add('bold-row'); 
+    }
+
+    if ( voucherNo === 'CLOSING BALANCE') {
+        row.classList.add('bold-row'); 
+    }
+    if (receiptParticulars === 'GRAND TOTAL' || voucherNo === 'GRAND TOTAL' ) {
+        row.classList.add('bold-row'); 
+    }
+}
+
+// Function to update the table with the provided data
+function updateTableWithData(data) {
+    cashBookTableBody.innerHTML = ''; // Clear existing rows
+
+    // Add the initial row for Opening Balance
+    createAndAppendRow(data.openingBalanceDate, 'Opening Balance', data.initialOBCash, data.openingBalance);
+
+    const dataKeys = Object.keys(data).filter(key => key !== 'openingBalanceDate');
+
+    for (const dateKey of dataKeys) {
+        const entries = data[dateKey];
+
+        // Create an array to hold all receipt entries for this date
+        const receiptEntries = entries.receipts || [];
+
+        // Create an array to hold all payment entries for this date
+        const paymentEntries = entries.payments || [];
+
+        // Calculate the maximum length between receiptEntries and paymentEntries
+        const maxLength = Math.max(receiptEntries.length, paymentEntries.length);
+
+        // Loop through the maxLength to create a row for each entry
+        for (let i = 0; i < maxLength; i++) {
+            const receipt = receiptEntries[i];
+            const payment = paymentEntries[i];
+
+            // Create a row and add the date if it's the first entry
+            if (i === 0) {
+                createPaymentAndReceiptRow(
+                    dateKey,
+                    receipt ? receipt.desc : '',
+                    '',
+                    receipt ? receipt.amount : '',
+                    payment ? payment.components_name : '',
+                    payment ? payment.sanction_ord_no : '',
+                    '',
+                    payment ? payment.amount : '',
+                );
+            } else {
+                // Create a row without the date for subsequent entries
+                createPaymentAndReceiptRow(
+                    '',
+                    receipt ? receipt.desc : '',
+                    '',
+                    receipt ? receipt.amount : '',
+                    payment ? payment.components_name : '',
+                    payment ? payment.sanction_ord_no : '',
+                    '',
+                    payment ? payment.amount : '',
+                );
+            }
         }
-    };
+    }
+
+    // Calculate and update the Closing Balance based on your logic
+    // ...
+
+    // Add a static row for Total Receipts and Total Expenses 
+    createPaymentAndReceiptRow('  ', '  ', '  ', '  ', '  ', '  ', '  ');
+    createPaymentAndReceiptRow('','TOTAL RECEIPTS', '', data && data.totalReceipts, '',  'TOTAL EXPENSES','', data && data.totalPayments);
+    createPaymentAndReceiptRow('','', '', '', '',  'CLOSING BALANCE','', data && data.closingBalance);
+    createPaymentAndReceiptRow('','GRAND TOTAL', data && data.initialOBCash, data && data.grandTotal, '',  'GRAND TOTAL', data && data.initialOBCash, data && data.grandTotal);
+
+    // Calculate and update the Closing Balance based on your logic
+    // ...
+}
+
+
+
+    // ...
+
+
+        const fetchDataAndUpdateTable = async () => {
+            const schemeId = selectedSchemes.join(','); // Comma-separated list of selected schemes
+            const selectedFilter = filterTypeSelect.value;
+
+            if (selectedFilter === 'financialYear') {
+                const financialYearId = financialYearFilterSelect.value;
+                const response = await fetchData(schemeId, null, null, financialYearId);
+                updateTableWithData(response);
+            } else if (selectedFilter === 'monthly') {
+                const month = monthFilterSelect.value;
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const response = await fetchData(schemeId, year + '-' + month + '-01', year + '-' + (parseInt(month) + 1) + '-01');
+                updateTableWithData(response);
+            } else if (selectedFilter === 'dateRange') {
+                const startDate = encodeURIComponent(startDateInput.value);
+                const endDate = encodeURIComponent(endDateInput.value);
+                const response = await fetchData(schemeId, startDate, endDate, null);
+                updateTableWithData(response);
+            }
+        };
 
     const updateFilterDisplay = () => {
         const selectedFilter = filterTypeSelect.value;
@@ -260,64 +469,6 @@
             endDateInput.style.display = 'block';
         }
     };
-
-    // Function to populate the Cash Book Register table with data
-    const populateCashBookTable = (data) => {
-    // Extract and sort the dates
-    const sortedDates = Object.keys(data).sort((a, b) => new Date(a) - new Date(b));
-
-    // Clear existing rows
-    cashBookTableBody.innerHTML = '';
-
-    // Loop through the sorted dates
-    for (const date of sortedDates) {
-        const entries = data[date];
-
-        // Check if there are payment records for this date
-        if (entries.payments) {
-            for (const payment of entries.payments) {
-                const row = createTableRow(date, payment);
-                cashBookTableBody.appendChild(row);
-            }
-        }
-
-        // Check if there are receipt records for this date
-        if (entries.receipts) {
-            for (const receipt of entries.receipts) {
-                const row = createTableRow(date, receipt);
-                cashBookTableBody.appendChild(row);
-            }
-        }
-
-        // Check if there are advance records for this date
-        if (entries.advances) {
-            for (const advance of entries.advances) {
-                const row = createTableRow(date, advance);
-                cashBookTableBody.appendChild(row);
-            }
-        }
-    }
-
-    // Update other parts of the table as needed, such as totals and closing balance
-};
-
-// Function to create a table row for an entry
-function createTableRow(date, receipt, payment, advance) {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td>${date}</td>
-        <td>${receipt ? receipt.desc : (payment ? payment.components_name : (advance ? advance.desc : ''))}</td>
-        <td>${receipt ? receipt.amount : (payment ? payment.amount : (advance ? advance.amount : ''))}</td>
-        <td>${receipt ? (receipt.receiver_bank ? receipt.receiver_bank.bankName : '') : (payment ? (payment.from_bank ? payment.from_bank.bankName : '') : (advance ? (advance.to_bank ? advance.to_bank : '') : ''))}</td>
-        <td>${receipt ? receipt.source_bank_details : ''}</td>
-        <td>${receipt ? receipt.autoVoucherNo : (payment ? payment.autoVoucherNo : (advance ? advance.autoVoucherNo : ''))}</td>
-        <td>${receipt ? receipt.amount : (payment ? payment.amount : (advance ? advance.amount : ''))}</td>
-        <td>${receipt ? (receipt.receiver_bank ? receipt.receiver_bank.bankName : '') : (payment ? (payment.from_bank ? payment.from_bank.bankName : '') : (advance ? (advance.from_bank ? advance.from_bank : '') : ''))}</td>
-    `;
-    return row;
-}
-    
 </script>
 
-</body>
 </html>

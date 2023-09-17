@@ -1805,7 +1805,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       bank_Acc, // Array of beneficiary bank account numbers
       desc,
     } = req.body;
-
+console.log(`kjhdjkhdakakjahdkaj`,components_name)
 
     const paymentDate = new Date(date); // Assuming "date" is the payment date
 
@@ -1852,12 +1852,19 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
       discounter.count
     );
   // Create an array to store beneficiary data
-  const beneficiaryData = beneficiaries.map((beneficiary, index) => ({
-    name: beneficiary,
-    amount: parseFloat(amount[index] || 0),
-    bankAcc: bank_Acc[index],
-  }));
-  
+  const beneficiaryData = Array.isArray(beneficiaries)
+  ? beneficiaries.map((beneficiary, index) => ({
+      name: beneficiary,
+      amount: parseFloat(amount[index] || 0),
+      bankAcc: bank_Acc[index],
+    }))
+  : [
+      {
+        name: beneficiaries,
+        amount: parseFloat(amount[0] || 0),
+        bankAcc: bank_Acc[0],
+      },
+    ];
 
   // Create and save the combined payment entry
   const disOfcPayment = new DisPayment({
@@ -1869,7 +1876,7 @@ app.post("/cas/district/payment", isAuthenticated, async (req, res) => {
     scheme: schemeDetails._id,
     beneficiaries: beneficiaryData,
     office_name: districtDetails._id,
-    components_name,
+    components_name:components_name,
     from_bank: bankDetails.bankId,
     autoVoucherNo: voucherNo,
     status: "pending",
@@ -2434,28 +2441,85 @@ app.get("/cas/district/report/data", isAuthenticated, async (req, res) => {
       // Handle invalid filterType here if needed
     }
 
-    // Fetch payment, receipt, advance, and opening balance records concurrently
-    const [paymentRecords, receiptRecords, advanceRecords, openingBalanceRecords] = await Promise.all([
-      DisPayment.find({
-        office_name: officeId,
-        scheme: { $in: selectedSchemes },
-        date: { $gte: startDate, $lte: endDate },
-      }),
-      DisReceipt.find({
-        office_name: officeId,
-        scheme: { $in: selectedSchemes },
-        date: { $gte: startDate, $lte: endDate },
-      }),
-      Advance.find({
-        office: officeId,
-        date: { $gte: startDate, $lte: endDate },
-      }),
-      OpeningBalance.find({
-        office: officeId,
-        scheme: { $in: selectedSchemes },
-      }),
+    const initialOpeningBalance = await OpeningBalance.findOne({
+      scheme: { $in: selectedSchemes },
+      office: officeId,
+    }).populate('bank');
+
+    // Calculate the initial opening balance as the sum of cash and bank balances for the selected schemes
+    let openingBalance = initialOpeningBalance ? (initialOpeningBalance.bank.balance || 0) : 0;
+
+    // Calculate the sum of payments and receipts from the start date to the day before the start date
+    if (filterType !== "financialYear") {
+      // Calculate the opening balance for the date startDate - 1
+      const dateForOpeningBalance = new Date(startDate);
+      dateForOpeningBalance.setDate(dateForOpeningBalance.getDate() - 1);
+    const paymentsBeforeStartDate = await DisPayment.aggregate([
+      {
+        $match: {
+          scheme: { $in: selectedSchemes },
+          date: { $lt: dateForOpeningBalance },
+          office_name: new mongoose.Types.ObjectId(officeId),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalBankPayment: { $sum: "$amount" },
+        },
+      },
     ]);
 
+    // Perform aggregation to calculate the total bank receipts before the start date
+    const receiptsBeforeStartDate = await DisReceipt.aggregate([
+      {
+        $match: {
+          scheme: { $in: selectedSchemes },
+          date: { $lt: dateForOpeningBalance },
+          office_name: new mongoose.Types.ObjectId(officeId),
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalBankReceipt: { $sum: "$amount" },
+        },
+      },
+    ]);
+    const totalBankPayment = paymentsBeforeStartDate[0]?.totalBankPayment || 0;
+    const totalBankReceipt = receiptsBeforeStartDate[0]?.totalBankReceipt || 0;
+    openingBalance += totalBankReceipt - totalBankPayment;
+  }
+   
+
+    
+
+    // Calculate the opening balance as of the start date
+   
+
+console.log(`OPPPBBBBB`,openingBalance)
+    const receiptRecords = await DisReceipt.find({
+      scheme: { $in: selectedSchemes },
+      date: { $gte: startDate, $lte: endDate },
+      office_name: officeId,
+    });
+
+    // Fetch payment records within the date range
+    const paymentRecords = await DisPayment.find({
+      scheme: { $in: selectedSchemes },
+      date: { $gte: startDate, $lte: endDate },
+      office_name: officeId,
+    });
+
+    const totalReceipts = receiptRecords.reduce((total, record) => total + record.amount, 0);
+
+    // Calculate Total Expenses
+    const totalExpenses = paymentRecords.reduce((total, record) => total + record.amount, 0);
+
+    // Calculate Closing Balance
+    const closingBalance = openingBalance + totalReceipts - totalExpenses;
+
+    const grandTotal= openingBalance+totalReceipts
     // Combine the results into a single response object segregated by date
     const segregatedData = {};
 
@@ -2471,17 +2535,36 @@ app.get("/cas/district/report/data", isAuthenticated, async (req, res) => {
       });
     }
 
-    addToSegregatedData(paymentRecords, 'payments');
     addToSegregatedData(receiptRecords, 'receipts');
-    addToSegregatedData(advanceRecords, 'advances');
-    
-    console.log(segregatedData)
-    res.json(segregatedData);
+    addToSegregatedData(paymentRecords, 'payments');
+
+    // Sort the dates in ascending order
+    const sortedDates = Object.keys(segregatedData).sort();
+
+    // Create a new object with sorted dates
+    const sortedSegregatedData = {};
+    sortedDates.forEach(date => {
+      sortedSegregatedData[date] = segregatedData[date];
+    });
+
+    // Include the opening balance in the response
+    sortedSegregatedData.openingBalance = openingBalance;
+    sortedSegregatedData.initialOBCash=initialOpeningBalance.cash 
+    sortedSegregatedData.totalReceipts=totalReceipts
+    sortedSegregatedData.totalPayments=totalExpenses
+    sortedSegregatedData.closingBalance=closingBalance
+    sortedSegregatedData.grandTotal=grandTotal
+
+
+    console.log(sortedSegregatedData);
+
+    res.json(sortedSegregatedData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
@@ -2515,10 +2598,8 @@ app.get("/cas/district/schemewise", isAuthenticated, async (req, res) => {
 
   app.get('/cas/district/schemewise/:schemeId/:startDate/:endDate', isAuthenticated, async (req, res) => {
     try {
-        const office_Id = req.user.user.officeId;
+        const officeId = req.user.user.officeId;
         const { schemeId, startDate, endDate } = req.params;
-
-        // Validate date inputs
         const startDateTime = new Date(startDate);
         const endDateTime = new Date(endDate);
 
@@ -2527,67 +2608,28 @@ app.get("/cas/district/schemewise", isAuthenticated, async (req, res) => {
         }
 
         const dateData = [];
+        let openingBalance = 0;
 
         // Find the initial opening balance (static)
         const initialOpeningBalance = await OpeningBalance.findOne({
             scheme: schemeId,
-            office: office_Id,
+            office: officeId,
         }).populate('bank');
 
-        let openingBalance = initialOpeningBalance ? (initialOpeningBalance.bank.balance || 0) + (initialOpeningBalance.cash || 0) : 0;
+        if (initialOpeningBalance) {
+            openingBalance = (initialOpeningBalance.bank.balance || 0) + (initialOpeningBalance.cash || 0);
+        }
 
-        // Calculate the sum of payments and receipts from 1st April to the day before the start date
-        const paymentsReceiptsBeforeStartDate = await DisPayment.aggregate([
-            {
-                $match: {
-                    scheme: new mongoose.Types.ObjectId(schemeId),
-                    date: { $gte: new Date(startDateTime.getFullYear(), 3, 1), $lt: startDateTime },
-                    office_name: new mongoose.Types.ObjectId(office_Id),
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalBankPayment: { $sum: '$amount' },
-                },
-            },
-        ]);
-
-        const receiptsBeforeStartDate = await DisReceipt.aggregate([
-            {
-                $match: {
-                    scheme: new mongoose.Types.ObjectId(schemeId),
-                    date: { $gte: new Date(startDateTime.getFullYear(), 3, 1), $lt: startDateTime },
-                    office_name: new mongoose.Types.ObjectId(office_Id),
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalBankReceipt: { $sum: '$amount' },
-                },
-            },
-        ]);
-
-        const totalPaymentsBeforeStartDate = paymentsReceiptsBeforeStartDate[0] ? paymentsReceiptsBeforeStartDate[0].totalBankPayment : 0;
-        const totalReceiptsBeforeStartDate = receiptsBeforeStartDate[0] ? receiptsBeforeStartDate[0].totalBankReceipt : 0;
-
-        openingBalance += totalReceiptsBeforeStartDate - totalPaymentsBeforeStartDate;
-
-        // Initialize currentDate with startDateTime
-        let currentDate = new Date(startDateTime);
+        const currentDate = new Date(startDateTime);
 
         while (currentDate <= endDateTime) {
-            // Calculate the closing balance for the current date
-            const closingBalance = openingBalance;
-
             // Fetch payments and receipts for the current date
             const payments = await DisPayment.aggregate([
                 {
                     $match: {
                         scheme: new mongoose.Types.ObjectId(schemeId),
                         date: currentDate,
-                        office_name: new mongoose.Types.ObjectId(office_Id),
+                        office_name: new mongoose.Types.ObjectId(officeId),
                     },
                 },
                 {
@@ -2603,7 +2645,7 @@ app.get("/cas/district/schemewise", isAuthenticated, async (req, res) => {
                     $match: {
                         scheme: new mongoose.Types.ObjectId(schemeId),
                         date: currentDate,
-                        office_name: new mongoose.Types.ObjectId(office_Id),
+                        office_name: new mongoose.Types.ObjectId(officeId),
                     },
                 },
                 {
@@ -2614,26 +2656,31 @@ app.get("/cas/district/schemewise", isAuthenticated, async (req, res) => {
                 },
             ]);
 
-            // Check if there are payments or receipts for the current date
-            if (payments[0] && payments[0].totalBankPayment > 0 || receipts[0] && receipts[0].totalBankReceipt > 0) {
-                // Update the opening balance for the next date
-                openingBalance = closingBalance + (receipts[0] ? receipts[0].totalBankReceipt : 0) - (payments[0] ? payments[0].totalBankPayment : 0);
+            const totalPayments = payments[0] ? payments[0].totalBankPayment : 0;
+            const totalReceipts = receipts[0] ? receipts[0].totalBankReceipt : 0;
 
+            // Check if there are payments or receipts for the current date
+            if (totalPayments > 0 || totalReceipts > 0) {
                 dateData.push({
-                    date: currentDate.toDateString(),
-                    openingBalance: closingBalance,
-                    payments: payments[0] ? payments[0].totalBankPayment : 0,
-                    receipts: receipts[0] ? receipts[0].totalBankReceipt : 0,
+                    date: formatDate(currentDate),
+                    openingBalance: openingBalance,
+                    payments: totalPayments,
+                    receipts: totalReceipts,
                 });
+
+                // Update opening balance for the next day
+                openingBalance += totalReceipts - totalPayments;
             }
 
             // Increment currentDate by one day
             currentDate.setDate(currentDate.getDate() + 1);
         }
 
-        console.log(dateData);
+        function formatDate(date) {
+          const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+          return date.toLocaleString('en-GB', options);
+        }
 
-        // Send the data in the response
         res.json(dateData);
     } catch (error) {
         console.error('Error fetching data:', error);

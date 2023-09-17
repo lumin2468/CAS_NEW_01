@@ -88,16 +88,16 @@
                     </div>
                 </div>
                 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Component <span class="text-danger">*</span></label>
-                        <select class="form-control" id="componentSelect" name="components_name">
-                          
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Component <span class="text-danger">*</span></label>
+                            <select class="form-control" id="componentSelect" name="components_name">
+                            
+                            
+                            </select>
                         
-                        </select>
-                    
+                        </div>
                     </div>
-                </div>
                 
                 <div class="col-md-4">
                     <div class="form-group">
@@ -270,10 +270,12 @@
           const response = await fetch(`/cas/directorate/payments/${selectedScheme}`);
           const data1 = await response.json();
           // Update the table with the fetched data
+          console.log(data1.components)
           compSelect.innerHTML = data1.components
             .map(
-              (component) =>` <option value=${component.name}>${component.name}</option>`
+              (component, index) =>` <option value="${component.name}">${component.name}</option>`//
             )
+            .join(""); 
         } catch (error) {
           console.error('Error fetching data:', error);
         }
