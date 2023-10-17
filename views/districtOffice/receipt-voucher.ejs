@@ -112,7 +112,7 @@
                                     <input type="text" hidden="true" class="form-control" name="scheme" value="<%= (receiptDetails.scheme._id) %>">
                                 </div>
                                     <%}else{%>
-                            <select name="receivedFrom" id="receipt_mode" class="form-control">
+                            <select name="receivedMode" id="receipt_mode" class="form-control">
                                 <option>Select</option>
                                 <option>Schemewise</option>
                                 <option>Others</option>
@@ -146,7 +146,7 @@
                         <% } %>
                     </div>  
                 </div>
-            
+                
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label"> From Directorate <span class="text-danger">*</span></label>
@@ -179,7 +179,19 @@
                         <% } %>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" id="bankDropdownSection" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Receiver Bank Details<span class="text-danger">*</span></label>
+                        <select class="form-control" id="bankSelect" name="bankDetails">
+                            <option>Select Bank</option>
+                            <% for( let bnk of bankDetails ) { %>
+                                <option value="<%= bnk._id%>" <%= bankDetails.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank +' '+bnk.IFSCNumber %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4" id="receiverBankSection">
                     <div class="form-group">
                         <label class="form-label"> Receiver Bank Details <span class="text-danger">*</span></label>
                         <% if (receiptDetails) { %>
@@ -295,6 +307,8 @@
       const receiptMode = document.getElementById('receipt_mode');
       const othersTypeSection = document.getElementById('othersTypeSection');
     const schemeNameSection = document.getElementById('schemeNameSection');
+    const bankDropdownSection = document.getElementById("bankDropdownSection");
+    const receiverBankSection = document.getElementById("receiverBankSection");
       // Function to fetch data from the backend API and update the table
 
       function handleReceiptModeChange() {
@@ -303,9 +317,13 @@
    if (selectedValue === 'Others') {
         othersTypeSection.style.display = 'block';
         schemeNameSection.style.display = 'none';
+        bankDropdownSection.style.display = "block";
+        receiverBankSection.style.display = "none";
     } else if (selectedValue === 'Schemewise') {
         othersTypeSection.style.display = 'none';
         schemeNameSection.style.display = 'block';
+        bankDropdownSection.style.display = "none";
+        receiverBankSection.style.display = "block";
     } else {
         othersTypeSection.style.display = 'none';
         schemeNameSection.style.display = 'none';

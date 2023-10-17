@@ -515,7 +515,73 @@ amount:{
   }
 
 });
+const DisOtherReceipt = Schema({
+  date: {
+    type: Date,
+    required: true,
+  },
+  modeof_payment: {
+    type: String,
+    required: true,
+  },
+  transaction_Id: {
+    type: String,
+    required: true,
+  },
+  transaction_date: {
+    type: Date,
+    required: true,
+  },
+  directorate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Directorate",
+  },
+  sanction_ord_no: {
+    type: String,
+    required: true,
+  },
+  ref_voucher_no: {
+    type: String,
+    required: true,
+  },
+  scheme: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Scheme",
+  },
+  office_name:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "District",
+  },
+  
+  source_bank_details:{
+    type: String,
+    required: true
+  },
 
+  receiver_bank:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "BankDetails",
+  },
+  amount:{
+    type: Number,
+    required:true
+  },
+  financial_year:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "FinancialYear",
+  },
+  autoVoucherNo:{
+    type:String,
+    required:true,
+    unique:true,
+  },
+ 
+ desc:{
+    type: String,
+    
+  }
+
+});
 const DisPayment = Schema({
   date: {
     type: Date,
@@ -728,7 +794,10 @@ const openingBalance = Schema({
     type:Date,
     required:true,
    },
-  
+   directorate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Directorate",
+  },
   office:{
     type: mongoose.Schema.Types.ObjectId,
       ref: "District",
@@ -759,29 +828,29 @@ const openingBalance = Schema({
 });
 
 
-const dirOpeningBalance = Schema({
-  directorate:{
-    type: mongoose.Schema.Types.ObjectId,
-      ref: "Directorate",
-    },
-  date: {
-    type: Date,
-    required: true,
-  },
-  
-  bank: {
+  const dirOpeningBalance = Schema({
+    directorate:{
       type: mongoose.Schema.Types.ObjectId,
-      ref: "BankDetails",
+        ref: "Directorate",
+      },
+    date: {
+      type: Date,
       required: true,
     },
-  
-  cash:{
-    type:Number
-  },
-  Advance: {
-    type: Number
     
-  },
+    bank: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BankDetails",
+        required: true,
+      },
+    
+    cash:{
+      type:Number
+    },
+    Advance: {
+      type: Number
+      
+    },
   
 
   // Other opening balance fields
