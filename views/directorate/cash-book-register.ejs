@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8">
@@ -8,21 +8,21 @@
     <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
-    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <style>
+        .bold-row {
+            font-weight: bold;
+          
+        }
+      
+        
+    </style>
 </head>
 <body>
 
-
-    <%if(designation==="ACCOUNTANT"){%>
-        <%-include('../Includes/sidebar3.ejs')%>
-        <%-include('../Includes/header-5.ejs')%>
-        
-        <% }else{ %>
-
-    <%-include('../Includes/sidebar2.ejs')%>
-    <%-include('../Includes/header-4.ejs')%>
-    <% } %>
+    <%-include('../Includes/sidebar.ejs')%>
+    <%-include('../Includes/header-3.ejs')%>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
     <div class="flex-wrap d-flex justify-content-between align-items-center">
@@ -30,7 +30,9 @@
         <div>
             <select class="form-control" id="schemeSelect">
                 <option>Select Scheme</option>
-               
+                <% for (let sch of directorate.schemes) { %>
+                    <option value="<%= sch._id %>"><%= sch.name %></option>
+                <% } %>
             </select>
         </div>
         <div>
@@ -41,7 +43,9 @@
             </select>
             <select class="form-control" id="financialYearFilter">
                 <option>Select</option>
-               
+                <% for (let year of financialYear) { %>
+                    <option value="<%= year._id %>"><%= year.year %></option>
+                <% } %>
             </select>
             <select class="form-control" id="monthFilter" style="display: none;">
                 <option>SELECT</option>
@@ -54,18 +58,31 @@
                 <option value="7">July</option>
                 <option value="8">August</option>
                 <option value="9">September</option>
-                <option value="10">Octobor</option>
+                <option value="10">October</option>
                 <option value="11">November</option>
                 <option value="12">December</option>
                 <!-- Add more months as needed -->
             </select>
             <div style="display: flex; flex-direction: row;">
-            <input type="date" id="startDateInput" style="display: none;">
-            <input type="date" id="endDateInput" style="display: none;">
+                <input type="date" id="startDateInput" style="display: none;">
+                <input type="date" id="endDateInput" style="display: none;">
+            </div>
         </div>
-        </div>
-       
     </div>
+
+    <!-- Add a container to display selected schemes -->
+    <div>
+        <h5>Selected Schemes:</h5>
+        <ul id="selectedSchemesList">
+            <!-- Selected schemes will be displayed here -->
+        </ul>
+    </div>
+
+    <div>
+        <!-- Add a checkbox for selecting all schemes -->
+        <input type="checkbox" id="selectAllSchemes"> Select All Schemes
+    </div>
+
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -86,43 +103,37 @@
                             <th>Bank</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="cashBookTableBody">
+                        <!-- Rows for displaying data will be added here dynamically -->
                         <tr>
-                            <td id="startDate" ></td>
+                            <td id="start">01/06/2023</td>
                             <td>Opening Balance</td>
-                            <td id="cash"></td>
-                            <td id="bank"></td>
-                            <td>Beneficiary</td>
-                            <td></td>
-                            <td></td>
-                            <td id="pamnAmnt"></td>
+                            <td id="cash">10,000</td>
+                            <td id="bank">20,000</td>
+                            
                         </tr>
                         <tr>
                             <td>01/06/2023</td>
                             <td>Govt.</td>
-                            <td id="rcvAmnt"></td>
+                            <td>20,000</td>
                             <td></td>
                             <td>Payment to Vendor</td>
                             <td></td>
                             <td></td>
-                            <td>0</td>
+                            <td>1,000</td>
                         </tr>
                         <tr>
                             <td>01/06/2023</td>
-                            <td>Other Source</td>
+                            <td>World Bank</td>
                             <td></td>
-                            <td>0</td>
+                            <td>50,000</td>
                             <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td colspan="2" class="text-end"><strong>Total Receipt </strong></td>
-                            <td>30,000</td>
-                            <td>70,000</td>
-                            <td></td>
-                            <td colspan="1" class="text-end"><strong>Total Expenses</strong></td>
+                            <td colspan="6" class="text-end"><strong>Total Expenses</strong></td>
                             <td>2,000</td>
                             <td>1,000</td>
                         </tr>
@@ -132,11 +143,11 @@
                             <td>69,000</td>
                         </tr>
                         <tr>
-                            <td colspan="2" class="text-end"><strong>Grant Total </strong></td>
+                            <td colspan="2" class="text-end"><strong>Total Receipt</strong></td>
                             <td>30,000</td>
                             <td>70,000</td>
                             <td></td>
-                            <td colspan="1" class="text-end"><strong>Grant Total </strong></td>
+                            <td></td>
                             <td>30,000</td>
                             <td>70,000</td>
                         </tr>
@@ -146,10 +157,313 @@
         </div>
     </div>
 </div>
-<%- include('../Includes/footer.ejs')%>
+<%- include('../Includes/footer.ejs') %>
 
 </body>
+<script>
+    const schemeSelect = document.getElementById('schemeSelect');
+    const filterTypeSelect = document.getElementById('filterType');
+    const financialYearFilterSelect = document.getElementById('financialYearFilter');
+    const monthFilterSelect = document.getElementById('monthFilter');
+    const startDateInput = document.getElementById('startDateInput');
+    const endDateInput = document.getElementById('endDateInput');
+    const selectedSchemesList = document.getElementById('selectedSchemesList');
+    const selectAllSchemes = document.getElementById('selectAllSchemes');
+    const cashBookTableBody = document.getElementById('cashBookTableBody');
+
+    // Store selected schemes in an array
+    const selectedSchemes = [];
+
+    schemeSelect.addEventListener('change', () => {
+        const selectedSchemeId = schemeSelect.value;
+        const selectedSchemeName = schemeSelect.options[schemeSelect.selectedIndex].text;
+
+        // Check if the scheme is already selected
+        if (!selectedSchemes.includes(selectedSchemeId)) {
+            selectedSchemes.push(selectedSchemeId);
+            // Add the selected scheme to the list
+            const listItem = document.createElement('li');
+            listItem.textContent = selectedSchemeName;
+            // Add a click event to remove the scheme when clicked
+            listItem.addEventListener('click', () => {
+                removeScheme(selectedSchemeId, listItem);
+            });
+            selectedSchemesList.appendChild(listItem);
+        }
+    });
+
+    // Function to remove a selected scheme
+    function removeScheme(schemeId, listItem) {
+        const index = selectedSchemes.indexOf(schemeId);
+        if (index !== -1) {
+            selectedSchemes.splice(index, 1);
+            selectedSchemesList.removeChild(listItem);
+        }
+    }
+
+    async function fetchData(schemeIds, startDate, endDate, financialYearId) {
+        let url = `/cas/directorate/report/data?selectedSchemes=${schemeIds}&filterType=${filterTypeSelect.value}`;
+
+        if (financialYearId) {
+            url += `&financialYear=${financialYearId}`;
+        } else if (startDate && endDate) {
+            url += `&startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        const response = await fetch(url);
+        return response.json();
+    }
+
+    // Handle the "Select All Schemes" checkbox
+    selectAllSchemes.addEventListener('change', () => {
+        if (selectAllSchemes.checked) {
+            // Clear the selected schemes array and the list
+            selectedSchemes.length = 0;
+            selectedSchemesList.innerHTML = '';
+
+            // Select all schemes from the dropdown
+            const schemeOptions = schemeSelect.options;
+            for (let i = 1; i < schemeOptions.length; i++) {
+                const schemeId = schemeOptions[i].value;
+                const schemeName = schemeOptions[i].text;
+                selectedSchemes.push(schemeId);
+
+                // Add the selected scheme to the list
+                const listItem = document.createElement('li');
+                listItem.textContent = schemeName;
+                // Add a click event to remove the scheme when clicked
+                listItem.addEventListener('click', () => {
+                    removeScheme(schemeId, listItem);
+                });
+                selectedSchemesList.appendChild(listItem);
+            }
+        } else {
+            // Uncheck "Select All Schemes"
+            selectedSchemes.length = 0;
+            selectedSchemesList.innerHTML = '';
+        }
+    });
+
+    filterTypeSelect.addEventListener('change', () => {
+        updateFilterDisplay();
+        fetchDataAndUpdateTable();
+    });
+
+    financialYearFilterSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    monthFilterSelect.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    startDateInput.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    endDateInput.addEventListener('change', () => {
+        fetchDataAndUpdateTable();
+    });
+
+    // Function to create a table row for an entry
+    function createAndAppendRow(dateKey, desc, cash, bank) {
+        const row = document.createElement('tr');
+        const dateCell = document.createElement('td');
+        dateCell.textContent = dateKey;
+        row.appendChild(dateCell);
+
+        const descCell = document.createElement('td');
+        descCell.textContent = desc;
+        row.appendChild(descCell);
+
+        const cashCell = document.createElement('td');
+        cashCell.textContent = cash || '';
+        row.appendChild(cashCell);
+
+        const bankCell = document.createElement('td');
+        bankCell.textContent = bank || '';
+        row.appendChild(bankCell);
+
+        cashBookTableBody.appendChild(row);
+    }
+
+    // Function to update the table with the provided data
+    // ...
+
+// Function to create a table row for a payment entry
+// Function to create a row for receipt
+   // Function to create a row for payment and receipt entries
+   function createPaymentAndReceiptRow(dateKey, receiptParticulars, receiptCash, receiptBank, paymentParticulars, voucherNo, paymentCash, paymentBank) {
+    const row = document.createElement('tr');
+
+    // Date Column (Month & Date)
+    const dateCell = document.createElement('td');
+    dateCell.textContent = dateKey;
+    row.appendChild(dateCell);
+
+    // Receipt Particulars Column
+    const receiptParticularsCell = document.createElement('td');
+    receiptParticularsCell.textContent = receiptParticulars;
+    row.appendChild(receiptParticularsCell);
+
+    // Receipt Cash Column
+    const receiptCashCell = document.createElement('td');
+    receiptCashCell.textContent = receiptCash || ''; // Display an empty string if cash is not provided
+    row.appendChild(receiptCashCell);
+
+    // Receipt Bank Column
+    const receiptBankCell = document.createElement('td');
+    receiptBankCell.textContent = receiptBank || ''; // Display an empty string if bank is not provided
+    row.appendChild(receiptBankCell);
+
+    // Payment Particulars Column
+    const paymentParticularsCell = document.createElement('td');
+    paymentParticularsCell.textContent = paymentParticulars || ''; // Display an empty string if paymentParticulars is not provided
+    row.appendChild(paymentParticularsCell);
+
+    // Voucher No. Column
+    const voucherNoCell = document.createElement('td');
+    voucherNoCell.textContent = voucherNo || ''; // Display an empty string if voucherNo is not provided
+    row.appendChild(voucherNoCell);
+
+    // Payment Cash Column
+    const paymentCashCell = document.createElement('td');
+    paymentCashCell.textContent = paymentCash || ''; // Display an empty string if paymentCash is not provided
+    row.appendChild(paymentCashCell);
+
+    // Payment Bank Column
+    const paymentBankCell = document.createElement('td');
+    paymentBankCell.textContent = paymentBank || ''; // Display an empty string if paymentBank is not provided
+    row.appendChild(paymentBankCell);
+
+    // Append the row to the table body
+    cashBookTableBody.appendChild(row);
+    if (receiptParticulars === 'TOTAL RECEIPTS' || voucherNo === 'TOTAL EXPENSES') {
+        row.classList.add('bold-row'); 
+    }
+
+    if ( voucherNo === 'CLOSING BALANCE') {
+        row.classList.add('bold-row'); 
+    }
+    if (receiptParticulars === 'GRAND TOTAL' || voucherNo === 'GRAND TOTAL' ) {
+        row.classList.add('bold-row'); 
+    }
+}
+
+// Function to update the table with the provided data
+function updateTableWithData(data) {
+    cashBookTableBody.innerHTML = ''; // Clear existing rows
+
+    // Add the initial row for Opening Balance
+    createAndAppendRow(data.openingBalanceDate, 'Opening Balance', data.initialOBCash, data.openingBalance);
+
+    const dataKeys = Object.keys(data).filter(key => key !== 'openingBalanceDate');
+
+    for (const dateKey of dataKeys) {
+        const entries = data[dateKey];
+
+        // Create an array to hold all receipt entries for this date
+        const receiptEntries = entries.receipts || [];
+
+        // Create an array to hold all payment entries for this date
+        const paymentEntries = entries.payments || [];
+
+        // Calculate the maximum length between receiptEntries and paymentEntries
+        const maxLength = Math.max(receiptEntries.length, paymentEntries.length);
+
+        // Loop through the maxLength to create a row for each entry
+        for (let i = 0; i < maxLength; i++) {
+            const receipt = receiptEntries[i];
+            const payment = paymentEntries[i];
+
+            // Create a row and add the date if it's the first entry
+            if (i === 0) {
+                createPaymentAndReceiptRow(
+                    dateKey,
+                    receipt ? receipt.desc : '',
+                    '',
+                    receipt ? receipt.amount : '',
+                    payment ? payment.narration : '',
+                    payment ? payment.sanctionOrdNo : '',
+                    '',
+                    payment ? payment.amount : '',
+                );
+            } else {
+                // Create a row without the date for subsequent entries
+                createPaymentAndReceiptRow(
+                    '',
+                    receipt ? receipt.desc : '',
+                    '',
+                    receipt ? receipt.amount : '',
+                    payment ? payment.narration : '',
+                    payment ? payment.sanctionOrdNo : '',
+                    '',
+                    payment ? payment.amount : '',
+                );
+            }
+        }
+    }
+
+    // Calculate and update the Closing Balance based on your logic
+    // ...
+
+    // Add a static row for Total Receipts and Total Expenses 
+    createPaymentAndReceiptRow('  ', '  ', '  ', '  ', '  ', '  ', '  ');
+    createPaymentAndReceiptRow('','TOTAL RECEIPTS', '', data && data.totalReceipts, '',  'TOTAL EXPENSES','', data && data.totalPayments);
+    createPaymentAndReceiptRow('','', '', '', '',  'CLOSING BALANCE','', data && data.closingBalance);
+    createPaymentAndReceiptRow('','GRAND TOTAL', data && data.initialOBCash, data && data.grandTotal, '',  'GRAND TOTAL', data && data.initialOBCash, data && data.grandTotal);
+
+    // Calculate and update the Closing Balance based on your logic
+    // ...
+}
 
 
+
+    // ...
+
+
+        const fetchDataAndUpdateTable = async () => {
+            const schemeId = selectedSchemes.join(','); // Comma-separated list of selected schemes
+            const selectedFilter = filterTypeSelect.value;
+
+            if (selectedFilter === 'financialYear') {
+                const financialYearId = financialYearFilterSelect.value;
+                const response = await fetchData(schemeId, null, null, financialYearId);
+                updateTableWithData(response);
+            } else if (selectedFilter === 'monthly') {
+                const month = monthFilterSelect.value;
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const response = await fetchData(schemeId, year + '-' + month + '-01', year + '-' + (parseInt(month) + 1) + '-01');
+                updateTableWithData(response);
+            } else if (selectedFilter === 'dateRange') {
+                const startDate = encodeURIComponent(startDateInput.value);
+                const endDate = encodeURIComponent(endDateInput.value);
+                const response = await fetchData(schemeId, startDate, endDate, null);
+                updateTableWithData(response);
+            }
+        };
+
+    const updateFilterDisplay = () => {
+        const selectedFilter = filterTypeSelect.value;
+
+        if (selectedFilter === 'financialYear') {
+            financialYearFilterSelect.style.display = 'block';
+            monthFilterSelect.style.display = 'none';
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+        } else if (selectedFilter === 'monthly') {
+            financialYearFilterSelect.style.display = 'none';
+            monthFilterSelect.style.display = 'block';
+            startDateInput.style.display = 'none';
+            endDateInput.style.display = 'none';
+        } else if (selectedFilter === 'dateRange') {
+            financialYearFilterSelect.style.display = 'none';
+            monthFilterSelect.style.display = 'none';
+            startDateInput.style.display = 'block';
+            endDateInput.style.display = 'block';
+        }
+    };
+</script>
 
 </html>

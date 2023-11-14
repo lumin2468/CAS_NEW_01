@@ -68,8 +68,13 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label class="form-label">Purpose <span class="text-danger">*</span></label>
-                        <input type="text"  class="form-control" name="purpose" >
+                        <label class="form-label">Scheme <span class="text-danger">*</span></label>
+                        <select class="form-control" name="scheme" id="schemeSelect">
+                            <option>Select</option>
+                            <% for( let scm of schemeData ) { %>
+                                <option value="<%= scm._id %>" <%= schemeData.name === scm.name ? 'selected': '' %> ><%= scm.name %></option>
+                            <% } %>
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -82,6 +87,7 @@
                     <div class="form-group">
                         <label class="form-label">Receiver <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="directorate"  value="<%=directorateData.name%>" >
+                        <input type="hidden" class="form-control" id="directorate" value="<%=directorateData._id%>" >
                     </div>
                 </div>
                 
@@ -95,10 +101,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label"> To receiver Bank  <span class="text-danger">*</span></label>
-                        <select class="form-control" id="officeSelect" name="receiver_bank">
-                        <% for( let dir of directorateData.bank ) { %>
-                            <option value="<%= dir.accountNumber %>" <%=directorateData.bank === dir.bank ? 'selected': '' %> ><%= dir.bank %></option>
-                        <% } %>
+                        <select class="form-control" id="scheme_linked_bank" name="receiver_bank">
+                       
                     </select>
                     </div>
                 </div> 
@@ -192,9 +196,13 @@
 
 </body>
 <script>
+     document.addEventListener('DOMContentLoaded', function () {
     const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('transaction_Id');
       const transactionDate = document.getElementById('transaction_date');
+      const selectedScheme = document.getElementById('schemeSelect');
+      const directorateValue = document.getElementById('directorate');
+      const schemeLinkedBank = document.getElementById('scheme_linked_bank');
       // Function to fetch data from the backend API and update the table
 
       async function modeofPmnts(){
@@ -209,11 +217,37 @@
       }
 
       mop.addEventListener('change', modeofPmnts);
+      
+      async function fetchOfcData() {
+          const directorate = directorateValue.value;
+          const schemeName=selectedScheme.value;
+          if (selectedScheme === 'Select') {
+          schemeLinkedBank.innerHTML = `<option>'No Bank found'</option>`; // Clear the table when 'Select' is chosen
+          return;
+        }
+  
+        try {
+          const response = await fetch(`/cas/directorate/receipts/bank/${directorate}/${schemeName}`);
+          const data = await response.json();
+          console.log(`fetched data`,data);
+        //   // Update the table with the fetched data
+        if(data?.bankId){
+            schemeLinkedBank.innerHTML=`<option value=${data.bankId.accountNumber} >${data.bankId.bank}/${data.bankId.IFSCNumber}/${data.bankId.branch}</option>`;
+             }else{
+                schemeLinkedBank.innerHTML=`<option>'No Bank Linked'</option>`
+             }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+
+      selectedScheme.addEventListener('change', fetchOfcData)
 
       const voucherNo = '<%= voucherNo %>';
     if (voucherNo) {
       // Display the voucher number in a popup
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
+});
 </script>
 </html>

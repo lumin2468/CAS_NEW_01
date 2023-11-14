@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 <body>
 
@@ -28,21 +30,19 @@
                         <input type="text" class="form-control" name="directorate" value="<%= directorate_data.name %>">
                     </div>
                 </div>
-                <div class="col-md-4">
+                <!-- <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Office Name <span class="text-danger">*</span></label>
                         <select class="form-control" name="office_name" id ="selectedDist">
                             <option>Select</option>
-                            <% for( let dis of district_office) { %>
-                                <option value="<%= dis?._id %>" <%= district_office?.name === dis?.name ? 'selected': '' %> ><%= dis?.name %></option>
-                            <% } %>
+                           
                         </select>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
-                        <select class="form-control" name="scheme_name">
+                        <select class="form-control" name="scheme_name" id="scheme_name">
                             <option>Select</option>
                             <% for( let schm of scheme_details) { %>
                                 <option value="<%= schm?.name %>" <%= scheme_details?.name === schm?.name ? 'selected': '' %> ><%= schm?.name %></option>
@@ -51,13 +51,23 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="form-group">
+                <div class="col-md-2" style="display: flex;flex-direction: row; align-items: center;justify-content: center;">
+                    <div class="form-group col-md-10" >
                         <label class="form-label">Bank Name <span class="text-danger">*</span></label>
                         <select class="form-control" name="bank_name" id="bankName">
-                      
+                            <option>Select</option>
+                            <% for( let bnk of bank_details) { %>
+                                <option value="<%= bnk?.accountNumber %>" <%= bank_details?.bank === bnk?.bank ? 'selected': '' %> ><%= `${bnk?.bank}/${bnk?.IFSCNumber}/${bnk?.branch}` %></option>
+                            <% } %>
                         </select>
                     </div>
+                    <div>
+                        <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2 " TARGET="_blank" href="/cas/directorate/bank" role="button"  style="margin-top : 10px;">
+                        <span class="btn-inner" style="align-self: center;">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        </a>
+                        </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
@@ -82,7 +92,7 @@
                             <th>Sl. No.</th>
                             <th>Directorate Name</th>
                             <th>Scheme</th>
-                            <th>Office Name</th>
+                            
                             <th>Bank</th>
                             <th>Action</th>
                         </tr>
@@ -93,7 +103,7 @@
                             <td><%=index+1%></td>
                             <td><%= schmbnk.directorate.name %></td>
                             <td><%= schmbnk.scheme?.name %></td>
-                            <td><%= schmbnk.office?.name %></td>
+                            
                             <td><%= schmbnk.bankId.bank %></td>
                             <td>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
@@ -128,11 +138,11 @@
 </body>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const districtDetails=document.getElementById('selectedDist');
+    const schmSelect=document.getElementById('scheme_name');
     const bankData=document.getElementById('bankName')
     
-    async function fetchDistData() {
-        const disValue=districtDetails.value;
+    async function fetchDirData() {
+        // const disValue=districtDetails.value;
         // if (selectedScheme === 'Select') {
         //    // Clear the table when 'Select' is chosen
         //    bankData.innerHTML=""
@@ -140,7 +150,7 @@
         // }
   
         try {
-          const response = await fetch(`/cas/directorate/scheme2bank/${disValue}`);
+          const response = await fetch(`/cas/directorate/scheme2bank/`);
           const data = await response.json();
           console.log(`fetched data`,data);
           // Update the table with the fetched data
@@ -152,7 +162,7 @@
           console.error('Error fetching data:', error);
         }
       }
-    districtDetails.addEventListener('change', fetchDistData)
+    schmSelect.addEventListener('change', fetchDirData)
     })
 </script>
 

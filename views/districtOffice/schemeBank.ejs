@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -56,14 +57,29 @@
                         </select>
                     </div>
                 </div>
+            
 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
-                        <select class="form-control" name="bank_name" id="bankName">
+                <div class="col-md-3">
+                    <div style="flex-direction: row;display: flex; align-items: center;justify-content:center;">
+                        <div class="form-group col-md-10" >
+                            
+                            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                            <select class="form-control" name="bank_name" id="bankName">
                       
-                        </select>
-                    </div>
+                            </select>
+                          
+                   
+                    
+                 
+                    
+                        </div>
+                        <div>
+                        <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2 " TARGET="_blank" href="/cas/district/bank" role="button"  style="margin-top : 10px;">
+                        <span class="btn-inner" style="align-self: center;">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        </a>
+                        </div>
                 </div>
                 <div class="col-md-12">
                     <div class="form-group">
@@ -146,7 +162,7 @@
         // }
   
         try {
-          const response = await fetch(`/cas/directorate/scheme2bank/${disValue}`);
+          const response = await fetch(`/cas/district/scheme2bank/${disValue}`);
           const data = await response.json();
           console.log(`fetched data`,data);
           // Update the table with the fetched data

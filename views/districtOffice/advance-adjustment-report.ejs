@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
+<body>
+
+
+    <%if(designation==="ACCOUNTANT"){%>
+        <%-include('../Includes/sidebar3.ejs')%>
+        <%-include('../Includes/header-5.ejs')%>
+        
+        <% }else{ %>
+
+    <%-include('../Includes/sidebar2.ejs')%>
+    <%-include('../Includes/header-4.ejs')%>
+    <% } %>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <div class="flex-wrap d-flex justify-content-between align-items-center">
+        <div><h4 class="mb-5">Advance Adjustment Report</h4></div>
+        <div>
+            <select class="form-control" id="vendorSelect">
+                <option>Select Vendor
+
+
+                         
+                </option>
+                <% for( let ven of vendorDetails ) { %>
+                    <option value="<%= ven._id %>" <%= vendorDetails.name === ven.name ? 'selected': '' %> ><%= ven.name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
+            <select class="form-control" id="filterType">
+                <option value="financialYear">Financial Year</option>
+                <option value="monthly">Monthly</option>
+                <option value="dateRange">Date Range</option>
+            </select>
+            <select class="form-control" id="financialYearFilter">
+                <option>Select</option>
+                <% for (let year of financialYear) { %>
+                    <option value="<%= year._id %>"><%= year.year %></option>
+                <% } %>
+            </select>
+            <select class="form-control" id="monthFilter" style="display: none;">
+                <option>SELECT</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <div style="display: flex; flex-direction: row;">
+            <input type="date" id="startDateInput" style="display: none;">
+            <input type="date" id="endDateInput" style="display: none;">
+        </div>  
+        </div>
+       
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th colspan="5" class="text-center">Advance</th>
+                            <th colspan="5" class="text-center">Adjustment</th>
+                        </tr>
+                    
+                        <tr>
+                            <th>Date(YYYY-MM-DD)</th>  
+                            <th>Voucher No.</th>
+                            <th>Purpose</th>
+                            <th>Cash/Bank</th>
+                            <th>Advance Amount</th>
+                            <th>Adjustment Amount</th>
+                            <th>Voucher No.</th>
+                            <th>Cash/Bank</th>
+                            <th>closing Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="advanceAndadjustmentBody">
+                    <tr>
+                        <td >22/9/23</td>
+                        <td>23419</td>
+                        <td >Repair Mang</td>
+                        <td >Bank</td>
+                        <td>50,000</td>
+                        <td>50.000</td>
+                        <td>14901</td>
+                        <td>Bank</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td></td>
+                        <td ></td>   
+                        <td ></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>Total</strong></td>
+                        <td></td>
+                        <td>50,000</td>
+                        <td>50,000</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" class="text-end"><strong>Total Advance</strong></td>
+                        <td>50,000</td>
+                        <td></td>
+                       
+                    </tr>
+                    <tr>
+                        <td colspan="7" class="text-end"><strong>Total Adjustment</strong></td>
+                        <td>50,000</td>
+                        <td></td>
+                       
+                    </tr>
+                    <tr>
+                        <td colspan="7" class="text-end"><strong>Closing Balance</strong></td>
+                        <td>Nill</td>
+                        <td></td>
+                       
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const vendorSelect = document.getElementById('vendorSelect');
+        const filterTypeSelect = document.getElementById('filterType');
+        const financialYearFilterSelect = document.getElementById('financialYearFilter');
+        const monthFilterSelect = document.getElementById('monthFilter');
+        const startDateInput = document.getElementById('startDateInput');
+        const endDateInput = document.getElementById('endDateInput');
+        const advanceAndAdjustmentBody = document.getElementById('advanceAndadjustmentBody'); // Note the case difference here
+
+        console.log(`ADVV`,advanceAndAdjustmentBody)
+        const fetchData = async () => {
+            const vendorId = vendorSelect.value;
+            const selectedFilter = filterTypeSelect.value;
+
+            if (vendorId && ((selectedFilter === 'financialYear' && financialYearFilterSelect.value) || (selectedFilter === 'monthly' && monthFilterSelect.value) || (selectedFilter === 'dateRange' && startDateInput.value && endDateInput.value))) {
+                let url = `/cas/district/advance-adjustment-report/result?vendorId=${vendorId}&filterType=${selectedFilter}`;
+
+                if (selectedFilter === 'financialYear') {
+                    url += `&financialYearId=${financialYearFilterSelect.value}`;
+                } else if (selectedFilter === 'monthly') {
+                    url += `&month=${monthFilterSelect.value}`;
+                } else if (selectedFilter === 'dateRange') {
+                    url += `&startDate=${startDateInput.value}&endDate=${endDateInput.value}`;
+                }
+
+                const response = await fetch(url);
+                const data= await response.json();
+                console.log(`ResponseData`,data.totalAdjustmentAmount)
+                updateTable(data);
+            }
+        };
+
+        filterTypeSelect.addEventListener('change', () => {
+            updateFilterDisplay();
+        });
+        financialYearFilterSelect.addEventListener('change', fetchData);
+        vendorSelect.addEventListener('change',fetchData);
+
+        function createAdvanceAndAdjustmentRow(record) {
+            // Create table row elements based on the record data
+            const row = document.createElement('tr');
+            const fields = ['date', 'voucherNo', 'purpose', 'cashOrBank', 'advanceAmount', 'adjustmentAmount', 'adjVoucherNo', 'adjCashOrBank', 'closingBalance'];
+            
+            // Create and populate table data cells (td) for each data field
+            fields.forEach(field => {
+                const cell = document.createElement('td');
+                cell.textContent = record[field] || ''; // Display the field value or an empty string if it's undefined
+                row.appendChild(cell);
+            });
+
+            return row;
+        }
+
+
+        
+
+        
+        function updateTable(data) {
+    // Clear the table body before populating with new data
+    while (advanceAndAdjustmentBody.firstChild) {
+        advanceAndAdjustmentBody.removeChild(advanceAndAdjustmentBody.firstChild);
+    }
+
+    // Iterate through the data and create rows for the table
+    data.data.forEach(record => {
+        const row = createAdvanceAndAdjustmentRow(record);
+        advanceAndAdjustmentBody.appendChild(row);
+    });
+
+    // Add the summary rows
+    const totalRow = document.createElement('tr');
+    totalRow.innerHTML = `
+        <td colspan="3" class="text-end"><strong>Total</strong></td>
+        <td></td>
+        <td>${(data.totalAdvanceAmount).toFixed(2)}</td>
+        <td>${(data.totalAdjustmentAmount).toFixed(2)}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    `;
+    advanceAndAdjustmentBody.appendChild(totalRow);
+
+    const totalAdvanceRow = document.createElement('tr');
+    totalAdvanceRow.innerHTML = `
+        <td colspan="7" class="text-end"><strong>Total Advance</strong></td>
+        <td>${(data.totalAdvanceAmount).toFixed(2)}</td>
+        <td></td>
+    `;
+    advanceAndAdjustmentBody.appendChild(totalAdvanceRow);
+
+    const totalAdjustmentRow = document.createElement('tr');
+    totalAdjustmentRow.innerHTML = `
+        <td colspan="7" class="text-end"><strong>Total Adjustment</strong></td>
+        <td>${(data.totalAdjustmentAmount).toFixed(2)}</td>
+        <td></td>
+    `;
+    advanceAndAdjustmentBody.appendChild(totalAdjustmentRow);
+
+    const closingBalanceRow = document.createElement('tr');
+    closingBalanceRow.innerHTML = `
+        <td colspan="7" class="text-end"><strong>Closing Balance</strong></td>
+        <td>${(data.totalAdvanceAmount-data.totalAdjustmentAmount).toFixed(2)}</td>
+        <td></td>
+    `;
+    advanceAndAdjustmentBody.appendChild(closingBalanceRow);
+}
+
+        function updateFilterDisplay() {
+            // Simplify the filter display based on the selected filter type
+            const selectedFilter = filterTypeSelect.value;
+            financialYearFilterSelect.style.display = selectedFilter === 'financialYear' ? 'block' : 'none';
+            monthFilterSelect.style.display = selectedFilter === 'monthly' ? 'block' : 'none';
+            startDateInput.style.display = selectedFilter === 'dateRange' ? 'block' : 'none';
+            endDateInput.style.display = selectedFilter === 'dateRange' ? 'block' : 'none';
+        }
+    });
+    
+</script>
+
+
+</html>

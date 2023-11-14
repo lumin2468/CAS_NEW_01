@@ -10,59 +10,72 @@
     <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <%- include('../Includes/sidebar.ejs')%> 
-    <%- include('../Includes/header-3.ejs')%>
+
+    <%-include('../Includes/sidebar.ejs')%>
+    <%-include('../Includes/header-3.ejs')%>
 
 <div class="content-inner container-fluid pb-0" id="page_layout">
     <h4 class="mb-5">Opening Balance</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/openingBalance" method="post">
-            <table class="table table-bordered" id="obTable">
+            <form action="/cas/directorate/openingBalance" method="post" id="form">
+            <table class="table table-bordered" id="tableBody">
                 <thead>
-                    <tr>    
-                        <th>Date</th>
+                    <tr> 
+                        <th>Date</th>   
+                        <th>Scheme</th>
                         <th>Cash</th>
                         <th>Bank</th>
                         <th>Bank Balance</th>
                         <th>Advance</th>
-                       <th></th>
+
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="date" class="form-control" name="date" ></td>
-                        <td><input type="text" class="form-control" name="cash" ></td>
+                        <td><input type="date" class="form-control" name="date"></td>
                         <td>
-                            <select class="form-control" name="bank_details">
+                         <select class="form-control schemeDtls" name="scheme">
                                 <option>Select</option>
-                                <% for( let bnk of bnkDetails ) { %>
-                                    <option value="<%= bnk.accountNumber %>" <%=bnkDetails.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank %></option>
+                                <% for( let sch of schemes ) { %>
+                                    <option value="<%= sch._id %>" <%= schemes === sch.name ? 'selected': '' %> ><%= sch.name %></option>
                                 <% } %>
-                              </select>
-                                                 
+                            </select>
+                        </td>
+                        <td><input type="text" class="form-control" name="cash" ></td>
+                        <td> <select class="form-control bankDetails" name="bank">
+                            </select>
                         </td>
                         <td><input type="text" class="form-control" name="bank_balance" ></td>
-                        <td><input type="text" class="form-control" name="advance"></td>
-                      
-                        
+                        <td><input type="text" class="form-control" name="advance" ></td>
+                       
                         <td>
-                            <a class="btn btn-success btn-icon btn-sm rounded-pill ms-2" href="#" role="button" id="addMore">
-                                <span class="btn-inner">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-32"><path d="M12 4V20M20 12H4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            
+                            <a class="btn btn-danger btn-icon btn-sm rounded-pill ms-2 delete-row" href="#" role="button" style="display: none;" >
+                                <span class="btn-inner" style="align-self: center;">
+                                    <i class="fas fa-minus"></i>
                                 </span>
                             </a>
                         </td>
                     </tr>
+                
                 </tbody>
             </table>
+            <div style="display: flex; flex-direction: row; justify-content: center; gap:15px">
+                <div class="text-center">
+                    <button id="submitBtn" class="btn btn-primary">SUBMIT</button>
+                </div>
+                
+            </form>
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button class="btn btn-primary" id="addMore">ADD MORE</button>
             </div>
-        </form>
+        </div>
         </div>
     </div>
 
@@ -73,26 +86,27 @@
                     <thead>
                         <tr>
                             <th>Sl. No.</th>
-                            <th>Date</th>
+                            <th>Scheme</th>
                             <th>Cash</th>
-                            <th>Bank Account No.</th>
-                            <th>Bank opening Balance</th>
-                            <th>Total Balance</th>
+                            <th>Bank Name</th>
+                            <th>Bank Balance</th>
                             <th>Advance</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% for( let[index, opnB] of opngBalance.entries()) { %>
+                        <% for( let[index, oB] of opngBalance.entries()) { %>
                         <tr>
-                            <td><%= index+1 %></td>
-                            <td><%=(opnB.date).toLocaleString('en-GB') %></td>
-                            <td><%= opnB.cash %></td>
-                            <td><%= opnB.bank.accountNumber %></td>
-                            <td><%= opnB.cash %></td>
-                            <td><%= opnB.bank.balance %></td>
-                            <td><%= opnB.advance %></td>
-                            
+                            <td><%=index+1  %></td>
+                            <td><%=oB?.scheme?.name %></td>
+                            <td><%=oB.cash  %></td>
+                            <td><%=oB.bank.bank %></td>
+                            <td><%=oB.bank.balance %></td>
+                            <% if (!oB.advance) {%>
+                             <td>0</td> 
+                             <% }else{ %>  
+                            <td><%=oB.advance %></td>
+                            <% } %>
                             <td>
                                 <div>
                                 <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
@@ -127,4 +141,120 @@
 
 
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const tableBody = document.getElementById('tableBody');
+    const add = document.getElementById('addMore');
+    const submitBtn = document.getElementById('submitBtn');
+    const schemeDetails = document.querySelector('.schemeDtls');
+    
+    const addBank = async (event, bnkData, selectedScheme) => {
+        if (selectedScheme === "Select") {
+            bnkData.innerHTML = "";
+        }
+        const response = await fetch(`/cas/directorate/openingBalance/${selectedScheme}`);
+        const data = await response.json();
+        console.log(data);
+        if(!data){  
+            bnkData.innerHTML = "no bank linked";
+        }
+        bnkData.innerHTML = `<option value=${data.bankId._id}>${data.bankId.bank} / ${ data.bankId.accountNumber} / ${ data.bankId.IFSCNumber} </option>`;
+    };
+    
+    
+    schemeDetails.addEventListener('change', (event) => {
+        const bankSelect = document.querySelector('.bankDetails');
+        addBank(event, bankSelect, schemeDetails.value);
+    });
+
+    submitBtn.addEventListener('click', async (event) => {
+        
+        try {
+            const form = document.getElementById('form');
+            const formData = new FormData(form);
+            const response = await fetch("/cas/directorate/openingBalance", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (response.ok) {
+                // Success! You can redirect or show a success message
+                window.location.href =  "/cas/directorate/openingBalance";
+            } else {
+                // Handle error here
+                console.error("Error submitting form");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
+
+    let rowCounter = 1;
+
+    function cloneRow(e) {
+        e.preventDefault();
+        const lastRow = tableBody.children[1];
+        const newRow = lastRow.cloneNode(true);
+        const inputs = newRow.querySelectorAll('input[type="text"]');
+        inputs.forEach((input) => (input.value = ''));
+        if (rowCounter > 0) {
+        const deleteButton = newRow.querySelector('.delete-row');
+        deleteButton.style.display = 'flex';
+                }  
+        rowCounter++; 
+        tableBody.appendChild(newRow);
+        
+        // Attach event listeners to the new row
+        attachRowEventListeners(newRow);
+    }
+
+    function deleteRow(event) {
+        event.preventDefault();
+        const rows = tableBody.querySelectorAll('tr');
+console.log(rows.length)
+        // Check if there's only one row left; don't remove it
+        if (rows.length > 1) {
+            const row = event.target.closest('tr');
+            const tbody = row.parentElement;
+            tbody.removeChild(row);
+        } else {
+            // If there's only one row left, clear the inputs instead of removing it
+            const inputs = rows[1].querySelectorAll('input[type="text"]');
+            inputs.forEach((input) => (input.value = ''));
+        }
+    }
+
+    function attachRowEventListeners(row) {
+        const schemeSelect = row.querySelector('.schemeDtls');
+        const bankSelect = row.querySelector('.bankDetails');
+
+        schemeSelect.addEventListener('change', (event) => {
+            addBank(event, bankSelect, schemeSelect.value);
+        });
+
+        // Add more event listeners as needed for your specific functionality
+    }
+
+    // Attach event listener to the "Add More" button
+    add.addEventListener('click', (e)=>{
+        cloneRow(e)
+    });
+
+    // Attach event listener to the table body to handle delete rows
+    tableBody.addEventListener('click', (event) => {
+        if (event.target.classList.contains('delete-row')) {
+            deleteRow(event);
+        }else if (event.target.id === 'addMore') {
+            cloneRow(event);
+        }
+    });
+
+    // Initial attachment of event listeners for the first row
+    const firstRow = tableBody.querySelector('tr');
+    attachRowEventListeners(firstRow);
+    
+    });
+</script>
+  
+  
 </html>

@@ -532,14 +532,15 @@ app.get("/cas/directorate/bank", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
     const directorate = await Directorate.findOne({ _id: directorateOfc });
-    const districts = await District.find({ directorate: directorateOfc });
+    // const districts = await District.find({ directorate: directorateOfc });
     const bankDetails = await BankDetails.find({
       directorate: directorateOfc,
+      office:null
     }).populate("office");
 
     res.render("directorate/bank", {
       directorate,
-      districts,
+      // districts,
       bankDetails,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
@@ -559,20 +560,19 @@ app.post("/cas/directorate/bank", isAuthenticated, async (req, res) => {
       branchName,
       accountNo,
       directorate,
-      district_office,
       address,
     } = req.body;
     const direcOfc = await Directorate.findOne({ _id: directorateOfc });
     let distOfc = {};
-    console.log(district_office);
-    if (!(district_office === "Select")) {
-      distOfc = await District.findOne({ name: district_office });
-      console.log(distOfc);
-    }
+    
+    // if (!(district_office === "Select")) {
+    //   distOfc = await District.findOne({ name: district_office });
+    //   console.log(distOfc);
+    // }
 
     const bankMaster = new BankDetails({
       directorate: direcOfc?._id,
-      office: distOfc?._id,
+      office:null,
       bank: bankName,
       accountNumber: accountNo,
       IFSCNumber: Ifsc_code,
@@ -580,10 +580,10 @@ app.post("/cas/directorate/bank", isAuthenticated, async (req, res) => {
       branch: branchName,
       address: address,
     });
-    if (!(district_office === "Select")) {
-      distOfc.bank.push(bankMaster._id);
-      distOfc.save();
-    }
+    // if (!(district_office === "Select")) {
+    //   distOfc.bank.push(bankMaster._id);
+    //   distOfc.save();
+    // }
     bankMaster.save();
     res.status(200).redirect("/cas/directorate/bank");
   } catch (error) {
@@ -596,22 +596,23 @@ app.get("/cas/directorate/scheme2bank", isAuthenticated, async (req, res) => {
   try {
     const direcOfc = req.user.user.directorate;
     const directorate_data = await Directorate.findOne({ _id: direcOfc });
-    const district_office = await District.find({ directorate: direcOfc });
-    const bank_details = await BankDetails.find({ directorate: direcOfc });
+    // const district_office = await District.find({ directorate: direcOfc });
+    const bank_details = await BankDetails.find({ directorate: direcOfc, office:null,scheme: null });
     const scheme_details = await Scheme.find({ directorate: direcOfc });
     const schemeBankDetails = await SchemeBankMaster.find({
       directorate: direcOfc,
+      office:null,
     })
-      .populate("directorate")
-      .populate("bankId")
-      .populate("office")
-      .populate("scheme");
-
+    .populate("directorate")
+    .populate("bankId")
+    .populate("scheme");
+    
+    console.log(`DIRRRRRSCHBBNNNKKK`,schemeBankDetails)
     res.render("directorate/schemeBank.ejs", {
       directorate_data,
       bank_details,
       scheme_details,
-      district_office,
+      // district_office,
       schemeBankDetails,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
@@ -622,7 +623,23 @@ app.get("/cas/directorate/scheme2bank", isAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/cas/directorate/scheme2bank/:id", async (req, res) => {
+// app.get("/cas/directorate/scheme2bank/:id", async (req, res) => {
+//   try {
+//     // const distId = req.params.id;
+//     const direcOfc = req.user.user.directorate;
+//     const bank_details = await BankDetails.find({
+//       directorate: direcOfc,
+//       office: null,
+//       scheme: null,
+//     });
+//     res.json(bank_details);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
+app.get("/cas/district/scheme2bank/:id", async (req, res) => {
   try {
     const distId = req.params.id;
     const bank_details = await BankDetails.find({
@@ -636,31 +653,31 @@ app.get("/cas/directorate/scheme2bank/:id", async (req, res) => {
   }
 });
 
-app.post("/cas/directorate/scheme2bank", async (req, res) => {
+app.post("/cas/directorate/scheme2bank",isAuthenticated, async (req, res) => {
   try {
-    console.log(`I am in`);
-    const { directorate, office_name, scheme_name, bank_name, scheme_desc } =
-      req.body;
-    const office_details = await District.findOne({ _id: office_name });
+    const direcOfc = req.user.user.directorate;
+    const { directorate, scheme_name, bank_name, scheme_desc } =
+    req.body;
+    console.log(`I am in`,directorate);
+    // const office_details = await District.findOne({ _id: office_name });
     const scheme_details = await Scheme.findOne({ name: scheme_name });
     const bank_details = await BankDetails.findOne({
       accountNumber: bank_name,
     });
 
     const schemeBankDetails = new SchemeBankMaster({
-      office: office_details._id,
-      directorate: office_details.directorate,
+      directorate: direcOfc,
       scheme: scheme_details._id,
       bankId: bank_details._id,
       description: scheme_desc,
     });
-    scheme_details.bank = schemeBankDetails.bankId;
-    scheme_details.save();
+    // scheme_details.bank = schemeBankDetails.bankId;
+    // scheme_details.save();
     schemeBankDetails.save();
     bank_details.scheme = schemeBankDetails._id;
     bank_details.save();
-    office_details.schemes.push(scheme_details._id);
-    office_details.save();
+    // office_details.schemes.push(scheme_details._id);
+    // office_details.save();
     res.redirect("/cas/directorate/scheme2bank");
   } catch (error) {
     console.error(error);
@@ -946,13 +963,16 @@ app.get("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
     const financialYear = await FinancialYear.find();
     const directorateData = await Directorate.findOne({ _id: directorateOfc })
       .populate("bank")
-      .populate("department");
+      .populate("department")
+     
+    const schemeData=await Scheme.find({directorate:directorateOfc})
     console.log(directorateData);
     const modeofpmnt = await modeofPayment.find();
     res.render("directorate/receipt-voucher", {
       directorateData,
       modeofpmnt,
       financialYear,
+      schemeData,
       voucherNo,
       receiptDetails,
       username: req.user.user.username,
@@ -973,7 +993,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       transaction_date,
       sanction_no,
       ref_voucher_no,
-      purpose,
+      scheme,
       source,
       directorate,
       source_bank,
@@ -981,9 +1001,14 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       amount,
       desc,
     } = req.body;
+    const directorateOfc = req.user.user.directorate;
+    console.log(`SCHEMEMEEE`,scheme)
 
     const paymentDate = new Date(date); // Assuming "date" is the payment date
+    console.log(`PaymntDate`,paymentDate)
     const paymentYear = paymentDate.getFullYear();
+
+    const schemeValue= await Scheme.findOne({_id:scheme})
 
     // Find the financial year that corresponds to the payment date
     const financialYear = await FinancialYear.findOne({
@@ -997,13 +1022,14 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       return;
     }
 
-    const purposeAbbr = purpose.substring(0, 3).toUpperCase();
+    const schemeAbbr = schemeValue.name.substring(0, 3).toUpperCase();
+   
     const directorateData = await Directorate.findOne({
       name: directorate,
     }).populate("department");
 
     const receiverBankDetails = await BankDetails.findOne({
-      directorate: directorateData._id,
+      directorate: directorateOfc,
       accountNumber: receiver_bank,
     });
 
@@ -1011,7 +1037,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       {
         directorate,
         source: source,
-        purpose: purpose,
+        scheme: schemeValue.name,
         financialYear: financialYear.year,
       },
       { $inc: { count: 1 } }, // Increment the counter by 1
@@ -1023,7 +1049,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
     const voucherNo = generateRecVoucherNumber(
       directorate_abbvr,
       source_abbvr,
-      purposeAbbr,
+      schemeAbbr,
       financialYear.year,
       recCounter.count
     );
@@ -1035,7 +1061,7 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
       transaction_date,
       sanction_no,
       ref_voucher_no,
-      purpose,
+      scheme:schemeValue._id,
       source,
       directorate: directorateData._id,
       source_bank,
@@ -1057,70 +1083,195 @@ app.post("/cas/directorate/receipt", isAuthenticated, async (req, res) => {
 });
 
 app.get(
-  "/cas/directorate/openingBalance",
+  "/cas/directorate/receipts/bank/:officeName/:schemeName",
+  async (req, res) => {
+    try {
+      const { officeName, schemeName } = req.params;
+      console.log(officeName, schemeName);
+      const ofcId = await Directorate.findOne({ _id: officeName });
+      const schmId = await Scheme.findOne({ _id: schemeName });
+
+      const bnkDetails = await SchemeBankMaster.findOne({
+        scheme: schmId,
+        directorate: ofcId._id,
+        office:null,
+
+      }).populate("bankId");
+      console.log(`schemeeeee`, bnkDetails);
+      res.json(bnkDetails);
+      //  const componentData = await Scheme.findOne({ name: schemeName }).populate('components');
+      //  res.json(componentData)
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      res
+        .status(500)
+        .json({ error: "Failed to fetch data from the database." });
+    }
+  }
+);
+
+app.get(
+  "/cas/directorate/openingBalance/:schemeId",
   isAuthenticated,
   async (req, res) => {
     try {
+      
+      const directorateOfc = req.user.user.directorate;
+      const { schemeId } = req.params;
+      const bankDetails = await SchemeBankMaster.findOne({
+        directorate: directorateOfc,
+        scheme: schemeId,
+        office:null,
+      }).populate("bankId");
+      res.json(bankDetails);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
+
+
+app.get(
+  "/cas/directorate/openingBalance",
+  isAuthenticated, async (req, res, next) =>{
+    try {
       const financialYear = await FinancialYear.find();
       const directorateOfc = req.user.user.directorate;
-      const opngBalance = await DirOpeningBalance.find({
+      const opngBalance = await DirOpeningBalance.find({        
         directorate: directorateOfc,
-      }).populate("bank");
-
-      console.log(`hasdhhasdgagdahda`, opngBalance.bank);
-      const dirOfcDetails = await Directorate.findOne({ _id: directorateOfc });
-      const bnkDetails = await BankDetails.find({
+      }).populate("bank").populate("scheme");
+      console.log(`hasdhhasdgagdahda`, opngBalance);
+      const dirOfcDetails = await Directorate.findOne({ _id: directorateOfc })
+      const schemes = await Scheme.find({
         directorate: directorateOfc,
       });
+      const bnkDetails = await BankDetails.find({directorate: directorateOfc});
       console.log(dirOfcDetails.bank);
       res.render("directorate/opening-balance", {
         dirOfcDetails,
-        financialYear,
+        financialYear, 
         bnkDetails,
+        schemes,
         opngBalance,
         username: req.user.user.username,
         designation: req.user.user.designation.name,
       });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+      next(error);
     }
   }
-);
+  );
 app.post(
   "/cas/directorate/openingBalance",
   isAuthenticated,
   async (req, res) => {
-    try {
-      const { date, cash, bank_details, bank_balance, advance } = req.body;
-      const directorate = req.user.user.directorate;
-      const dirDetails = await Directorate.findOne({ _id: directorate });
+  //   try {
+  //     const { date, cash, bank_details, bank_balance, advance } = req.body;
+  //     const directorate = req.user.user.directorate;
+  //     const dirDetails = await Directorate.findOne({ _id: directorate });
 
-      const bnkDetails = await BankDetails.findOne({
-        accountNumber: bank_details,
-        directorate: directorate,
-      });
-      console.log(bnkDetails.balance);
-      bnkDetails.balance =
-        parseInt(bnkDetails.balance) + parseInt(bank_balance);
-      bnkDetails.save();
-      const newOpeningbal = new DirOpeningBalance({
-        date,
-        cash: parseInt(cash),
-        directorate: directorate,
-        bank: bnkDetails._id,
-        advance: parseInt(advance),
-      });
-      newOpeningbal.save();
-      dirDetails.openingBalance.push(newOpeningbal._id);
-      dirDetails.save();
-      res.redirect("/cas/directorate/openingBalance");
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
+  //     const bnkDetails = await BankDetails.findOne({
+  //       accountNumber: bank_details,
+  //       directorate: directorate,
+  //     });
+  //     console.log(bnkDetails.balance);
+  //     bnkDetails.balance =
+  //       parseInt(bnkDetails.balance) + parseInt(bank_balance);
+  //     bnkDetails.save();
+  //     const newOpeningbal = new DirOpeningBalance({
+  //       date,
+  //       cash: parseInt(cash),
+  //       directorate: directorate,
+  //       bank: bnkDetails._id,
+  //       advance: parseInt(advance),
+  //     });
+  //     newOpeningbal.save();
+  //     dirDetails.openingBalance.push(newOpeningbal._id);
+  //     dirDetails.save();
+  //     res.redirect("/cas/directorate/openingBalance");
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ error: "Internal Server Error" });
+  //   }
+  try {
+    const direcOfc = req.user.user.directorate;
+    const openingBalData = req.body;
+    console.log(`DIR OOBBBB`,openingBalData);
+    let bankData
+
+    if (!Array.isArray(openingBalData.scheme)) {
+      // Handle the case when a single entry is submitted
+      openingBalData.scheme = [openingBalData.scheme];
+      openingBalData.cash = [openingBalData.cash];
+      openingBalData.bank = [openingBalData.bank];
+      openingBalData.bank_balance = [openingBalData.bank_balance];
+      openingBalData.advance = [openingBalData.advance];
+      openingBalData.date = [openingBalData.date]; // Add date field
+     
     }
+
+    const newOpeningBalances = await Promise.all(
+      openingBalData.scheme.map(async (scheme, index) => {
+        const cash = openingBalData.cash[index];
+        const bank = openingBalData.bank[index];
+        const bank_balance = openingBalData.bank_balance[index];
+        const advance = openingBalData.advance[index];
+        const date = openingBalData.date[index]; // Get date from the request body
+
+        // Check if an opening balance already exists for this scheme and office
+        const existingOpeningBal = await DirOpeningBalance.findOne({
+          scheme,
+          directorate: direcOfc,
+        });
+        console.log(`EXISTING OB`,existingOpeningBal)
+        if (existingOpeningBal) {
+          // If an opening balance already exists, update it instead of creating a new one
+          // You can add your update logic here if needed
+          return res.json("OPENING BALANCE ALREADY EXIST IN DATABASE");
+          
+        }
+
+        // Process bank details and update balance
+         bankData = await BankDetails.findOne({ _id:bank,});
+        console.log(`BBBNNNKKKKJJJJ`,bankData);
+        if (!bankData) {
+          throw new Error("Bank details not found");
+        }
+        bankData.balance =
+          parseInt(bankData.balance) + parseInt(bank_balance);
+        await bankData.save();
+
+        // Create and save opening balance entry with date
+        const newOpeningBal = new DirOpeningBalance({
+          date: new Date(date), // Convert date string to a Date object
+          scheme,
+          directorate: direcOfc,
+          cash: parseInt(cash),
+          bank: bankData._id,
+          advance: parseInt(advance),
+        });
+        await newOpeningBal.save();
+        console.log(`NEWOOOOBBBB`,newOpeningBal)
+        return newOpeningBal;
+      })
+    );
+
+    // Update office details with new opening balance IDs
+    const ofcDetails = await Directorate.findOne({ _id: direcOfc });
+    ofcDetails.openingBalance.push(
+      ...newOpeningBalances.map((entry) => entry._id)
+    );
+    await ofcDetails.save();
+      console.log(`ofcDetailsssss`,ofcDetails)
+    res.redirect("/cas/directorate/openingBalance");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || "Internal Server Error" });
+  }
   }
 );
+
 
 app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
   try {
@@ -1172,13 +1323,14 @@ app.post("/cas/directorate/district", isAuthenticated, async (req, res) => {
 app.get("/cas/directorate/report", isAuthenticated, async (req, res) => {
   try {
     const directorateOfc = req.user.user.directorate;
-
+    const financialYear = await FinancialYear.find();
     const directorate = await Directorate.findOne({
       _id: directorateOfc,
     }).populate("schemes");
 
     res.render("directorate/cash-book-register", {
       directorate,
+      financialYear,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
     });
@@ -1187,6 +1339,166 @@ app.get("/cas/directorate/report", isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+app.get("/cas/directorate/report/data", isAuthenticated, async (req, res) => {
+  try {
+ 
+    const directorateOfc = req.user.user.directorate;
+    const selectedSchemes = req.query.selectedSchemes
+      .split(",")
+      .map((id) => new mongoose.Types.ObjectId(id.trim()));
+    const filterType = req.query.filterType;
+    let startDate, endDate;
+
+    if (filterType === "financialYear") {
+      const financialYearId = req.query.financialYear;
+      const financialYearData = await FinancialYear.findOne({
+        _id: financialYearId,
+      });
+      startDate = financialYearData.startDate;
+      endDate = financialYearData.endDate;
+    } else if (filterType === "monthly") {
+      const selectedMonth = req.query.month;
+      const year = new Date().getFullYear();
+      startDate = new Date(year, selectedMonth - 1, 1);
+      endDate = new Date(year, selectedMonth, 0);
+    } else if (filterType === "dateRange") {
+      startDate = new Date(req.query.startDate);
+      endDate = new Date(req.query.endDate);
+    } else {
+      // Handle invalid filterType here if needed
+    }
+
+    const initialOpeningBalance = await DirOpeningBalance.findOne({
+      scheme: { $in: selectedSchemes },
+      directorate: directorateOfc,
+    }).populate("bank");
+
+    // Calculate the initial opening balance as the sum of cash and bank balances for the selected schemes
+    let openingBalance = initialOpeningBalance
+      ? initialOpeningBalance.bank.balance || 0
+      : 0;
+
+    // Calculate the sum of payments and receipts from the start date to the day before the start date
+    if (filterType !== "financialYear") {
+      // Calculate the opening balance for the date startDate - 1
+      const dateForOpeningBalance = new Date(startDate);
+      dateForOpeningBalance.setDate(dateForOpeningBalance.getDate() - 1);
+      const paymentsBeforeStartDate = await DirPayment.aggregate([
+        {
+          $match: {
+            scheme: { $in: selectedSchemes },
+            date: { $lt: dateForOpeningBalance },
+            directorate: new mongoose.Types.ObjectId(directorateOfc),
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalBankPayment: { $sum: "$amount" },
+          },
+        },
+      ]);
+
+      // Perform aggregation to calculate the total bank receipts before the start date
+      const receiptsBeforeStartDate = await DirReceipt.aggregate([
+        {
+          $match: {
+            scheme: { $in: selectedSchemes },
+            date: { $lt: dateForOpeningBalance },
+            directorate: new mongoose.Types.ObjectId(directorateOfc),
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalBankReceipt: { $sum: "$amount" },
+          },
+        },
+      ]);
+      const totalBankPayment =
+        paymentsBeforeStartDate[0]?.totalBankPayment || 0;
+      const totalBankReceipt =
+        receiptsBeforeStartDate[0]?.totalBankReceipt || 0;
+      openingBalance += totalBankReceipt - totalBankPayment;
+    }
+
+    // Calculate the opening balance as of the start date
+
+    console.log(`OPPPBBBBB`, openingBalance);
+    const receiptRecords = await DirReceipt.find({
+      scheme: { $in: selectedSchemes },
+      date: { $gte: startDate, $lte: endDate },
+      directorate:directorateOfc
+    });
+
+    // Fetch payment records within the date range
+    const paymentRecords = await DirPayment.find({
+      scheme: { $in: selectedSchemes },
+      date: { $gte: startDate, $lte: endDate },
+      directorate:directorateOfc
+    });
+
+    const totalReceipts = receiptRecords.reduce(
+      (total, record) => total + record.amount,
+      0
+    );
+
+    // Calculate Total Expenses
+    const totalExpenses = paymentRecords.reduce(
+      (total, record) => total + record.amount,
+      0
+    );
+
+    // Calculate Closing Balance
+    const closingBalance = openingBalance + totalReceipts - totalExpenses;
+
+    const grandTotal = openingBalance + totalReceipts;
+    // Combine the results into a single response object segregated by date
+    const segregatedData = {};
+
+    // Helper function to add records to segregatedData
+    function addToSegregatedData(records, dataType) {
+      records.forEach((record) => {
+        const dateKey = record.date.toISOString().split("T")[0]; // Extract date in YYYY-MM-DD format
+        if (!segregatedData[dateKey]) {
+          segregatedData[dateKey] = {};
+        }
+        segregatedData[dateKey][dataType] =
+          segregatedData[dateKey][dataType] || [];
+        segregatedData[dateKey][dataType].push(record);
+      });
+    }
+
+    addToSegregatedData(receiptRecords, "receipts");
+    addToSegregatedData(paymentRecords, "payments");
+
+    // Sort the dates in ascending order
+    const sortedDates = Object.keys(segregatedData).sort();
+
+    // Create a new object with sorted dates
+    const sortedSegregatedData = {};
+    sortedDates.forEach((date) => {
+      sortedSegregatedData[date] = segregatedData[date];
+    });
+
+    // Include the opening balance in the response
+    sortedSegregatedData.openingBalance = openingBalance;
+    sortedSegregatedData.initialOBCash = initialOpeningBalance.cash;
+    sortedSegregatedData.totalReceipts = totalReceipts;
+    sortedSegregatedData.totalPayments = totalExpenses;
+    sortedSegregatedData.closingBalance = closingBalance;
+    sortedSegregatedData.grandTotal = grandTotal;
+
+    console.log(sortedSegregatedData);
+
+    res.json(sortedSegregatedData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 //  ---------------DistOfc-------------------
 
@@ -2316,7 +2628,7 @@ app.post("/cas/district/bank", isAuthenticated, async (req, res) => {
     distOfc.save();
 
     bankMaster.save();
-    res.status(200).redirect("/cas/directorate/bank");
+    res.status(200).redirect("/cas/district/bank");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -2446,7 +2758,8 @@ app.post("/cas/district/opening-balance", isAuthenticated, async (req, res) => {
         if (existingOpeningBal) {
           // If an opening balance already exists, update it instead of creating a new one
           // You can add your update logic here if needed
-          res.json("OPENING BALANCE ALREADY EXIST IN DATABASE");
+        return  res.json("OPENING BALANCE ALREADY EXIST IN DATABASE");
+          
         }
 
         // Process bank details and update balance
@@ -2860,109 +3173,250 @@ app.get(
       console.log(`QUERY`, req.query);
 
       // Fetch Payments
-      const paymentPipeline = [
-        {
-          $match: {
-            scheme: scheme_id._id,
-            date: { $gte: startDate, $lte: endDate },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalBankPayment: { $sum: "$amount" },
-          },
-        },
-      ];
-      const payments = await DisPayment.aggregate([
-        {
-          $match: {
-            scheme: scheme_id._id,
-            date: { $gte: startDate, $lte: endDate },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalBankPayment: { $sum: "$amount" },
-          },
-        },
-      ]);
+      // const paymentPipeline = [
+      //   {
+      //     $match: {
+      //       scheme: scheme_id._id,
+      //       date: { $gte: startDate, $lte: endDate },
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: null,
+      //       totalBankPayment: { $sum: "$amount" },
+      //     },
+      //   },
+      // ];
+      // const payments = await DisPayment.aggregate([
+      //   {
+      //     $match: {
+      //       scheme: scheme_id._id,
+      //       date: { $gte: startDate, $lte: endDate },
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: null,
+      //       totalBankPayment: { $sum: "$amount" },
+      //     },
+      //   },
+      // ]);
 
       // Fetch Receipts
-      const receiptPipeline = [
-        {
-          $match: {
-            scheme: scheme_id._id,
-            date: { $gte: startDate, $lte: endDate },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalBankReceipt: { $sum: "$amount" },
-          },
-        },
-      ];
-      const receipts = await DisReceipt.aggregate([
-        {
-          $match: {
-            scheme: scheme_id._id,
-            date: { $gte: startDate, $lte: endDate },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalBankReceipt: { $sum: "$amount" },
-          },
-        },
-      ]);
+      // const receiptPipeline = [
+      //   {
+      //     $match: {
+      //       scheme: scheme_id._id,
+      //       date: { $gte: startDate, $lte: endDate },
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: null,
+      //       totalBankReceipt: { $sum: "$amount" },
+      //     },
+      //   },
+      // ];
+      // const receipts = await DisReceipt.aggregate([
+      //   {
+      //     $match: {
+      //       scheme: scheme_id._id,
+      //       date: { $gte: startDate, $lte: endDate },
+      //     },
+      //   },
+      //   {
+      //     $group: {
+      //       _id: null,
+      //       totalBankReceipt: { $sum: "$amount" },
+      //     },
+      //   },
+      // ]);
 
-      // Fetch Advances
-      const advancePipeline = [
-        {
-          $match: {
-            scheme: new mongoose.Types.ObjectId(scheme_id._id),
-            office: new mongoose.Types.ObjectId(office_Id),
-            date: { $gte: startDate, $lte: endDate },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalAdvance: { $sum: "$amount" },
-          },
-        },
-      ];
-      const advances = await Advance.aggregate([
-        {
-          $match: {
-            from_bank: new mongoose.Types.ObjectId(bankSchemeDtls._id),
-            office: new mongoose.Types.ObjectId(office_Id),
-            date: { $gte: startDate, $lte: endDate },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalAdvance: { $sum: "$amount" },
-          },
-        },
-      ]);
-      console.log(`paymentsssssssss`, advances);
-      res.json({
-        openingBalance,
-        payments: payments[0] || {},
-        receipts: receipts[0] || {},
-        advances: advances[0] || {},
+      const receiptRecords = await DisReceipt.find({
+        scheme: { $in: scheme_id._id},
+        date: { $gte: startDate, $lte: endDate },
+        office_name: office_Id,
       });
+  
+      // Fetch payment records within the date range
+      const paymentRecords = await DisPayment.find({
+        scheme: { $in: scheme_id._id },
+        date: { $gte: startDate, $lte: endDate },
+        office_name: office_Id,
+      });
+
+      const totalReceipts = receiptRecords.reduce(
+        (total, record) => total + record.amount,
+        0
+      );
+  
+      // Calculate Total Expenses
+      const totalExpenses = paymentRecords.reduce(
+        (total, record) => total + record.amount,
+        0
+      );
+  
+      // Calculate Closing Balance
+      const closingBalance = openingBalance.bank.balance + totalReceipts - totalExpenses;
+  
+      const grandTotal = openingBalance.bank.balance + totalReceipts;
+      // Combine the results into a single response object segregated by date
+      const segregatedData = {};
+  
+      // Helper function to add records to segregatedData
+      function addToSegregatedData(records, dataType) {
+        records.forEach((record) => {
+          const dateKey = record.date.toISOString().split("T")[0]; // Extract date in YYYY-MM-DD format
+          if (!segregatedData[dateKey]) {
+            segregatedData[dateKey] = {};
+          }
+          segregatedData[dateKey][dataType] =
+            segregatedData[dateKey][dataType] || [];
+          segregatedData[dateKey][dataType].push(record);
+        });
+      }
+  
+      addToSegregatedData(receiptRecords, "receipts");
+      addToSegregatedData(paymentRecords, "payments");
+  
+      // Sort the dates in ascending order
+      const sortedDates = Object.keys(segregatedData).sort();
+  
+      // Create a new object with sorted dates
+      const sortedSegregatedData = {};
+      sortedDates.forEach((date) => {
+        sortedSegregatedData[date] = segregatedData[date];
+      });
+  
+      // Include the opening balance in the response
+      sortedSegregatedData.openingBalance = openingBalance;
+      sortedSegregatedData.initialOBCash = openingBalance.cash.toFixed(2);
+      sortedSegregatedData.totalReceipts = totalReceipts.toFixed(2);
+      sortedSegregatedData.totalPayments = totalExpenses.toFixed(2);
+      sortedSegregatedData.closingBalance = closingBalance.toFixed(2);
+      sortedSegregatedData.grandTotal = grandTotal.toFixed(2);
+  
+      console.log(sortedSegregatedData);
+  
+      res.json(sortedSegregatedData);
+      // console.log(`paymentsssssssss`,paymentRecords,receiptRecords);
+      // res.json({
+      //   openingBalance,
+      //   payments: payments[0] || {},
+      //   receipts: receipts[0] || {},
+        
+      // });
     } catch (error) {
       console.error("Error fetching data:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   }
 );
+
+app.get("/cas/district/advance-report", isAuthenticated, async (req, res) => {
+  try {
+      const directorateOfc = req.user.user.directorate;
+      const office_Id = req.user.user.officeId;
+      const financialYear=await FinancialYear.find()
+      const districtDetails = await District.findOne({ _id: office_Id }).populate("schemes")
+      const vendorDetails= await Vendor.find({ office_name: office_Id })
+     
+    
+      res.render("districtOffice/advance-adjustment-report", {
+       districtDetails,
+       vendorDetails,
+       financialYear,
+       office_Id,
+       username: req.user.user.username,
+       designation: req.user.user.designation.name,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+  });
+
+  app.get("/cas/district/advance-adjustment-report/result", isAuthenticated, async (req, res) => {
+    try { 
+      const vendorId = req.query.vendorId;  
+      const filterType = req.query.filterType;
+      let startDate, endDate;
+      if (filterType === "financialYear") {
+        const financialYear = req.query.financialYearId;
+        console.log("Finan", financialYear);
+        if (financialYear !== "Select") {
+          const financialYearValue = await FinancialYear.findOne({
+            _id: financialYear,
+          });
+          startDate = financialYearValue.startDate;
+          endDate = financialYearValue.endDate;
+          console.log(startDate, endDate);
+        }
+      } else if (filterType === "monthly") {
+        // const selectedMonth = req.query.month; // Get selected month from query parameter
+        // const year = new Date().getFullYear(); // Get current year
+        startDate = new Date(req.query.startDate); // Month is 0-indexed
+        endDate = new Date(req.query.endDate);
+      } else if (filterType === "dateRange") {
+        startDate = new Date(req.query.startDate); // Get start date from query parameter
+        endDate = new Date(req.query.endDate);
+      }
+
+      console.log(`QUERY`,req.query)
+      // Fetch advance and adjustment data for the selected vendor and date range
+      const advances = await Advance.find({
+        party: vendorId,
+        date: { $gte: startDate, $lte: endDate },
+      }).populate('purpose').populate('from_bank')
+  
+      const adjustments = await Adjustment.find({
+        advance: { $in: advances.map(adv => adv._id) },
+        adjDate: { $gte: startDate, $lte: endDate },
+      }).populate('advance')
+  console.log(`ADDJJJMMNNTT`,adjustments)
+      // Combine and format the data for sending to the client
+      const data = [];
+      let totalAdvanceAmount = 0;
+    let totalAdjustmentAmount = 0;
+      advances.forEach(advance => {
+        const adjustmentForAdvance = adjustments.find(adj => adj.advance._id.toString() === advance._id.toString());
+        console.log(`ADJFORADV`, adjustmentForAdvance);
+      
+        const rowData = {
+          date: advance.date,
+          voucherNo: advance.autoVoucherNo,
+          purpose: advance.purpose.name,
+          cashOrBank: advance.from_bank.bank,
+          advanceAmount: (advance.amount).toFixed(2),
+          adjustmentAmount: 0, // Default to 0
+          adjVoucherNo: '', // Default to an empty string
+          adjCashOrBank: '', // Default to an empty string
+          closingBalance: 0,  // Calculate this if needed
+        };
+      
+        if (adjustmentForAdvance) {
+          // If adjustmentForAdvance is populated, use its values
+          rowData.adjustmentAmount = (adjustmentForAdvance.adjAmount).toFixed(2);
+          rowData.adjVoucherNo = adjustmentForAdvance.advance.autoVoucherNo;
+          rowData.adjCashOrBank = adjustmentForAdvance.advance.from_bank?'Bank':'';
+          rowData.closingBalance=rowData.advanceAmount===rowData.adjustmentAmount ?"NIL":(rowData.advanceAmount-rowData.adjustmentAmount).toFixed(2);
+        }
+        totalAdvanceAmount += +rowData.advanceAmount;
+        totalAdjustmentAmount += +rowData.adjustmentAmount;
+        data.push(rowData);
+      });
+     
+  // Send the data as JSON response
+      console.log(data);
+    
+
+      res.json({ data,totalAdvanceAmount, totalAdjustmentAmount });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
 
 // Start the server
 const PORT = process.env.PORT || 3000;

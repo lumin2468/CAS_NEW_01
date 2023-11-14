@@ -406,9 +406,9 @@ const DirReceipt = Schema({
     type: String,
     required: true,
   },
-  purpose: {
-    type: String,
-    required: true
+  scheme: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Scheme",
   },
  source: {
   type: String,
@@ -745,7 +745,7 @@ const dirCounterSchema =Schema({
 const dirRecCounterSchema =Schema({
   directorate: String,
   source: String,
-  purpose: String,
+  scheme: String,
   financialYear: String,
   count: { type: Number, default: 1 },
 });
@@ -829,25 +829,30 @@ const openingBalance = Schema({
 
 
   const dirOpeningBalance = Schema({
-    directorate:{
-      type: mongoose.Schema.Types.ObjectId,
+    
+      date:{
+        type:Date,
+        required:true,
+       },
+       directorate: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Directorate",
       },
-    date: {
-      type: Date,
-      required: true,
-    },
-    
-    bank: {
+      scheme: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "BankDetails",
-        required: true,
+        ref: "Scheme",
       },
+      bank:
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "BankDetails",
+          required: true,
+        },
     
-    cash:{
+      cash:{
       type:Number
-    },
-    Advance: {
+      },
+      Advance: {
       type: Number
       
     },
@@ -1245,7 +1250,7 @@ const schemeBankMaster = new Schema({
   office: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "District",
-    required: true,
+   
   },
   directorate: {
     type: mongoose.Schema.Types.ObjectId,

@@ -62,8 +62,9 @@
                         <td><input type="text" class="form-control" name="advance" ></td>
                        
                         <td>
-                            <a class="btn btn-danger btn-icon btn-sm rounded-pill ms-2 delete-row" href="#" role="button">
-                                <span class="btn-inner">
+                            
+                            <a class="btn btn-danger btn-icon btn-sm rounded-pill ms-2 delete-row" href="#" role="button" style="display: none;" >
+                                <span class="btn-inner" style="align-self: center;">
                                     <i class="fas fa-minus"></i>
                                 </span>
                             </a>
@@ -195,14 +196,21 @@
         }
     });
 
+    let rowCounter = 1;
+
     function cloneRow(e) {
         e.preventDefault();
         const lastRow = tableBody.children[1];
         const newRow = lastRow.cloneNode(true);
         const inputs = newRow.querySelectorAll('input[type="text"]');
         inputs.forEach((input) => (input.value = ''));
+        if (rowCounter > 0) {
+        const deleteButton = newRow.querySelector('.delete-row');
+        deleteButton.style.display = 'flex';
+                }  
+        rowCounter++; 
         tableBody.appendChild(newRow);
-
+        
         // Attach event listeners to the new row
         attachRowEventListeners(newRow);
     }
@@ -212,7 +220,7 @@
         const rows = tableBody.querySelectorAll('tr');
 console.log(rows.length)
         // Check if there's only one row left; don't remove it
-        if (rows.length > 2) {
+        if (rows.length > 1) {
             const row = event.target.closest('tr');
             const tbody = row.parentElement;
             tbody.removeChild(row);
@@ -243,6 +251,8 @@ console.log(rows.length)
     tableBody.addEventListener('click', (event) => {
         if (event.target.classList.contains('delete-row')) {
             deleteRow(event);
+        }else if (event.target.id === 'addMore') {
+            cloneRow(event);
         }
     });
 
