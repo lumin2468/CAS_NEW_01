@@ -3248,7 +3248,7 @@ app.get(
       const totalReceipts = receiptRecords.reduce(
         (total, record) => total + record.amount,
         0
-      );
+      )
   
       // Calculate Total Expenses
       const totalExpenses = paymentRecords.reduce(

@@ -168,7 +168,7 @@
           // Update the table with the fetched data
           bankData.innerHTML = data
             .map(
-              (bnk) => ` <option value=${bnk.accountNumber}>${bnk.bank}</option>`
+              (bnk) => ` <option value=${bnk.accountNumber}>${bnk.bank}/${bnk.IFSCNumber}/${bnk.accountNumber}</option>`
             )
         } catch (error) {
           console.error('Error fetching data:', error);
