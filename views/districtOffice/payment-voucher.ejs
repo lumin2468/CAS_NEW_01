@@ -160,7 +160,7 @@
                 </div>
                 
                 <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
+                    <button type="submit" class="btn btn-primary next action-button" id="submitBtn">Submit</button>
                 </div>
             </div>
         </div>
@@ -224,6 +224,15 @@
                         <% } %>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -242,6 +251,7 @@
       const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('transaction_id');
       const transactionDate = document.getElementById('transaction_date');
+      const submitBtn = document.getElementById("submitBtn")
       
 
       // Function to fetch data from the backend API and update the table
@@ -432,6 +442,14 @@
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
 
+    submitBtn.addEventListener("click", () => {
+      var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
     
   </script>
  

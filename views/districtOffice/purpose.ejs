@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
 
 
@@ -28,43 +33,48 @@
     <h4 class="mb-5">Purpose</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/district/purpose" method="post">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="name">
+            <form action="/cas/district/purpose" method="post" onsubmit="return validatePurposeForm()">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" id="purposeName">
+                            <div id="purposeNameError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Purpose Start Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="start_date" id="startDate">
+                            <div id="startDateError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Purpose End Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="end_date" id="endDate">
+                            <div id="endDateError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Purpose Abbreviation <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="abbvr" id="purposeAbbreviation">
+                            <div id="purposeAbbreviationError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Purpose Description</label>
+                            <textarea name="desc" class="form-control" id="purposeDescription"></textarea>
+                            <div id="purposeDescription" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <button type="submit" name="next" class="btn btn-primary next action-button" id="submitBtn">Submit</button>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Purpose Start Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="start_date">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Purpose End Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="end_date">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Purpose Abbreviation <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="abbvr">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Purpose Description</label>
-                        <textarea name="desc" class="form-control"></textarea>
-                    </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" name="next" class="btn btn-primary next action-button">Submit</button>
-                </div>
-            </div>
-        </form>
+            </form>
         </div>
     </div>
 
@@ -134,6 +144,15 @@
                         </tr>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -142,4 +161,56 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
+
+<script>
+    document.getElementById("submitBtn").addEventListener("click", function(event) {
+     var confirmSubmit = confirm("Are you sure want to continue?");
+       if (!confirmSubmit) {
+           
+           event.preventDefault();
+           alert("You clicked Cancel. Action canceled.");
+       }
+   });
+    function validatePurposeForm() {
+
+        document.getElementById("purposeNameError").innerHTML = "";
+        document.getElementById("startDateError").innerHTML = "";
+        document.getElementById("endDateError").innerHTML = "";
+        document.getElementById("purposeAbbreviationError").innerHTML = "";
+
+        // Get form inputs
+        var purposeName = document.getElementById("purposeName").value;
+        var startDate = document.getElementById("startDate").value;
+        var endDate = document.getElementById("endDate").value;
+        var purposeAbbreviation = document.getElementById("purposeAbbreviation").value;
+
+        var isValid = true;
+
+        if (purposeName === "") {
+            document.getElementById("purposeNameError").innerHTML = "Please enter the purpose name.";
+            isValid = false;
+        }
+
+        if (startDate === "") {
+            document.getElementById("startDateError").innerHTML = "Please select the start date.";
+            isValid = false;
+        }
+
+        if (endDate === "") {
+            document.getElementById("endDateError").innerHTML = "Please select the end date.";
+            isValid = false;
+        }
+
+        if (purposeAbbreviation === "") {
+            document.getElementById("purposeAbbreviationError").innerHTML = "Please enter the purpose abbreviation.";
+            isValid = false;
+        }
+        if (purposeDescription  === "") {
+            document.getElementById("purposeDescription Error").innerHTML = "Please enter the purpose description .";
+            isValid = false;
+        }
+
+        return isValid;
+    }
+</script>
 </html>

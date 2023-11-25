@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
 
     
@@ -27,119 +32,129 @@
 <div class="content-inner container-fluid pb-0" id="page_layout">
     <h4 class="mb-5">Adjustment</h4>
     <div class="card">
-        <form action="/cas/district/adjustment" method="post">
-        <div class="card-body">
-            <div class="row">
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Voucher No <span class="text-danger">*</span></label>
-                        <select class="form-control" name="autoVoucherNo" id="autoVoucherNo">
-                            <option>Select</option>
-                            <% for( let adv of advanceDetails ) { %>
-                                <option value="<%= adv.autoVoucherNo %>" <%= advanceDetails.autoVoucherNo === adv.autoVoucherNo ? 'selected': '' %> ><%= adv.autoVoucherNo %></option>
-                            <% } %>
-                        </select>
+        <form action="/cas/district/adjustment" method="post" onsubmit="return validateAdjustmentForm()">
+            <div class="card-body">
+                <div class="row">
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Voucher No <span class="text-danger">*</span></label>
+                            <select class="form-control" name="autoVoucherNo" id="autoVoucherNo">
+                                <option>Select</option>
+                                <% for( let adv of advanceDetails ) { %>
+                                    <option value="<%= adv.autoVoucherNo %>" <%= advanceDetails.autoVoucherNo === adv.autoVoucherNo ? 'selected': '' %> ><%= adv.autoVoucherNo %></option>
+                                <% } %>
+                            </select>
+                            <div id="autoVoucherNoError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Adjustment Date<span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="adjDate" >
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Adjustment Date<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="adjDate" id="adjDate">
+                            <div id="adjDateError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Sanction Order Ref. No.<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="sanction_ord_no" name="sanction_no" >
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Sanction Order Ref. No.<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sanction_ord_no" name="sanction_no">
+                            <div id="sanctionNoError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-            <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> Date <span class="text-danger">*</span></label>
-                        <input type="text" id="dateValue" class="form-control" >
-                        <input type="text" hidden="true" id="date" class="form-control" name="date">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> Date <span class="text-danger">*</span></label>
+                            <input type="text" id="dateValue" class="form-control">
+                            <input type="text" hidden="true" id="date" class="form-control" name="date">
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
-                        <input type="text" id="MOP" class="form-control"  name="mode_of_payment">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
+                            <input type="text" id="MOP" class="form-control" name="mode_of_payment">
+                            <div id="modeOfPaymentError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="transaction_id" class="form-label">CHEQUE/DRAFT No. <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" id="transaction_id_val" name="transaction_id">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label id="transaction_id" class="form-label">CHEQUE/DRAFT No. <span class="text-danger">*</span></label>
+                            <input type="" class="form-control" id="transaction_id_val" name="transaction_id">
+                            <div id="transactionIdError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="transaction_date" class="form-label">CHEQUE/DRAFT Date.  <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" readonly="true" id="transaction_date_val" name="transaction_date">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label id="transaction_date" class="form-label">CHEQUE/DRAFT Date.  <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" readonly="true" id="transaction_date_val" name="transaction_date">
+                            <div id="transactionDateError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Pupose Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" readonly="true" id="purpose" name="purpose">
-                       
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Pupose Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" readonly="true" id="purpose" name="purpose">
+                            <div id="purposeError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Party Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" readonly="true" id="party" name="party">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Party Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" readonly="true" id="party" name="party">
+                            <div id="partyError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Office Name<span class="text-danger">*</span></label>
-                        <input type="text" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Office Name<span class="text-danger">*</span></label>
+                            <input type="text" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                            <div id="officeNameError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
-                        <input type="text" id="officeBank" class="form-control" readonly="'true" name="office_bank">
-
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
+                            <input type="text" id="officeBank" class="form-control" readonly="'true" name="office_bank">
+                            <div id="officeBankError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-
-
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> To Party Bank Account  <span class="text-danger">*</span></label>
-                        <input type="text"  id="benifBank" class="form-control" name="partyBank">
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> To Party Bank Account  <span class="text-danger">*</span></label>
+                            <input type="text"  id="benifBank" class="form-control" name="partyBank">
+                            <div id="partyBankError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="form-label"> Amount Paid <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="amount" name="amount">
+    
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label"> Amount Paid <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="amount" name="amount">
+                            <div id="amountError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="form-label"> Amount to be Adjusted <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="adjAmount" name="adjAmount">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label"> Amount to be Adjusted <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="adjAmount" name="adjAmount">
+                            <div id="adjAmountError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Naration <span class="text-danger">*</span></label>
-                        <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Naration <span class="text-danger">*</span></label>
+                            <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
+                            <div id="descError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary next action-button" id="submitBtn">Submit</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
     </div>
 
     <div class="card">
@@ -190,6 +205,15 @@
                      <% } %>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -218,6 +242,7 @@
       const amount = document.getElementById("amount");
       const amountAdjustedInput = document.getElementById('adjAmount');
       const form = document.querySelector('form');
+      const submitBtn = document.getElementById("submitBtn")
 
       // Function to fetch data from the backend API and update the table
      async function autoVoucherNoDetails(){
@@ -348,6 +373,133 @@ function handleSubmit(event) {
       // Display the voucher number in a popup
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
+
+    function validateAdjustmentForm() {
+            var isValid = true;
+
+            // Reset error messages
+            document.getElementById('autoVoucherNoError').innerText = '';
+            document.getElementById('adjDateError').innerText = '';
+            document.getElementById('sanctionNoError').innerText = '';
+            document.getElementById('modeOfPaymentError').innerText = '';
+            document.getElementById('transactionIdError').innerText = '';
+            document.getElementById('transactionDateError').innerText = '';
+            document.getElementById('purposeError').innerText = '';
+            document.getElementById('partyError').innerText = '';
+            document.getElementById('officeNameError').innerText = '';
+            document.getElementById('officeBankError').innerText = '';
+            document.getElementById('partyBankError').innerText = '';
+            document.getElementById('amountError').innerText = '';
+            document.getElementById('adjAmountError').innerText = '';
+            document.getElementById('descError').innerText = '';
+
+
+            var autoVoucherNo = document.getElementById('autoVoucherNo').value;
+            if (autoVoucherNo === 'Select') {
+                document.getElementById('autoVoucherNoError').innerText = 'Please select a Voucher No.';
+                isValid = false;
+            }
+
+            var adjDate = document.getElementById('adjDate').value;
+            if (!adjDate) {
+                document.getElementById('adjDateError').innerText = 'Adjustment Date is required.';
+                isValid = false;
+            }
+
+            var sanctionNo = document.getElementById('sanction_ord_no').value;
+            if (!sanctionNo) {
+                document.getElementById('sanctionNoError').innerText = 'Sanction Order Ref. No. is required.';
+                isValid = false;
+            }
+
+
+            var modeOfPayment = document.getElementById('MOP').value;
+            if (!modeOfPayment) {
+                document.getElementById('modeOfPaymentError').innerText = 'Mode of Payment is required.';
+                isValid = false;
+            }
+
+            // CHEQUE/DRAFT No.
+            var transactionId = document.getElementById('transaction_id_val').value;
+            if (!transactionId) {
+                document.getElementById('transactionIdError').innerText = 'CHEQUE/DRAFT No. is required.';
+                isValid = false;
+            }
+
+      
+            var transactionDate = document.getElementById('transaction_date_val').value;
+            if (!transactionDate) {
+                document.getElementById('transactionDateError').innerText = 'transaction id is required.';
+                isValid = false;
+            }
+
+            // Purpose Name
+            var purpose = document.getElementById('purpose').value;
+            if (!purpose) {
+                document.getElementById('purposeError').innerText = 'Purpose Name is required.';
+                isValid = false;
+            }
+
+            // Party Name
+            var party = document.getElementById('party').value;
+            if (!party) {
+                document.getElementById('partyError').innerText = 'Party Name is required.';
+                isValid = false;
+            }
+
+            // Office Name
+            var officeName = document.getElementById('officeSelect').value;
+            if (!officeName) {
+                document.getElementById('officeNameError').innerText = 'Office Name is required.';
+                isValid = false;
+            }
+
+            // From Office Bank
+            var officeBank = document.getElementById('officeBank').value;
+            if (!officeBank) {
+                document.getElementById('officeBankError').innerText = 'From Office Bank is required.';
+                isValid = false;
+            }
+
+            // To Party Bank Account
+            var partyBank = document.getElementById('benifBank').value;
+            if (!partyBank) {
+                document.getElementById('partyBankError').innerText = 'To Party Bank Account is required.';
+                isValid = false;
+            }
+
+            // Amount Paid
+            var amount = document.getElementById('amount').value;
+            if (!amount) {
+                document.getElementById('amountError').innerText = 'Amount Paid is required.';
+                isValid = false;
+            }
+
+            // Amount to be Adjusted
+            var adjAmount = document.getElementById('adjAmount').value;
+            if (!adjAmount) {
+                document.getElementById('adjAmountError').innerText = 'Amount to be Adjusted is required.';
+                isValid = false;
+            }
+
+            // Naration
+            var desc = document.getElementById('desc').value;
+            if (!desc) {
+                document.getElementById('descError').innerText = 'Naration is required.';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        submitBtn.addEventListener("click", () => {
+      var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
   </script>
  
 </html>

@@ -193,6 +193,9 @@ const schemeSchema = new Schema({
   abbreviation:{
     type:String,
     
+  },
+  obStatus:{
+    type:Boolean
   }
 });
 

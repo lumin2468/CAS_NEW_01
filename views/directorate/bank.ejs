@@ -11,6 +11,16 @@
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
+<style>
+    .error-message {
+        color: red;
+    }
+    #submitBtn:disabled {
+        background-color: #ccc; /* Use a color that indicates it's disabled */
+        cursor: not-allowed;
+        opacity: 0.5; /* You can adjust the opacity to your preference */
+    }
+</style>
 <body>
 
     <%-include('../Includes/sidebar.ejs')%>
@@ -20,61 +30,67 @@
     <h4 class="mb-5">Bank</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/bank" method="post">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Bank Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control"name="bankName">
+            <form action="/cas/directorate/bank" method="post" onsubmit="return validateForm()">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="bankName" id="bankName">
+                            <div id="bankNameError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="Ifsc_code" id="ifscCode">
+                            <div id="ifscCodeError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Branch Name<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="branchName" id="branchName">
+                            <div id="branchNameError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Account No.<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="accountNo" id="accountNo">
+                            <div id="accountNoError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Directorate Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name='directorate' value="<%= directorate.name %>" readonly>
+                        </div>
+                    </div>
+        
+                    <!-- You can uncomment this section if you want to validate the district_office field -->
+                    <!-- <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">District Office Name</label>
+                            <select class="form-control" name="district_office" id="districtOffice">
+                                <option>Select</option>
+                            </select>
+                            <div id="districtOfficeError" class="error-message"></div>
+                        </div>
+                    </div> -->
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="form-label">Branch Address <span class="text-danger">*</span></label>
+                            <textarea class="form-control" name="address" id="branchAddress"></textarea>
+                            <div id="branchAddressError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-12 text-center">
+                        <button type="submit" name="next" class="btn btn-primary next action-button" id="submitBtn">Submit</button>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">IFSC Code <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="Ifsc_code">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Branch Name<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="branchName">
-                    </div>
-                </div>
-               
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Account No.<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="accountNo">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Directorate Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name='directorate' value="<%= directorate.name %>">
-                    </div>
-                </div>
-
-                <!-- <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">District Office Name</label>
-                        <select class="form-control" name="district_office">
-                            <option>Select</option>
-                         
-                          </select>
-                    </div>
-                </div> -->
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="form-label">Branch Address <span class="text-danger">*</span></label>
-                        <textarea class="form-control" name="address"></textarea>
-                    </div>
-                </div>
-                
-                <div class="col-md-12 text-center">
-                    <button type="submit" name="next" class="btn btn-primary next action-button">Submit</button>
-                </div>
-            </div>
-        </form>
+            </form>
         </div>
     </div>
 
@@ -103,7 +119,7 @@
                             <td><%= bnk.branch %></td>
                             <td><%= bnk?.office ? bnk?.office?.name : bnk?.directorate.name %></td>
                             <td>
-                                <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
+                                <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="/cas/directorate/edit-bank/<%= bnk._id %>" role="button" title="Edit">
                                     <span class="btn-inner">
                                         <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path opacity="0.4" d="M19.9927 18.9534H14.2984C13.7429 18.9534 13.291 19.4124 13.291 19.9767C13.291 20.5422 13.7429 21.0001 14.2984 21.0001H19.9927C20.5483 21.0001 21.0001 20.5422 21.0001 19.9767C21.0001 19.4124 20.5483 18.9534 19.9927 18.9534Z" fill="currentColor"></path>
@@ -112,19 +128,21 @@
                                         </svg>
                                     </span>
                                 </a>
-                                <a class="btn btn-primary btn-icon btn-sm rounded-pill ms-2" href="#" role="button">
-                                    <span class="btn-inner">
-                                        <svg class="icon-32" width="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path opacity="0.4" d="M19.643 9.48851C19.643 9.5565 19.11 16.2973 18.8056 19.1342C18.615 20.8751 17.4927 21.9311 15.8092 21.9611C14.5157 21.9901 13.2494 22.0001 12.0036 22.0001C10.6809 22.0001 9.38741 21.9901 8.13185 21.9611C6.50477 21.9221 5.38147 20.8451 5.20057 19.1342C4.88741 16.2873 4.36418 9.5565 4.35445 9.48851C4.34473 9.28351 4.41086 9.08852 4.54507 8.93053C4.67734 8.78453 4.86796 8.69653 5.06831 8.69653H18.9388C19.1382 8.69653 19.3191 8.78453 19.4621 8.93053C19.5953 9.08852 19.6624 9.28351 19.643 9.48851Z" fill="currentColor"></path>
-                                            <path d="M21 5.97686C21 5.56588 20.6761 5.24389 20.2871 5.24389H17.3714C16.7781 5.24389 16.2627 4.8219 16.1304 4.22692L15.967 3.49795C15.7385 2.61698 14.9498 2 14.0647 2H9.93624C9.0415 2 8.26054 2.61698 8.02323 3.54595L7.87054 4.22792C7.7373 4.8219 7.22185 5.24389 6.62957 5.24389H3.71385C3.32386 5.24389 3 5.56588 3 5.97686V6.35685C3 6.75783 3.32386 7.08982 3.71385 7.08982H20.2871C20.6761 7.08982 21 6.75783 21 6.35685V5.97686Z" fill="currentColor"></path>
-                                        </svg>
-                                    </span>
-                                </a>
+                                
                             </td>
                         </tr>
                         <% } %>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -133,4 +151,64 @@
 <%- include('../Includes/footer.ejs')%>
 
 </body>
+<script>
+    let isValid = true;
+    const submitBtn=document.getElementById("submitBtn")    
+    function validateForm() {
+        // Get form inputs
+        var bankName = document.getElementById("bankName").value;
+        var ifscCode = document.getElementById("ifscCode").value;
+        var branchName = document.getElementById("branchName").value;
+        var accountNo = document.getElementById("accountNo").value;
+        var branchAddress = document.getElementById("branchAddress").value;
+
+        document.getElementById("bankNameError").innerHTML = "";
+        document.getElementById("ifscCodeError").innerHTML = "";
+        document.getElementById("branchNameError").innerHTML = "";
+        document.getElementById("accountNoError").innerHTML = "";
+        document.getElementById("branchAddressError").innerHTML = "";
+       
+
+     
+        
+
+        if (bankName === "") {
+            document.getElementById("bankNameError").innerHTML = "Please enter the bank name.";
+            isValid = false;
+        }
+
+        if (ifscCode === "") {
+            document.getElementById("ifscCodeError").innerHTML = "Please enter the IFSC code.";
+            isValid = false;
+        }
+
+        if (branchName === "") {
+            document.getElementById("branchNameError").innerHTML = "Please enter the branch name.";
+            isValid = false;
+        }
+
+        if (accountNo === "") {
+            document.getElementById("accountNoError").innerHTML = "Please enter the account number.";
+            isValid = false;
+        }
+
+        if (branchAddress === "") {
+            document.getElementById("branchAddressError").innerHTML = "Please enter the branch address.";
+            isValid = false;
+        }
+
+        return isValid; 
+    }
+    
+    submitBtn.disabled = !isValid;
+    submitBtn.addEventListener("click", function(event) {
+     var confirmSubmit = confirm("Are you sure want to continue?");
+       if (!confirmSubmit) {
+           
+           event.preventDefault();
+           alert("You clicked Cancel. Action canceled.");
+       }
+   });
+</script>
+
 </html>

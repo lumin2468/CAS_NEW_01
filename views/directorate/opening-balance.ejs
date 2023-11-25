@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
 
 
@@ -22,58 +27,56 @@
     <h4 class="mb-5">Opening Balance</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/openingBalance" method="post" id="form">
-            <table class="table table-bordered" id="tableBody">
-                <thead>
-                    <tr> 
-                        <th>Date</th>   
-                        <th>Scheme</th>
-                        <th>Cash</th>
-                        <th>Bank</th>
-                        <th>Bank Balance</th>
-                        <th>Advance</th>
-
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="date" class="form-control" name="date"></td>
-                        <td>
-                         <select class="form-control schemeDtls" name="scheme">
-                                <option>Select</option>
-                                <% for( let sch of schemes ) { %>
-                                    <option value="<%= sch._id %>" <%= schemes === sch.name ? 'selected': '' %> ><%= sch.name %></option>
-                                <% } %>
-                            </select>
-                        </td>
-                        <td><input type="text" class="form-control" name="cash" ></td>
-                        <td> <select class="form-control bankDetails" name="bank">
-                            </select>
-                        </td>
-                        <td><input type="text" class="form-control" name="bank_balance" ></td>
-                        <td><input type="text" class="form-control" name="advance" ></td>
-                       
-                        <td>
-                            
-                            <a class="btn btn-danger btn-icon btn-sm rounded-pill ms-2 delete-row" href="#" role="button" style="display: none;" >
-                                <span class="btn-inner" style="align-self: center;">
-                                    <i class="fas fa-minus"></i>
-                                </span>
-                            </a>
-                        </td>
-                    </tr>
-                
-                </tbody>
-            </table>
-            <div style="display: flex; flex-direction: row; justify-content: center; gap:15px">
-                <div class="text-center">
-                    <button id="submitBtn" class="btn btn-primary">SUBMIT</button>
-                </div>
+            <form action="/cas/directorate/openingBalance" method="post" id="form" onsubmit="return validateForm()">
+                <table class="table table-bordered" id="tableBody">
+                    <thead>
+                        <tr> 
+                            <th>Date</th>   
+                            <th>Scheme</th>
+                            <th>Cash</th>
+                            <th>Bank</th>
+                            <th>Bank Balance</th>
+                            <th>Advance</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="date" class="form-control" name="date" required></td>
+                            <td>
+                                <select class="form-control schemeDtls" name="scheme" required>
+                                    <option>Select</option>
+                                    <% for( let sch of schemes ) { %>
+                                        <option value="<%= sch._id %>" <%= schemes === sch.name ? 'selected': '' %> ><%= sch.name %></option>
+                                    <% } %>
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" name="cash" required></td>
+                            <td>
+                                <select class="form-control bankDetails" name="bank" required>
+                                    <!-- Add options here -->
+                                </select>
+                            </td>
+                            <td><input type="text" class="form-control" name="bank_balance" required></td>
+                            <td><input type="text" class="form-control" name="advance" required></td>
+                            <td>
+                                <a class="btn btn-danger btn-icon btn-sm rounded-pill ms-2 delete-row" href="#" role="button" style="display: none;">
+                                    <span class="btn-inner" style="align-self: center;">
+                                        <i class="fas fa-minus"></i>
+                                    </span>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="display: flex; flex-direction: row; justify-content: center; gap:15px">
+                    <div class="text-center">
+                        <button id="submitBtn" class="btn btn-primary" id="submitBtn">SUBMIT</button>
+                    </div>
                 
             </form>
-            <div class="text-center">
-                <button class="btn btn-primary" id="addMore">ADD MORE</button>
+            <div class="text-center" >
+                <button class="btn btn-primary" id="addMore" style="background-color: green;border-color: green;"> <i class="fas fa-plus"></i></button>
             </div>
         </div>
         </div>
@@ -132,6 +135,15 @@
                         <% } %>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -147,6 +159,15 @@
     const add = document.getElementById('addMore');
     const submitBtn = document.getElementById('submitBtn');
     const schemeDetails = document.querySelector('.schemeDtls');
+
+    submitBtn.addEventListener("click", () => {
+      var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
     
     const addBank = async (event, bnkData, selectedScheme) => {
         if (selectedScheme === "Select") {
@@ -254,6 +275,73 @@ console.log(rows.length)
     attachRowEventListeners(firstRow);
     
     });
+
+
+
+        function validateForm() {
+            var date = document.getElementsByName("date")[0].value;
+            var scheme = document.getElementsByName("scheme")[0].value;
+            var cash = document.getElementsByName("cash")[0].value;
+            var bank = document.getElementsByName("bank")[0].value;
+            var bankBalance = document.getElementsByName("bank_balance")[0].value;
+            var advance = document.getElementsByName("advance")[0].value;
+
+            var isValid = true;
+
+            resetErrorMessages();
+
+            if (!date) {
+                showError("Date is required.");
+                isValid = false;
+            }
+
+            if (scheme === "Select") {
+                showError("Please select a scheme.");
+                isValid = false;
+            }
+
+            if (!cash) {
+                showError("Cash is required.");
+                isValid = false;
+            }
+
+            if (bank === "Select") {
+                showError("Please select a bank.");
+                isValid = false;
+            }
+
+            if (!bankBalance) {
+                showError("Bank Balance is required.");
+                isValid = false;
+            }
+
+            if (!advance) {
+                showError("Advance is required.");
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function showError(message) {
+            var errorDiv = document.createElement("div");
+            errorDiv.className = "error-message";
+            errorDiv.innerHTML = message;
+
+            document.getElementById("form").prepend(errorDiv);
+        }
+
+        function resetErrorMessages() {
+            var errorMessages = document.querySelectorAll(".error-message");
+            errorMessages.forEach(function (errorMessage) {
+                errorMessage.remove();
+            });
+        }
+       
+       
+      
+
+      
 </script>
   
   

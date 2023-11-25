@@ -161,14 +161,17 @@
             </div>
   
           
-  
+            <div id="schemeDataContainer" scheme-data="<%= JSON.stringify(initialOB) %>"></div>
           <div class="card">
               <div class="card-body">
                   <h4 class="border-bottom mt-0 pb-2 mb-2">Scheme Wise</h4>
                   <div class="row">
                       <div class="col-md-6 col-lg-4">
-                          <select class="form-control">
-                              <option>Select Scheme</option>
+                          <select class="form-control" id="selectedScheme">
+                            <option value="all">All Schemes</option>
+                            <% schemes?.forEach(scheme => { %>
+                                <option value="<%= scheme._id %>"><%= scheme.name %></option>
+                              <% }); %>
                           </select>
                       </div>
                       <div class="col-md-6 col-lg-8">
@@ -177,668 +180,11 @@
                   </div>
   
                   <div class="sch-wise-div">
-                      <div class="row mt-3">
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Provision of Infrstructure support to valuntary organisation engaged in animal welfare</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Strengthening of State Animal Welfare Board and the District Societies for Prevention of Cruelty to Animals</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Setting up of Animal Helpline & Veterinary Ambulance  service in urban areas</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Supporting Animal Birth Control Program in urban Areas of Odisha</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Establishment of New Stray Cattle Shelter Houses and Gosala</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Support to farmers for farmers for broiler farming (500 bird capacity) under DLS in individual mode</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Support to farmers for farmers for broiler farming (1000 bird capacity) under DLS in WSHS mode</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Support to farmers for farmers for layer farming (1000 bird capacity) in cage system in individual mode</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Livelihood support to farmers through rural backward poultry Rearing</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Support to Farmers for Establisment of small, scale poultry hatchery</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Livestock Health & Desease Control Programme (LHDC)</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Animal Welfare Activitivities</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Poultry Develoment</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Small Animal Development</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Fodder Development</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Training & Capacity Building</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Dairy Development</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Infrastructure Development for livestock Services</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Rural Infrastructure Development Fund</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="col-md-3">
-                              <div class="card border">
-                                  <h5 class="card-header bg-primary text-white py-3">Integrated sample survey (Other Components)</h5>
-                                  <div class="card-body">
-                                      <div class="dash-frame-label2">
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>80,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,20,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>50,000</span>
-                                              </div>
-                                          </div>
-                                          <div class="form-group">
-                                              <div class="d-flex justify-content-between">
-                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
-                                                  <span>1,00,000</span>
-                                              </div>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
+                      <div class="row mt-3 scheme-wise-div">
+                          
+                          
                       </div>
+
                   </div>
   
               </div>
@@ -1052,7 +398,7 @@
           </div>
       </div>
   
-  </div>
+ 
   
   <%- include("../Includes/footer.ejs")%>
   <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -1173,8 +519,69 @@
   });
 }
 
+
+const selectedScheme= document.getElementById('selectedScheme')
+function filterSchemeData() {
+   const selectedSchemeValue=selectedScheme.value;
+  const schemeWiseDiv = document.querySelector('.scheme-wise-div');
+  schemeWiseDiv.innerHTML = '';
+  const schemeData = JSON.parse(schemeDataContainer.getAttribute('scheme-data'));
+  console.log(`SCHEMEEEEEEE`,selectedSchemeValue)
+  // Filter and display the data
+  const filteredSchemeData = schemeData.filter(opBlnc => {
+    console.log(`OPPNNBBLLNCC`,opBlnc)
+    return selectedSchemeValue === 'all' || opBlnc.scheme._id === selectedSchemeValue;
+  });
+
+
+
+  filteredSchemeData.forEach(ob => {
+    const SchemeCard = `
+     
+    <div class="col-md-4">
+                              <div class="card border">
+                                  <h5 class="card-header bg-primary text-white py-3">${ob.scheme.name}</h5>
+                                  <div class="card-body">
+                                      <div class="dash-frame-label2">
+                                          <div class="form-group">
+                                              <div class="d-flex justify-content-between">
+                                                  <label>Cash in Hand (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
+                                                  <span>${ob.cash.toFixed(2)}</span>
+                                              </div>
+                                          </div>
+                                          <div class="form-group">
+                                              <div class="d-flex justify-content-between">
+                                                  <label>Bank (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
+                                                  <span>${ob.bank.balance.toFixed(2)}</span>
+                                              </div>
+                                          </div>
+                                          <div class="form-group">
+                                              <div class="d-flex justify-content-between">
+                                                  <label>Advance (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
+                                                  <span>50,000</span>
+                                              </div>
+                                          </div>
+                                          <div class="form-group">
+                                              <div class="d-flex justify-content-between">
+                                                  <label>Paid Vouchers (<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203.86 300"><defs><style>.cls-1{fill:#010202;}</style></defs><g id="Group_21638" data-name="Group 21638"><path id="Path_26915" data-name="Path 26915" class="cls-1" d="M135.76,28.35H185L203.86,0h-185L0,28.35H32.1c32.5,0,62.5,2.5,74.51,29.7H19L.15,86.39h110c0,20.4-16.9,51.65-72.8,51.65h-27v26.5L118.74,300H167L54.85,160c46.15-2.5,89.46-28.31,95.7-73.56H185L203.86,58.1h-53.8a62.85,62.85,0,0,0-14.3-29.75Z"/></g></svg>)</label>
+                                                  <span>1,00,000</span>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                        </div>
+      `;
+      schemeWiseDiv.innerHTML += SchemeCard;
+  });
+}
+
+
+selectedScheme.addEventListener('change', filterSchemeData)
+
 // Initialize by showing all districts
 filterDistrictData();
+filterSchemeData()
 
 
   </script>

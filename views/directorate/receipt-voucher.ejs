@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
+
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
 
     <%-include('../Includes/sidebar.ejs')%>
@@ -21,111 +27,106 @@
     <h4 class="mb-5">Receipt</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/receipt" method="post">
-            <div class="row">
-            <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> Date <span class="text-danger">*</span></label>
-                        <input type="date"  class="form-control" name="date" >
+            <form action="/cas/directorate/receipt" method="post" onsubmit="return validateForm()">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="date">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
+                            <select class="form-control" id="MOP" name="modeof_payment">
+                                <option>Select</option>
+                                <% for( let mop of modeofpmnt ) { %>
+                                    <option value="<%= mop.name %>" <%= modeofpmnt.name === mop.name ? 'selected': '' %> ><%= mop.name %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" id="transaction_Id">Transaction Reference Id </label>
+                            <input type="text" class="form-control" name="transaction_id">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label" id="transaction_date">Transaction  Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="transaction_date">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Sanction Order no. <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="sanction_no">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Reference Voucher No. <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="ref_voucher_no">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Scheme <span class="text-danger">*</span></label>
+                            <select class="form-control" name="scheme" id="schemeSelect">
+                                <option>Select</option>
+                                <% for( let scm of schemeData ) { %>
+                                    <option value="<%= scm._id %>" <%= schemeData.name === scm.name ? 'selected': '' %> ><%= scm.name %></option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> Source <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="source" value="<%= directorateData.department.name%>">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Receiver <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="directorate" value="<%=directorateData.name%>" >
+                            <input type="hidden" class="form-control" id="directorate" value="<%=directorateData._id%>" >
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> From Source Bank <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="source_bank"  >
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> To receiver Bank  <span class="text-danger">*</span></label>
+                            <select class="form-control" id="scheme_linked_bank" name="receiver_bank">
+                                <!-- Add options here -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label"> Amount <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="amount"  >
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label  class="form-label">Naration <span class="text-danger">*</span></label>
+                            <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
-                        <select class="form-control" id="MOP" name="modeof_payment" >
-                            <option>Select</option>
-                            <% for( let mop of modeofpmnt ) { %>
-                                <option value="<%= mop.name %>" <%= modeofpmnt.name === mop.name ? 'selected': '' %> ><%= mop.name %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label" id="transaction_Id">Transaction Reference Id </label>
-                        <input type="text",  class="form-control" name="transaction_id"  >
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label" id="transaction_date">Transaction  Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control"  name="transaction_date" >
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Sanction Order no. <span class="text-danger">*</span></label>
-                        <input type="text"  class="form-control" name="sanction_no" >
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Reference Voucher No. <span class="text-danger">*</span></label>
-                        <input type="text"  class="form-control" name="ref_voucher_no">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Scheme <span class="text-danger">*</span></label>
-                        <select class="form-control" name="scheme" id="schemeSelect">
-                            <option>Select</option>
-                            <% for( let scm of schemeData ) { %>
-                                <option value="<%= scm._id %>" <%= schemeData.name === scm.name ? 'selected': '' %> ><%= scm.name %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> Source <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="source" value="<%= directorateData.department.name%>">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Receiver <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="directorate"  value="<%=directorateData.name%>" >
-                        <input type="hidden" class="form-control" id="directorate" value="<%=directorateData._id%>" >
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> From Source Bank <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="source_bank"  >
-
-                    </div>
-                </div> 
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> To receiver Bank  <span class="text-danger">*</span></label>
-                        <select class="form-control" id="scheme_linked_bank" name="receiver_bank">
-                       
-                    </select>
-                    </div>
-                </div> 
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="form-label"> Amount <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="amount"  >
-                    </div>
-                </div>
-               
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label  class="form-label">Naration <span class="text-danger">*</span></label>
-                        <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
-                    </div>
-                </div>
-           
                 <div class="col-md-12 text-center">
-                    <button type="submit" name="next" class="btn btn-primary next action-button">Submit</button>
+                    <button type="submit" name="next" class="btn btn-primary next action-button" id="submitBtn">Submit</button>
                 </div>
-            </div>
-        </form>
+            </form>
+        
+        
         </div>
     </div>
 
@@ -186,6 +187,15 @@
                         </tr>
                         <% } %>
                     </tbody>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                          <li class="page-item"><a class="page-link" href="#">1</a></li>
+                          <li class="page-item"><a class="page-link" href="#">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#">3</a></li>
+                          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                      </nav>
                 </table>
             </div>
         </div>
@@ -203,6 +213,7 @@
       const selectedScheme = document.getElementById('schemeSelect');
       const directorateValue = document.getElementById('directorate');
       const schemeLinkedBank = document.getElementById('scheme_linked_bank');
+      const submitBtn = document.getElementById('submitBtn');
       // Function to fetch data from the backend API and update the table
 
       async function modeofPmnts(){
@@ -249,5 +260,93 @@
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
 });
+submitBtn.addEventListener("click", () => {
+      var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
+
+
+
+
+
+    function validateForm() {
+        // Reset error messages
+        resetErrorMessages();
+
+        // Get form fields
+        var date = document.getElementsByName("date")[0];
+        var modeOfPayment = document.getElementById("MOP");
+        var transactionId = document.getElementsByName("transaction_id")[0];
+        var transactionDate = document.getElementsByName("transaction_date")[0];
+        var scheme = document.getElementById("schemeSelect");
+        var source = document.getElementsByName("source")[0];
+        var directorate = document.getElementsByName("directorate")[0];
+        var sourceBank = document.getElementsByName("source_bank")[0];
+        var receiverBank = document.getElementById("scheme_linked_bank");
+        var amount = document.getElementsByName("amount")[0];
+        var description = document.getElementsByName("desc")[0];
+        var sanctionOrderNo = document.getElementsByName("sanction_no")[0];
+        var refVoucherNo = document.getElementsByName("ref_voucher_no")[0];
+
+        var isValid = true;
+
+        // Validate mandatory fields
+        if (!date.value || !modeOfPayment.value || !transactionDate.value || !scheme.value || !source.value || !directorate.value || !sourceBank.value || !receiverBank.value || !amount.value || !description.value) {
+            showError(date, "Date is required.");
+            showError(modeOfPayment, "Mode of Payment is required.");
+            showError(transactionDate, "Transaction Date is required.");
+            showError(scheme, "Scheme is required.");
+            showError(source, "Source is required.");
+            showError(directorate, "Directorate is required.");
+            showError(sourceBank, "From Source Bank is required.");
+            showError(receiverBank, "To Receiver Bank is required.");
+            showError(amount, "Amount is required.");
+            showError(description, "Naration is required.");
+
+            isValid = false;
+        }
+
+        // Validate optional fields (show error only if non-empty)
+        if (transactionId.value.trim() === "") {
+            showError(transactionId, "Transaction Reference Id cannot be empty.");
+            isValid = false;
+        }
+
+        if (sanctionOrderNo.value.trim() === "") {
+            showError(sanctionOrderNo, "Sanction Order no. cannot be empty.");
+            isValid = false;
+        }
+
+        if (refVoucherNo.value.trim() === "") {
+            showError(refVoucherNo, "Reference Voucher No. cannot be empty.");
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function showError(element, message) {
+        var errorDiv = document.createElement("div");
+        errorDiv.className = "error-message";
+        errorDiv.innerHTML = message;
+
+        // Insert the error message after the corresponding form field
+        element.parentNode.insertBefore(errorDiv, element.nextSibling);
+    }
+
+    function resetErrorMessages() {
+        var errorMessages = document.querySelectorAll(".error-message");
+        errorMessages.forEach(function (errorMessage) {
+            errorMessage.remove();
+        });
+    }
 </script>
+
+
+
+
 </html>

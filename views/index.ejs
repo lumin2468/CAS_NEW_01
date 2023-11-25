@@ -1,104 +1,224 @@
 <!doctype html>
 <html lang="en" dir="ltr">
+
 <head>
-    <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <link rel="shortcut icon" href="assets/images/favicon.png">
-      <link rel="stylesheet" href="assets/css/core/libs.min.css">
-      <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
-      <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
-      <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
-      <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
-      <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="assets/images/favicon.png">
+  <link rel="stylesheet" href="assets/css/core/libs.min.css">
+  <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+  <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+  <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+  <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1">
+  <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-  <body>
-    <!-- loader Start -->
-    <div id="loading">
-      <div class="loader simple-loader">
-          <div class="loader-body ">
-              <img src="assets/images/loader.webp" alt="loader" class="image-loader img-fluid ">
-          </div>
+<style>
+  .password-input-container {
+    position: relative;
+  }
+
+  .password-toggle-icon {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+  .password-toggle-icon-container {
+    position: absolute;
+    right: 5%;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  #password {
+    padding-right: 29px;
+    /* Increase right padding to accommodate the icon */
+  }
+
+  .error-message {
+    color: red;
+  }
+</style>
+
+<body>
+  <!-- loader Start -->
+  <div id="loading">
+    <div class="loader simple-loader">
+      <div class="loader-body ">
+        <img src="assets/images/loader.webp" alt="loader" class="image-loader img-fluid ">
       </div>
     </div>
-    <!-- loader END -->
-    <div class="wrapper">
-      <section class="login-content overflow-hidden">
-         <div class="row no-gutters align-items-center bg-white">
-            <div class="col-lg-6 d-lg-block d-none bg-primary p-0  overflow-hidden">
-               <img src="assets/images/01.png" class="img-fluid gradient-main" alt="images" loading="lazy" >
+  </div>
+  <!-- loader END -->
+  <div class="wrapper">
+    <section class="login-content overflow-hidden">
+      <div class="row no-gutters align-items-center bg-white">
+        <div class="col-lg-6 d-lg-block d-none bg-primary p-0  overflow-hidden">
+          <img src="assets/images/01.png" class="img-fluid gradient-main" alt="images" loading="lazy">
+        </div>
+        <div class="col-md-12 col-lg-6 align-self-center">
+          <div class="navbar-brand d-flex align-items-center justify-content-center text-primary">
+            <div class="login-logo text-center">
+              <img src="assets/images/odisha_logo_login.png" class="img-fluid">
+              <h2 class="text-primary mt-2">Cashbook Analytics System</h2>
+              <h6 class="mt-2 ms-3 mb-0 text-muted">Statewide Integrated Scheme Based Cash Book Management System</h6>
             </div>
-            <div class="col-md-12 col-lg-6 align-self-center">
-               <div class="navbar-brand d-flex align-items-center justify-content-center text-primary">
-                  <div class="login-logo text-center">
-                     <img src="assets/images/odisha_logo_login.png" class="img-fluid">
-                     <h2 class="text-primary mt-2">Cashbook Analytics System</h2>
-                     <h6 class="mt-2 ms-3 mb-0 text-muted">Statewide Integrated Scheme Based Cash Book Management System</h6>
-                  </div>
-               </div>
-               <div class="row justify-content-center pt-5">
-                  <div class="col-md-9">
-                     <div class="card  d-flex justify-content-center mb-0 auth-card iq-auth-form">
-                        <div class="card-body">
-                           <h2 class="mb-2 text-center">Sign In</h2>
-                           <p class="text-center">Login to stay connected.</p>
-                           <form action="/cas/login" method="POST" novalidate >
-                              <div class="row">
-                                 <div class="col-lg-12">
-                                    <div class="form-group">
-                                       <label class="form-label">User Type</label>
-                                       <select class="form-control" name="userType">
-                                       <% for( let desig of designation ) { %>
-                    <option value="<%= desig.name %>" <%= designation.name === desig.name ? 'selected': '' %> ><%= desig.name %></option>
-                <% } %>
-                                       </select>
-                                    </div>
-                                 </div>
-                                 <div class="col-lg-12">
-                                    <div class="form-group">
-                                       <label class="form-label">Username</label>
-                                       <input type="text" class="form-control" name="email" placeholder="Enter Username">
-                                    </div>
-                                 </div>
-                                 <div class="col-lg-12">
-                                    <div class="form-group">
-                                       <label class="form-label">Password</label>
-                                       <input type="password" name="password" class="form-control" placeholder="Enter Password">
-                                    </div>
-                                 </div>
-                                 <div class="col-lg-12 d-flex justify-content-between">
-                                    <div class="form-check mb-3">
-                                       <input type="checkbox" class="form-check-input" id="customCheck1">
-                                       <label class="form-check-label" for="customCheck1">Remember Me</label>
-                                    </div>
-                                    <a href="#">Forgot Password?</a>
-                                 </div>
-                              </div>
-                              <div class="d-flex justify-content-center">
-                                 <button type="submit" class="btn btn-primary" onclick="javascript:goToProperPage();">Sign In</button>
-                              </div>
-                           </form>
+          </div>
+          <div class="row justify-content-center pt-5">
+            <div class="col-md-9">
+              <div class="card  d-flex justify-content-center mb-0 auth-card iq-auth-form">
+                <div class="card-body">
+                  <h2 class="mb-2 text-center">Sign In</h2>
+                  <p class="text-center">Login to stay connected.</p>
+                  <form action="/cas/login" method="POST" novalidate id="loginForm" onsubmit="return validateForm();">
+                    <div class="row">
+                      <div class="col-lg-12">
+                        <div class="form-group">
+                           <label class="form-label">User Type </label>
+                           <select class="form-control" name="userType" placeholder="Enter Password" required>
+                             <option value="" disabled selected>Select User Type</option>
+                             <% for(let desig of designation) { %>
+                               <option value="<%= desig.name %>">
+                                 <%= desig.name %>
+                               </option>
+                             <% } %>
+                           </select>
+                           <div class="error-message" id="userType-error"></div>
+                         </div>
+                         
+                      </div>
+                      <div class="col-lg-12">
+                        <div class="form-group">
+                          <label class="form-label">Username <span class="mandatory">*</span></label>
+                          <input type="text" class="form-control" name="email" id="email" placeholder="Enter Username"
+                            required>
+                          <div class="error-message" id="email-error"></div>
                         </div>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-    </div>
+                      </div>
+                      <div class="col-lg-12">
+                        <div class="form-group">
+                          <label class="form-label">Password <span class="mandatory">*</span></label>
+                          <div class="password-input-container">
+                            <input type="password" name="password" id="password" class="form-control"
+                              placeholder="Enter Password" required>
+                            <div class="password-toggle-icon-container">
+                              <i class="password-toggle-icon fa fa-eye" id="password-toggle"></i>
+                            </div>
+                          </div>
+                          <div class="error-message" id="password-error"></div>
+                        </div>
+                      </div>
+                      <div class="col-lg-12 d-flex justify-content-between">
+                        <div class="form-check mb-3">
+                          <input type="checkbox" class="form-check-input" id="customCheck1">
+                          <label class="form-check-label" for="customCheck1">Remember Me</label>
+                        </div>
+                        <a href="">Forgot Password?</a>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                      <button type="submit" class="btn btn-primary">Sign In</button>
+                    </div>
+                  </form>
 
-<script src="assets/js/core/libs.min.js"></script>
-<script src="assets/js/plugins/slider-tabs.js"></script>
-<script src="assets/vendor/lodash/lodash.min.js"></script>
-<script src="assets/js/iqonic-script/utility.min.js"></script>
-<script src="assets/js/iqonic-script/setting.min.js"></script>
-<script src="assets/js/setting-init.js"></script>
-<script src="assets/js/core/external.min.js"></script>
-<script src="assets/js/charts/widgetchartsf700.js?v=1.0.1" defer></script>
-<script src="assets/js/charts/dashboardf700.js?v=1.0.1" defer></script>
-<script src="assets/js/qompac-uif700.js?v=1.0.1" defer></script>
-<script src="assets/js/sidebarf700.js?v=1.0.1" defer></script>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <script>
+
+    var passwordInput = document.getElementById("password");
+    var passwordToggle = document.getElementById("password-toggle");
+    var isPasswordVisible = false;
+
+
+    function togglePasswordVisibility() {
+      isPasswordVisible = !isPasswordVisible;
+      passwordInput.type = isPasswordVisible ? "text" : "password";
+      passwordToggle.className = isPasswordVisible ? "fa fa-eye" : "fa fa-eye-slash";
+
+
+
+    }
+    passwordToggle.addEventListener("click", togglePasswordVisibility);
+
+    function validateForm() {
+      var userType = document.forms["loginForm"]["userType"].value;
+      var username = document.forms["loginForm"]["email"].value;
+      var password = document.forms["loginForm"]["password"].value;
+
+
+      resetErrorMessages();
+
+      var isValid = true;
+
+
+      if (userType === "") {
+        displayError("userType", "Please select a User Type.");
+        isValid = false;
+      }
+
+
+      var emailPattern = /^\S+@\S+\.\S+$/;
+      if (!emailPattern.test(username)) {
+        displayError("email", "Please enter email address.");
+        isValid = false;
+      }
+
+
+      if (password.length < 6) {
+        displayError("password", "Please enter password.");
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function displayError(field, message) {
+  console.log("Displaying error for " + field + ": " + message);
+  var errorElement = document.getElementById(field + "-error");
+  if (errorElement) {
+    errorElement.innerText = message;
+    errorElement.style.display = "block"; // Show the error message
+  }
+}
+
+
+    function resetErrorMessages() {
+      var errorMessages = document.querySelectorAll(".error-message");
+      errorMessages.forEach(function (element) {
+        element.innerText = "";
+      });
+    }
+  </script>
+
+
+  <script src="assets/js/core/libs.min.js"></script>
+  <script src="assets/js/plugins/slider-tabs.js"></script>
+  <script src="assets/vendor/lodash/lodash.min.js"></script>
+  <script src="assets/js/iqonic-script/utility.min.js"></script>
+  <script src="assets/js/iqonic-script/setting.min.js"></script>
+  <script src="assets/js/setting-init.js"></script>
+  <script src="assets/js/core/external.min.js"></script>
+  <script src="assets/js/charts/widgetchartsf700.js?v=1.0.1" defer></script>
+  <script src="assets/js/charts/dashboardf700.js?v=1.0.1" defer></script>
+  <script src="assets/js/qompac-uif700.js?v=1.0.1" defer></script>
+  <script src="assets/js/sidebarf700.js?v=1.0.1" defer></script>
 
 
 
 </body>
+
 </html>

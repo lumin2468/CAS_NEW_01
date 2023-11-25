@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
+<body>
+
+    <%-include('../Includes/sidebar.ejs')%>
+    <%-include('../Includes/header-3.ejs')%>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <h4 class="mb-5">Scheme</h4>
+    <div>
+        <div style="margin-left:90%;">
+            <a href="/cas/directorate/scheme">
+                <button type="button" class="btn btn-primary next action-button"><i
+                        class="fa fa-arrow-left"></i>Back</button>
+            </a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+          <form action="/cas/directorate/edit-scheme/<%= scheme._id %>" method="post">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Directorate <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="directorate" value="<%= directorates.name %>" readonly>
+                </div>
+              </div>
+      
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="schemeName" value="<%= scheme.name %>">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Scheme Start Date <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="startDate" value="<%= scheme.startDate.toISOString().split('T')[0] %>">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Scheme End Date <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="endDate" value="<%= scheme.endDate.toISOString().split('T')[0] %>">
+                </div>
+              </div>
+      
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+
+
+</div>
+
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+
+</html>

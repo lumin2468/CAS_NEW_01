@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
 
    
@@ -27,114 +32,120 @@
 <div class="content-inner container-fluid pb-0" id="page_layout">
     <h4 class="mb-5">Advance</h4>
     <div class="card">
-        <form action="/cas/district/advance" method="post">
-        <div class="card-body">
-            <div class="row">
-            <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="date">
+        <form action="/cas/district/advance" method="post" onsubmit="return validateAdvanceForm()">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="date" id="date">
+                            <div id="dateError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
-                        <select class="form-control" id="MOP"  name="mode_of_payment">
-                            <option>Select</option>
-                            <% for( let mop of modeofpmnt ) { %>
-                                <option value="<%= mop.name %>" <%=modeofpmnt.name === mop.name ? 'selected': '' %> ><%= mop.name %></option>
-                            <% } %>
-                        </select>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
+                            <select class="form-control" id="MOP" name="mode_of_payment">
+                                <option>Select</option>
+                                <% for( let mop of modeofpmnt ) { %>
+                                    <option value="<%= mop.name %>" <%=modeofpmnt.name === mop.name ? 'selected': '' %> ><%= mop.name %></option>
+                                <% } %>
+                            </select>
+                            <div id="modeOfPaymentError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="transaction_id" class="form-label">CHEQUE/DRAFT No. <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" name="transaction_id">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label id="transaction_id" class="form-label">CHEQUE/DRAFT No. <span class="text-danger">*</span></label>
+                            <input type="" class="form-control" name="transaction_id" id="transaction_id_val">
+                            <div id="transactionIdError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="transaction_date" class="form-label">CHEQUE/DRAFT Date.  <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="transaction_date">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label id="transaction_date" class="form-label">CHEQUE/DRAFT Date.  <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="transaction_date" id="transaction_date_val">
+                            <div id="transactionDateError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Voucher/Sanction Order Ref. No.<span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="sanction_no">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Voucher/Sanction Order Ref. No.<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="sanction_no" id="sanction_ord_no">
+                            <div id="sanctionNoError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Pupose Name <span class="text-danger">*</span></label>
-                        <select class="form-control" id="schemeSelect" name='purpose'>
-                            <option>Select</option>
-                            <% for( let pur of office_details.purpose ) { %>
-                                <option value="<%= pur.name %>" <%= office_details.purpose.name === pur.name ? 'selected': '' %> ><%= pur.name %></option>
-                            <% } %>
-                          </select>
-                       
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Purpose Name <span class="text-danger">*</span></label>
+                            <select class="form-control" id="schemeSelect" name='purpose'>
+                                <option>Select</option>
+                                <% for( let pur of office_details.purpose ) { %>
+                                    <option value="<%= pur.name %>" <%= office_details.purpose.name === pur.name ? 'selected': '' %> ><%= pur.name %></option>
+                                <% } %>
+                            </select>
+                            <div id="purposeError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Party Name <span class="text-danger">*</span></label>
-                        <select class="form-control" id="beneficiarySelect" name="party">
-                            <option>Select</option>
-                            <% for( let ven of office_details.vendor ) { %>
-                                <option value="<%= ven.name %>" <%= office_details.vendor.name === ven.name ? 'selected': '' %> ><%= ven.name %></option>
-                            <% } %>
-                        </select>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Party Name <span class="text-danger">*</span></label>
+                            <select class="form-control" id="beneficiarySelect" name="party">
+                                <option>Select</option>
+                                <% for( let ven of office_details.vendor ) { %>
+                                    <option value="<%= ven.name %>" <%= office_details.vendor.name === ven.name ? 'selected': '' %> ><%= ven.name %></option>
+                                <% } %>
+                            </select>
+                            <div id="partyError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Office Name<span class="text-danger">*</span></label>
-                        <input type="text" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Office Name<span class="text-danger">*</span></label>
+                            <input type="text" id="officeSelect" class="form-control" readonly="'true" name="office_name" value="<%= office_details.name %>">
+                            <div id="officeNameError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
-                        <select class="form-control" id="ofcBnkSelect" name="from_bank">
-                            <option>Select</option>
-                            <% for( let bnk of office_details.bank ) { %>
-                                <option value="<%= bnk.accountNumber %>" <%= office_details.bank.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank %></option>
-                            <% } %>
-                          </select>
-
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> From Office Bank  <span class="text-danger">*</span></label>
+                            <select class="form-control" id="ofcBnkSelect" name="from_bank">
+                                <option>Select</option>
+                                <% for( let bnk of office_details.bank ) { %>
+                                    <option value="<%= bnk.accountNumber %>" <%= office_details.bank.bank === bnk.bank ? 'selected': '' %> ><%= bnk.bank %></option>
+                                <% } %>
+                            </select>
+                            <div id="fromBankError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-
-
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> To Party Bank  <span class="text-danger">*</span></label>
-                        <input type="text"  id="benifBank" class="form-control" name="partyBank">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> To Party Bank  <span class="text-danger">*</span></label>
+                            <input type="text" id="benifBank" class="form-control" name="partyBank">
+                            <div id="toPartyBankError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="form-label"> Amount <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="amount">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label"> Amount <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="amount">
+                            <div id="amountError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Naration <span class="text-danger">*</span></label>
-                        <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Naration <span class="text-danger">*</span></label>
+                            <input type="text" style='height:80px; width:320px;' class="form-control" name="desc">
+                            <div id="descError" class="error-message"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary next action-button" id="submitBtn">Submit</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    
     </div>
 
     <div class="card">
@@ -195,6 +206,15 @@
                         <% } %>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -211,6 +231,7 @@
       const transactionDate = document.getElementById('transaction_date');
       const beneficiarySelect = document.getElementById('beneficiarySelect');
       const benifBank = document.getElementById('benifBank');
+      const submitBtn = document.getElementById("submitBtn")
 
       // Function to fetch data from the backend API and update the table
             
@@ -306,6 +327,114 @@
       // Display the voucher number in a popup
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
+
+
+    submitBtn.addEventListener("click", () => {
+      var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
+    function validateAdvanceForm() {
+            var isValid = true;
+
+      
+            document.getElementById('dateError').innerText = '';
+            document.getElementById('modeOfPaymentError').innerText = '';
+            document.getElementById('transactionIdError').innerText = '';
+            document.getElementById('transactionDateError').innerText = '';
+            document.getElementById('sanctionNoError').innerText = '';
+            document.getElementById('purposeError').innerText = '';
+            document.getElementById('partyError').innerText = '';
+            document.getElementById('officeNameError').innerText = '';
+            document.getElementById('fromBankError').innerText = '';
+            document.getElementById('toPartyBankError').innerText = '';
+            document.getElementById('amountError').innerText = '';
+            document.getElementById('descError').innerText = '';
+
+
+            var date = document.getElementById('date').value;
+            if (!date) {
+                document.getElementById('dateError').innerText = 'Date is required.';
+                isValid = false;
+            }
+
+ 
+            var modeOfPayment = document.getElementById('MOP').value;
+            if (modeOfPayment === 'Select') {
+                document.getElementById('modeOfPaymentError').innerText = 'Please select Mode of Payment.';
+                isValid = false;
+            }
+
+            var transactionId = document.getElementById('transaction_id_val').value;
+            if (!transactionId) {
+                document.getElementById('transactionIdError').innerText = 'CHEQUE/DRAFT No. is required.';
+                isValid = false;
+            }
+
+  
+            var transactionDate = document.getElementById('transaction_date_val').value;
+            if (!transactionDate) {
+                document.getElementById('transactionDateError').innerText = 'CHEQUE/DRAFT Date is required.';
+                isValid = false;
+            }
+
+
+            var sanctionNo = document.getElementById('sanction_ord_no').value;
+            if (!sanctionNo) {
+                document.getElementById('sanctionNoError').innerText = 'Sanction Order Ref. No. is required.';
+                isValid = false;
+            }
+
+     
+            var purpose = document.getElementById('schemeSelect').value;
+            if (purpose === 'Select') {
+                document.getElementById('purposeError').innerText = 'Please select Purpose Name.';
+                isValid = false;
+            }
+
+            var party = document.getElementById('beneficiarySelect').value;
+            if (party === 'Select') {
+                document.getElementById('partyError').innerText = 'Please select Party Name.';
+                isValid = false;
+            }
+
+            var officeName = document.getElementById('officeSelect').value;
+            if (!officeName) {
+                document.getElementById('officeNameError').innerText = 'Office Name is required.';
+                isValid = false;
+            }
+
+            var fromBank = document.getElementById('ofcBnkSelect').value;
+            if (fromBank === 'Select') {
+                document.getElementById('fromBankError').innerText = 'Please select From Office Bank.';
+                isValid = false;
+            }
+
+
+            var toPartyBank = document.getElementById('benifBank').value;
+            if (!toPartyBank) {
+                document.getElementById('toPartyBankError').innerText = 'To Party Bank is required.';
+                isValid = false;
+            }
+
+            var amount = document.getElementById('amount').value;
+            if (!amount) {
+                document.getElementById('amountError').innerText = 'Amount is required.';
+                isValid = false;
+            }
+
+
+            var desc = document.getElementById('desc').value;
+            if (!desc) {
+                document.getElementById('descError').innerText = 'Naration is required.';
+                isValid = false;
+            }
+
+            return isValid;
+        }
   </script>
  
 </html>

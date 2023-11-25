@@ -11,6 +11,12 @@
     <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
     <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
 </head>
+
+<style>
+    .error-message {
+        color: red;
+    }
+</style>
 <body>
 
     <%-   include('../Includes/sidebar.ejs')%>
@@ -21,130 +27,128 @@
     <h4 class="mb-5">Payment</h4>
     <div class="card">
         <div class="card-body">
-            <form action="/cas/directorate/payment", method="post">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="date">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
-                        <select class="form-control" id="MOP" name="modeof_payment" >
-                            <option>Select</option>
-                            <% for( let mop of modeofpmnt ) { %>
-                                <option value="<%= mop.name %>" <%= modeofpmnt.name === mop.name ? 'selected': '' %> ><%= mop.name %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="tranId" class="form-label">Transaction ID <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" name="transaction_Id">
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label id="tranDate" class="form-label">Transaction Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" name="transaction_date">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Sanction Order Ref. No.  <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" name="sanction_ord_no">
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Reference Voucher No. <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" name="ref_voucher_no">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label  class="form-label">Scheme Name <span class="text-danger">*</span></label>
-                        <select class="form-control" id="schemeSelect" name="schemeName" >
-                            <option>Select</option>
-                            <% for( let sch of schemes ) { %>
-                                <option value="<%= sch._id %>" <%= schemes === sch.name ? 'selected': '' %> ><%= sch.name %></option>
-                            <% } %>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> From Directorate <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" name="directorate", value="<%=directorate_data.name%>">
-                    </div>
-                </div>      
-                    <!-- <div class="col-md-4">
+            <form action="/cas/directorate/payment" method="post" onsubmit="return validateForm()">
+                <div class="row">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label class="form-label">Component <span class="text-danger">*</span></label>
-                            <select class="form-control" id="componentSelect" name="components_name">
-                                
-                            
-                            </select>
-                        
+                            <label class="form-label"> Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="date" id="date">
+                            <div id="dateError" class="error-message"></div>
                         </div>
-                    </div> -->
-               
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">To Office <span class="text-danger">*</span></label>
-                        <select class="form-control" id="officeSelect" name="ofc_name" >
-                            <option>Select</option>
-                            <% for( let ofc of directorate_data.districts ) { %>
-                                <option value="<%= ofc._id %>" <%= directorate_data.districts.name === ofc.name ? 'selected': '' %> ><%= ofc.name %></option>
-                            <% } %>
-                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Mode of Payment <span class="text-danger">*</span></label>
+                            <select class="form-control" id="MOP" name="modeof_payment">
+                                <option>Select</option>
+                                <% for (let mop of modeofpmnt) { %>
+                                    <option value="<%= mop.name %>" <%= modeofpmnt.name === mop.name ? 'selected' : '' %> ><%= mop.name %></option>
+                                <% } %>
+                            </select>
+                            <div id="modeofPaymentError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label id="tranId" class="form-label">Transaction ID <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="transaction_Id" id="transactionId">
+                            <div id="transactionIdError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label id="tranDate" class="form-label">Transaction Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="transaction_date" id="transactionDate">
+                            <div id="transactionDateError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Sanction Order Ref. No. <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="sanction_ord_no" id="sanctionOrderNo">
+                            <div id="sanctionOrderNoError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Reference Voucher No. <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="ref_voucher_no" id="referenceVoucherNo">
+                            <div id="referenceVoucherNoError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Scheme Name <span class="text-danger">*</span></label>
+                            <select class="form-control" id="schemeSelect" name="schemeName">
+                                <option>Select</option>
+                                <% for (let sch of schemes) { %>
+                                    <option value="<%= sch._id %>" <%= schemes === sch.name ? 'selected' : '' %> ><%= sch.name %></option>
+                                <% } %>
+                            </select>
+                            <div id="schemeNameError" class="error-message"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> From Directorate <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="directorate" value="<%=directorate_data.name%>" id="directorate">
+                            <div id="directorateError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">To Office <span class="text-danger">*</span></label>
+                            <select class="form-control" id="officeSelect" name="ofc_name">
+                                <option>Select</option>
+                                <% for (let ofc of directorate_data.districts) { %>
+                                    <option value="<%= ofc._id %>" <%= directorate_data.districts.name === ofc.name ? 'selected' : '' %> ><%= ofc.name %></option>
+                                <% } %>
+                            </select>
+                            <div id="toOfficeError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> from Directorate Bank <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="fromDirectorateBank" readonly="true">
+                            <input type="text" class="form-control" id="fromDirectorateBankId" name="sender_bank" hidden="true">
+                            <div id="fromDirectorateBankError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label"> To office Bank <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ofcBnkSelect" name="receiver_bank">
+                            <div id="toOfficeBankError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="form-label"> Amount <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="p_amount" id="amount">
+                            <div id="amountError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="form-label">Naration <span class="text-danger">*</span></label>
+                            <input type="text" style='height:80px; width:340px;' class="form-control" name="desc" id="narration">
+                            <div id="narrationError" class="error-message"></div>
+                        </div>
+                    </div>
+        
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary next action-button">Submit</button>
                     </div>
                 </div>
-
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> from Directorate Bank <span class="text-danger">*</span></label>
-                        <select class="form-control" id="officeSelect" name="receiver_bank">
-                            <% for( let dir of directorate_data.bank ) { %>
-                                <option value="<%= dir.bank %>" <%=directorate_data.bank === dir.bank ? 'selected': '' %> ><%= dir.bank %></option>
-                            <% } %>
-                        </select>
-
-                    </div>
-                </div> 
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label"> To office Bank <span class="text-danger">*</span></label>
-                        <input type="" class="form-control" id="ofcBnkSelect" name="receiver_bank">
-
-                    </div>
-                </div> 
-              
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="form-label"> Amount <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="p_amount">
-                    </div>
-                </div>  
-                
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label">Naration <span class="text-danger">*</span></label>
-                        <input type="text" style='height:80px; width:340px;' class="form-control" name="desc">
-                    </div>
-                </div>
-                
-                <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-primary next action-button">Submit</button>
-                </div>
-            </div>
-        </form>
+            </form>
         </div>
     </div>
 
@@ -213,6 +217,15 @@
                         <% } %>
                     </tbody>
                 </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
             </div>
         </div>
     </div>
@@ -224,12 +237,15 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
       const schemeSelect = document.getElementById('schemeSelect');
-      const tableBody = document.getElementById('componentSelect');
+    //   const tableBody = document.getElementById('componentSelect');
       const officeSelect= document.getElementById('officeSelect');
       const ofcBnkSelect = document.getElementById('ofcBnkSelect');
       const mop = document.getElementById('MOP');
       const transactionId = document.getElementById('tranId');
       const transactionDate = document.getElementById('tranDate');
+      const submitBtn = document.getElementById('submitBtn');
+      const dirBank = document.getElementById('fromDirectorateBank');
+      const dirBankId = document.getElementById('fromDirectorateBankId');
       // Function to fetch data from the backend API and update the table
 
       async function modeofPmnts(){
@@ -243,28 +259,28 @@
         }
       }
 
-      async function fetchTableData() {
-        const selectedScheme = schemeSelect.value;
-        if (selectedScheme === 'Select') {
-          tableBody.innerHTML = ''; // Clear the table when 'Select' is chosen
-          return;
-        }
+    //   async function fetchTableData() {
+    //     const selectedScheme = schemeSelect.value;
+    //     if (selectedScheme === 'Select') {
+    //       tableBody.innerHTML = ''; // Clear the table when 'Select' is chosen
+    //       return;
+    //     }
   
-        try {
-          const response = await fetch(`/cas/directorate/payments/${selectedScheme}`);
-          const data = await response.json();
-          console.log(`fetched data`,data.components);
-          // Update the table with the fetched data
-          tableBody.innerHTML = data?.components
-            .map(
-              (component) => ` <option value=${component.name}>${component.name}</option>`
-            )
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      }
+    //     try {
+    //       const response = await fetch(`/cas/directorate/payments/${selectedScheme}`);
+    //       const data = await response.json();
+    //       console.log(`fetched data`,data.components);
+    //       // Update the table with the fetched data
+    //       tableBody.innerHTML = data?.components
+    //         .map(
+    //           (component) => ` <option value=${component.name}>${component.name}</option>`
+    //         )
+    //     } catch (error) {
+    //       console.error('Error fetching data:', error);
+    //     }
+    //   }
   
-
+      
       async function fetchOfcData() {
           const selectedOfc = officeSelect.value;
           const schemeName=schemeSelect.value;
@@ -279,7 +295,7 @@
           console.log(`fetched data`,data);
         //   // Update the table with the fetched data
         if(data?.bankId){
-            ofcBnkSelect.value=data.bankId.bank;
+            ofcBnkSelect.value=`${data.bankId.bank} /${data.bankId.IFSCNumber} / ${data.bankId.accountNumber}`;
              }else{
                 ofcBnkSelect.value="No Bank Linked"
              }
@@ -287,14 +303,40 @@
           console.error('Error fetching data:', error);
         }
       }
-  
+      async function fetchScmData(){
+
+        const scmName= schemeSelect.value
+        if (scmName === 'Select') {
+          dirBank.value = 'No Bank found'; // Clear the table when 'Select' is chosen
+          return;
+        }
+        try {
+          const response = await fetch(`/cas/directorate/payments/dirbank/${scmName}`);
+          const data = await response.json();
+          console.log(`fetched data`,data);
+          // Update the table with the fetched data
+          if(!data){
+            dirBank.value="No Bank Linked"
+            dirBankId.value=""
+          }
+        if(data?.bankId){
+            dirBank.value=`${data.bankId.bank}/${data.bankId.IFSCNumber} / ${data.bankId.accountNumber} `;
+            dirBankId.value=data.bankId._id;
+             }
+             
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+
+      }
     //   // Event listener to trigger data fetching when the scheme select value changes
-      schemeSelect.addEventListener('change', fetchTableData);
+    schemeSelect.addEventListener('change', fetchScmData)
+    //   schemeSelect.addEventListener('change', fetchTableData);
       officeSelect.addEventListener('change', fetchOfcData);
       mop.addEventListener('change', modeofPmnts);
   
       // Initially, call the fetch function to populate the table based on the default selected scheme (Select)
-      fetchTableData();
+      
     });
 
       // Check if the voucher number exists
@@ -303,7 +345,130 @@
       // Display the voucher number in a popup
       alert(`Voucher Number created successfully/n: ${voucherNo}`);
     }
+
+    submitBtn.addEventListener("click", () => {
+      var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
+    
   </script>
+
+<script>
+    document.getElementById("submitBtn").addEventListener("click", function (event) {
+        var confirmSubmit = confirm("Are you sure want to continue?");
+        if (!confirmSubmit) {
+            event.preventDefault();
+            alert("You clicked Cancel. Action canceled.");
+        }
+    });
+
+    function validateForm() {
+        // Get form inputs
+        var date = document.getElementById("date").value;
+        var modeofPayment = document.getElementById("MOP").value;
+        var transactionId = document.getElementById("transactionId").value;
+        var transactionDate = document.getElementById("transactionDate").value;
+        var sanctionOrderNo = document.getElementById("sanctionOrderNo").value;
+        var referenceVoucherNo = document.getElementById("referenceVoucherNo").value;
+        var schemeName = document.getElementById("schemeSelect").value;
+        var directorate = document.getElementById("directorate").value;
+        var toOffice = document.getElementById("officeSelect").value;
+        var fromDirectorateBank = document.getElementById("fromDirectorateBank").value;
+        var toOfficeBank = document.getElementById("ofcBnkSelect").value;
+        var amount = document.getElementById("amount").value;
+        var narration = document.getElementById("narration").value;
+
+        // Reset error messages
+        document.getElementById("dateError").innerHTML = "";
+        document.getElementById("modeofPaymentError").innerHTML = "";
+        document.getElementById("transactionIdError").innerHTML = "";
+        document.getElementById("transactionDateError").innerHTML = "";
+        document.getElementById("sanctionOrderNoError").innerHTML = "";
+        document.getElementById("referenceVoucherNoError").innerHTML = "";
+        document.getElementById("schemeNameError").innerHTML = "";
+        document.getElementById("directorateError").innerHTML = "";
+        document.getElementById("toOfficeError").innerHTML = "";
+        document.getElementById("fromDirectorateBankError").innerHTML = "";
+        document.getElementById("toOfficeBankError").innerHTML = "";
+        document.getElementById("amountError").innerHTML = "";
+        document.getElementById("narrationError").innerHTML = "";
+
+        // Simple validation example, you can customize this according to your requirements
+        var isValid = true;
+
+        if (date === "") {
+            document.getElementById("dateError").innerHTML = "Please enter the date.";
+            isValid = false;
+        }
+
+        if (modeofPayment === "Select") {
+            document.getElementById("modeofPaymentError").innerHTML = "Please select a mode of payment.";
+            isValid = false;
+        }
+
+        if (transactionId === "") {
+            document.getElementById("transactionIdError").innerHTML = "Please enter the transaction ID.";
+            isValid = false;
+        }
+
+        if (transactionDate === "") {
+            document.getElementById("transactionDateError").innerHTML = "Please enter the transaction date.";
+            isValid = false;
+        }
+
+        if (sanctionOrderNo === "") {
+            document.getElementById("sanctionOrderNoError").innerHTML = "Please enter the Sanction Order Ref. No.";
+            isValid = false;
+        }
+
+        if (referenceVoucherNo === "") {
+            document.getElementById("referenceVoucherNoError").innerHTML = "Please enter the Reference Voucher No.";
+            isValid = false;
+        }
+
+        if (schemeName === "Select") {
+            document.getElementById("schemeNameError").innerHTML = "Please select a scheme.";
+            isValid = false;
+        }
+
+        if (directorate === "") {
+            document.getElementById("directorateError").innerHTML = "Please enter the From Directorate.";
+            isValid = false;
+        }
+
+        if (toOffice === "Select") {
+            document.getElementById("toOfficeError").innerHTML = "Please select a To Office.";
+            isValid = false;
+        }
+
+        if (fromDirectorateBank === "Select") {
+            document.getElementById("fromDirectorateBankError").innerHTML = "Please select a From Directorate Bank.";
+            isValid = false;
+        }
+
+        if (toOfficeBank === "") {
+            document.getElementById("toOfficeBankError").innerHTML = "Please enter the To Office Bank.";
+            isValid = false;
+        }
+
+        if (amount === "") {
+            document.getElementById("amountError").innerHTML = "Please enter the Amount.";
+            isValid = false;
+        }
+
+        if (narration === "") {
+            document.getElementById("narrationError").innerHTML = "Please enter the Narration.";
+            isValid = false;
+        }
+
+        return isValid; // Form will be submitted if validation passes
+    }
+</script>
+
  
   
 </html>

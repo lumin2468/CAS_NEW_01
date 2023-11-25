@@ -99,6 +99,20 @@ app.engine("ejs", engine);
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 
+app.use('/cas/directorate/edit-bank', express.static(path.join(__dirname, 'public')));
+app.use('/cas/directorate/edit-scheme', express.static(path.join(__dirname, 'public')));
+app.use('/cas/directorate/edit-scheme2component/:id', express.static(path.join(__dirname, 'public')));
+app.use('/cas/directorate/edit-scheme2bank/:id', express.static(path.join(__dirname, 'public')));
+app.use('/cas/directorate/edit-user', express.static(path.join(__dirname, 'public')));
+
+
+app.use('/cas/district/benificiary-edit', express.static(path.join(__dirname, 'public')));
+app.use('/cas/district/edit-bank', express.static(path.join(__dirname, 'public')));
+app.use('/cas/district/edit-scheme2Bank', express.static(path.join(__dirname, 'public')));
+app.use('/cas/district/edit-vendor', express.static(path.join(__dirname, 'public')));
+app.use('/cas/district/edit-purpose', express.static(path.join(__dirname, 'public')));
+app.use('/cas/district/edit-user', express.static(path.join(__dirname, 'public')));
+
 // console.log(process.env.SECRET_KEY)
 // -------------------Session Storage --------------------------------
 // MongoDB configuration for session store
@@ -236,10 +250,12 @@ app.get("/cas/dashboard", verifyToken, async (req, res) => {
       res.render("directorate/dashboard", {
         username: req.user.username,
         designation: req.user.designation.name,
+        schemes: req.schemeData.schemes,
         districtData:req.districtDataArray,
         dirTranscData:req.dirTansacData,
         dirCash:req.dirCash,
-        dirBank:req.dirBank      
+        dirBank:req.dirBank,
+        initialOB:req.schemeData.initialOB     
       });
     });
   } else if (designation.name === "DFO" || designation.name === "CDVO") {
@@ -514,6 +530,7 @@ app.post("/cas/directorate/scheme", async (req, res) => {
       endDate: endDate,
       directorate: directorateName._id,
       description: schemeDesc,
+      obStatus: false
     });
     const newScheme = await schemeData;
     directorateName.schemes.push(newScheme._id);
@@ -826,6 +843,7 @@ app.post("/cas/directorate/payment", async (req, res) => {
       ofc_name,
       directorate_bank,
       receiver_bank,
+      sender_bank,
       p_amount,
       financial_year,
       desc,
@@ -887,7 +905,7 @@ app.post("/cas/directorate/payment", async (req, res) => {
       sanctionOrdNo: sanction_ord_no,
       refVoucherNo: ref_voucher_no,
       scheme: scheme_details._id,
-      senderBank: directorate_data.bank,
+      senderBank: sender_bank,
       receiverBank: bnkDetails.bankId._id,
       amount: p_amount,
       financialYear: financialYear._id,
@@ -908,6 +926,23 @@ app.post("/cas/directorate/payment", async (req, res) => {
 });
 
 // /cas/directorate/payments/
+
+app.get("/cas/directorate/payments/dirBank/:schemeName",isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+    const schemeName = req.params.schemeName;
+    const dirBnkDetails = await SchemeBankMaster.findOne({
+      directorate: directorateOfc,
+      scheme: schemeName,
+      office:null,
+    }).populate("bankId");
+    console.log("bankData", dirBnkDetails);
+    res.json(dirBnkDetails);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Failed to fetch data from the database." });
+  }
+});
 app.get("/cas/directorate/payments/:schemeName", async (req, res) => {
   try {
     const schemeName = req.params.schemeName;
@@ -1145,7 +1180,9 @@ app.get(
       const dirOfcDetails = await Directorate.findOne({ _id: directorateOfc })
       const schemes = await Scheme.find({
         directorate: directorateOfc,
+        obStatus:false,
       });
+      console.log(`hasdhhasd`, schemes)
       const bnkDetails = await BankDetails.find({directorate: directorateOfc});
       console.log(dirOfcDetails.bank);
       res.render("directorate/opening-balance", {
@@ -1166,111 +1203,89 @@ app.post(
   "/cas/directorate/openingBalance",
   isAuthenticated,
   async (req, res) => {
-  //   try {
-  //     const { date, cash, bank_details, bank_balance, advance } = req.body;
-  //     const directorate = req.user.user.directorate;
-  //     const dirDetails = await Directorate.findOne({ _id: directorate });
+  
+    try {
+      const direcOfc = req.user.user.directorate;
+      const openingBalData = req.body;
+      console.log(`DIR OOBBBB`,openingBalData);
+      let bankData
 
-  //     const bnkDetails = await BankDetails.findOne({
-  //       accountNumber: bank_details,
-  //       directorate: directorate,
-  //     });
-  //     console.log(bnkDetails.balance);
-  //     bnkDetails.balance =
-  //       parseInt(bnkDetails.balance) + parseInt(bank_balance);
-  //     bnkDetails.save();
-  //     const newOpeningbal = new DirOpeningBalance({
-  //       date,
-  //       cash: parseInt(cash),
-  //       directorate: directorate,
-  //       bank: bnkDetails._id,
-  //       advance: parseInt(advance),
-  //     });
-  //     newOpeningbal.save();
-  //     dirDetails.openingBalance.push(newOpeningbal._id);
-  //     dirDetails.save();
-  //     res.redirect("/cas/directorate/openingBalance");
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ error: "Internal Server Error" });
-  //   }
-  try {
-    const direcOfc = req.user.user.directorate;
-    const openingBalData = req.body;
-    console.log(`DIR OOBBBB`,openingBalData);
-    let bankData
+      if (!Array.isArray(openingBalData.scheme)) {
+        // Handle the case when a single entry is submitted
+        openingBalData.scheme = [openingBalData.scheme];
+        openingBalData.cash = [openingBalData.cash];
+        openingBalData.bank = [openingBalData.bank];
+        openingBalData.bank_balance = [openingBalData.bank_balance];
+        openingBalData.advance = [openingBalData.advance];
+        openingBalData.date = [openingBalData.date]; // Add date field
+      
+      }
 
-    if (!Array.isArray(openingBalData.scheme)) {
-      // Handle the case when a single entry is submitted
-      openingBalData.scheme = [openingBalData.scheme];
-      openingBalData.cash = [openingBalData.cash];
-      openingBalData.bank = [openingBalData.bank];
-      openingBalData.bank_balance = [openingBalData.bank_balance];
-      openingBalData.advance = [openingBalData.advance];
-      openingBalData.date = [openingBalData.date]; // Add date field
+      const newOpeningBalances = await Promise.all(
+        openingBalData.scheme.map(async (scheme, index) => {
+          const cash = openingBalData.cash[index];
+          const bank = openingBalData.bank[index];
+          const bank_balance = openingBalData.bank_balance[index];
+          const advance = openingBalData.advance[index];
+          const date = openingBalData.date[index]; // Get date from the request body
+          console.log(`Bank details`,bank)
+          // Check if an opening balance already exists for this scheme and office
+          // const existingOpeningBal = await DirOpeningBalance.findOne({
+          //   scheme,
+          //   directorate: direcOfc,
+          // });
+          // console.log(`EXISTING OB`,existingOpeningBal)
+          // if (existingOpeningBal) {
+          //   // If an opening balance already exists, update it instead of creating a new one
+          //   // You can add your update logic here if needed
+          //  res("Opening balance already exists." );
+            
+          // }
+
+          // Process bank details and update balance
+          bankData = await BankDetails.findOne({ _id:bank,});
+          console.log(`BBBNNNKKKKJJJJ`,bankData);
+          if (!bankData) {
+            throw new Error("Bank details not found");
+          }
+          bankData.balance =
+            parseInt(bankData.balance) + parseInt(bank_balance);
+          await bankData.save();
+
+          // Create and save opening balance entry with date
+          const newOpeningBal = new DirOpeningBalance({
+            date: new Date(date), // Convert date string to a Date object
+            scheme,
+            directorate: direcOfc,
+            cash: parseInt(cash),
+            bank: bankData._id,
+            advance: parseInt(advance),
+          });
+          await newOpeningBal.save();
+          const obSchemeLinking=await Scheme.findOne({_id:scheme})
+          obSchemeLinking.obStatus=true
+          obSchemeLinking.save();
+          console.log(`NEWOOOOBBBB`,newOpeningBal)
+          return newOpeningBal;
+        })
+      );
+
      
+
+      // Update office details with new opening balance IDs
+      const ofcDetails = await Directorate.findOne({ _id: direcOfc });
+      ofcDetails.openingBalance.push(
+        ...newOpeningBalances.map((entry) => entry._id)
+      );
+      await ofcDetails.save();
+        console.log(`ofcDetailsssss`,ofcDetails)
+      res.redirect("/cas/directorate/openingBalance");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message || "Internal Server Error" });
     }
-
-    const newOpeningBalances = await Promise.all(
-      openingBalData.scheme.map(async (scheme, index) => {
-        const cash = openingBalData.cash[index];
-        const bank = openingBalData.bank[index];
-        const bank_balance = openingBalData.bank_balance[index];
-        const advance = openingBalData.advance[index];
-        const date = openingBalData.date[index]; // Get date from the request body
-
-        // Check if an opening balance already exists for this scheme and office
-        const existingOpeningBal = await DirOpeningBalance.findOne({
-          scheme,
-          directorate: direcOfc,
-        });
-        console.log(`EXISTING OB`,existingOpeningBal)
-        if (existingOpeningBal) {
-          // If an opening balance already exists, update it instead of creating a new one
-          // You can add your update logic here if needed
-          return res.json("OPENING BALANCE ALREADY EXIST IN DATABASE");
-          
-        }
-
-        // Process bank details and update balance
-         bankData = await BankDetails.findOne({ _id:bank,});
-        console.log(`BBBNNNKKKKJJJJ`,bankData);
-        if (!bankData) {
-          throw new Error("Bank details not found");
-        }
-        bankData.balance =
-          parseInt(bankData.balance) + parseInt(bank_balance);
-        await bankData.save();
-
-        // Create and save opening balance entry with date
-        const newOpeningBal = new DirOpeningBalance({
-          date: new Date(date), // Convert date string to a Date object
-          scheme,
-          directorate: direcOfc,
-          cash: parseInt(cash),
-          bank: bankData._id,
-          advance: parseInt(advance),
-        });
-        await newOpeningBal.save();
-        console.log(`NEWOOOOBBBB`,newOpeningBal)
-        return newOpeningBal;
-      })
-    );
-
-    // Update office details with new opening balance IDs
-    const ofcDetails = await Directorate.findOne({ _id: direcOfc });
-    ofcDetails.openingBalance.push(
-      ...newOpeningBalances.map((entry) => entry._id)
-    );
-    await ofcDetails.save();
-      console.log(`ofcDetailsssss`,ofcDetails)
-    res.redirect("/cas/directorate/openingBalance");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message || "Internal Server Error" });
-  }
-  }
-);
+    }
+  );
 
 
 app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
@@ -1281,7 +1296,7 @@ app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
     const districtName = await DistrictName.find();
     const district = await District.find({ directorate: directorateOfc })
       .populate("directorate")
-      .populate("district");
+      .populate("district"); 
 
     res.render("directorate/districtMaster", {
       directorates,
@@ -1289,7 +1304,7 @@ app.get("/cas/directorate/district", isAuthenticated, async (req, res) => {
       districtName,
       username: req.user.user.username,
       designation: req.user.user.designation.name,
-    });
+    });    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1498,6 +1513,146 @@ app.get("/cas/directorate/report/data", isAuthenticated, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+app.get("/cas/directorate/fy-closing", isAuthenticated, async (req, res) => {
+  try {
+    const directorateOfc = req.user.user.directorate;
+   
+    const financialYear = await FinancialYear.find();
+    const directorate = await Directorate.findOne({
+      _id: directorateOfc,
+    }).populate("schemes");
+
+    res.render("directorate/fy-closing-report", {
+      directorate,
+      financialYear,
+      
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.get(
+  "/cas/directorate/fy-closing/:schemeId",
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const directorateOfc = req.user.user.directorate;
+      const schemeId = req.params.schemeId;
+      const filterType = req.query.filterType;
+      let startDate, endDate;
+      const scheme_id = await Scheme.findOne({ _id: schemeId });
+      const directorate = await Directorate.findOne({
+        _id: directorateOfc,
+        scheme: schemeId,
+      });
+
+      function getFinancialYearDates(financialYear) {
+        const [startYear, endYear] = financialYear.split("-").map(Number);
+
+        const startDate = new Date(startYear, 3, 1); // Assuming the financial year starts in April (month 3)
+        const endDate = new Date(startYear + 1, 2, 31); // Convert endYear to "2024" and set the month to 2 for March
+
+        return { startDate, endDate };
+      }
+
+      if (filterType === "financialYear") {
+        const financialYear = req.query.financialYear;
+        if (financialYear !== "Select") {
+          const financialYearValue = await FinancialYear.findOne({
+            _id: financialYear,
+          });
+          startDate = financialYearValue.startDate;
+          endDate = financialYearValue.endDate;
+          console.log(startDate, endDate);
+        }
+      } else if (filterType === "monthly") {
+        const selectedMonth = req.query.month;
+        const year = new Date().getFullYear();
+        startDate = new Date(req.query.startDate);
+        endDate = new Date(req.query.endDate);
+      } else if (filterType === "dateRange") {
+        startDate = new Date(req.query.startDate);
+        endDate = new Date(req.query.endDate);
+      }
+
+      const openingBalance = await OpeningBalance.findOne({
+        scheme: scheme_id._id,
+      }).populate("bank");
+      console.log(`QUERY`, req.query);
+
+      const receiptRecords = await DisReceipt.find({
+        scheme: { $in: scheme_id._id },
+        date: { $gte: startDate, $lte: endDate },
+        directorate: directorateOfc,
+      });
+
+      const paymentRecords = await DisPayment.find({
+        scheme: { $in: scheme_id._id },
+        date: { $gte: startDate, $lte: endDate },
+        directorate: directorateOfc,
+      });
+
+      const totalReceipts = receiptRecords.reduce(
+        (total, record) => total + record.amount,
+        0
+      );
+
+      const totalExpenses = paymentRecords.reduce(
+        (total, record) => total + record.amount,
+        0
+      );
+
+      const closingBalance =
+        openingBalance.bank.balance + totalReceipts - totalExpenses;
+
+      const grandTotal = openingBalance.bank.balance + totalReceipts;
+
+      const segregatedData = {};
+
+      function addToSegregatedData(records, dataType) {
+        records.forEach((record) => {
+          const dateKey = record.date.toISOString().split("T")[0];
+          if (!segregatedData[dateKey]) {
+            segregatedData[dateKey] = {};
+          }
+          segregatedData[dateKey][dataType] =
+            segregatedData[dateKey][dataType] || [];
+          segregatedData[dateKey][dataType].push(record);
+        });
+      }
+
+      addToSegregatedData(receiptRecords, "receipts");
+      addToSegregatedData(paymentRecords, "payments");
+
+      const sortedDates = Object.keys(segregatedData).sort();
+
+      const sortedSegregatedData = {};
+      sortedDates.forEach((date) => {
+        sortedSegregatedData[date] = segregatedData[date];
+      });
+
+      sortedSegregatedData.openingBalance = openingBalance;
+      sortedSegregatedData.initialOBCash = openingBalance.cash.toFixed(2);
+      sortedSegregatedData.totalReceipts = totalReceipts.toFixed(2);
+      sortedSegregatedData.totalPayments = totalExpenses.toFixed(2);
+      sortedSegregatedData.closingBalance = closingBalance.toFixed(2);
+      sortedSegregatedData.grandTotal = grandTotal.toFixed(2);
+
+      console.log(sortedSegregatedData);
+
+      res.json(sortedSegregatedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
 
 
 //  ---------------DistOfc-------------------
@@ -3416,6 +3571,611 @@ app.get("/cas/district/advance-report", isAuthenticated, async (req, res) => {
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
+  
+// -----------------------------edit  directorate----------------------------
+
+  app.get("/cas/directorate/edit-district", isAuthenticated, async (req, res) => {
+    try {
+      const directorateOfc = req.user.user.directorate;
+      const directorates = await Directorate.findOne({ _id: directorateOfc });
+      const districtName = await DistrictName.find();
+  
+  
+      const districtId = req.query.id;
+  
+      const district = await District.findOne({ _id: districtId })
+        .populate("directorate")
+        .populate("district");
+  
+      res.render("directorate/edit-districtMaster", {
+        directorates,
+        district,
+        districtName,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+  app.post("/cas/directorate/edit-district", isAuthenticated, async (req, res) => {
+    try {
+      const {directorate, district, officeName } = req.body;
+      const updatedDistrict = await District.findOneAndUpdate(
+        { _id: district },
+        { name: directorate, district, officeName },
+        { new: true }
+      );
+  
+  
+      res.redirect("/cas/directorate/edit-district"); 
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+ 
+  
+  
+  // -----------------------------edit-bank---------------------------------
+  app.get("/cas/directorate/edit-bank/:id", isAuthenticated, async (req, res) => {
+    try {
+      const directorateOfc = req.user.user.directorate;
+      const directorate = await Directorate.findOne({ _id: directorateOfc });
+      const bankId = req.params.id;
+      const bankDetail = await BankDetails.findOne({ _id: bankId, directorate: directorateOfc }).populate("office");
+  
+      res.render("directorate/edit-bank", {
+        directorate,
+        bankDetail,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+  app.post("/cas/directorate/edit-bank/:id", isAuthenticated, async (req, res) => {
+    try {
+      const bankId = req.params.id;
+      const { bankName, Ifsc_code, accountNo, branchName, directorate } = req.body;
+  
+  
+      const updatedBankDetail = await BankDetails.findOneAndUpdate(
+        { _id: bankId },
+        { bank: bankName, IFSCNumber: Ifsc_code, accountNumber: accountNo, branch: branchName,directorate  },
+        { new: true }
+      );
+  
+  
+      res.redirect("/cas/directorate/edit-bank");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+  
+  
+  
+  // ---------------------------------edit scheme----------------------
+  
+  app.get("/cas/directorate/edit-scheme/:id", isAuthenticated, async (req, res) => {
+    try {
+      const schemeId = req.params.id;
+      const directorateOfc = req.user.user.directorate;
+  
+      const directorates = await Directorate.findOne({ _id: directorateOfc });
+      const scheme = await Scheme.findOne({ _id: schemeId, directorate: directorateOfc });
+  
+      res.render("directorate/edit-scheme", {
+        directorates,
+        scheme,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+  app.post("/cas/directorate/edit-scheme/:id", isAuthenticated, async (req, res) => {
+    try {
+      const schemeId = req.params.id;
+      const { directorate, schemeName, startDate, endDate } = req.body;
+  
+      // Update the scheme data in the database
+      const updatedScheme = await Scheme.findOneAndUpdate(
+        { _id: schemeId },
+        { directorate, name: schemeName, startDate, endDate },
+        { new: true }
+      );
+  
+      // Redirect to a page showing the updated data or any other appropriate action
+      res.redirect("/cas/directorate/edit-scheme"); // Change the URL as needed
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+        
+ 
+  
+  
+  
+  // -----------------------------------edit schemeBank------------------
+  
+  
+app.get("/cas/directorate/edit-scheme2bank/:id", isAuthenticated, async (req, res) => {
+  try {
+      const schemeBankId = req.params.id;
+      const directorateOfc = req.user.user.directorate;
+
+      const directorate = await Directorate.findOne({ _id: directorateOfc });
+      const schemeBankDetails = await SchemeBankMaster.findOne({ _id: schemeBankId, directorate: directorateOfc })
+          .populate("directorate")
+          .populate("bankId")
+          .populate("scheme");
+
+          console.log(schemeBankDetails)
+
+      res.render("directorate/edit-schemeBank", {
+          directorate,
+          schemeBankDetails,
+          username: req.user.user.username,
+          designation: req.user.user.designation.name,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.post("/cas/directorate/edit-scheme2bank/:id", isAuthenticated, async (req, res) => {
+  try {
+      const schemeBankId = req.params.id;
+      
+      const { directorate,schemeName,bankName } = req.body;
+
+
+      const updatedSchemeBank = await SchemeBankMaster.findOneAndUpdate(
+          { _id: schemeBankId },
+          {  directorate,schemeName,bankName},
+          { new: true }
+      );
+
+
+      res.redirect("/cas/directorate/scheme2bank"); 
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+  
+  // --------------------------------edit component-------------------------------
+  
+  app.get("/cas/directorate/edit-scheme2component/:id", isAuthenticated, async (req, res) => {
+    try {
+      const directorateOfc = req.user.user.directorate;
+      const componentId = req.params.id;
+      const schemes = await Scheme.find({directorate:directorateOfc});
+      const component = await SchemeComponentMaster.findById(componentId).populate("scheme");
+  
+      if (!component) {
+        return res.status(404).json({ error: "Component not found" });
+      }
+  
+      res.render("directorate/edit-schemeComponent", {
+        schemes,
+        component,
+        username: req.user.user.username,
+        designation: req.user.user.designation.name,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+  app.post("/cas/directorate/edit-scheme2component/:id", isAuthenticated, async (req, res) => {
+    try {
+      const componentId = req.params.id;
+      const { component_name, code } = req.body;
+  
+      // Validate inputs if needed
+  
+      const updatedComponent = await SchemeComponentMaster.findByIdAndUpdate(
+        componentId,
+        { name: component_name, code },
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedComponent) {
+        return res.status(404).json({ error: "Component not found" });
+      }
+  
+      // Redirect or send a response as needed
+      res.redirect("/cas/directorate/edit-scheme2component");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+  
+  
+  
+  
+  // ----------------------------edit user--------------------------------
+  
+  app.get("/cas/directorate/edit-user/:userId", isAuthenticated, async (req, res) => {
+    try {
+      const directorateOfc = req.user.user.directorate;
+      const desig = [{ name: "DFO" }, { name: "CDVO" }];
+      const directorate = await Directorate.findOne({
+         _id: directorateOfc,
+      }).populate("districts");
+      const user = await User.findOne({ // Change from find to findOne
+         _id: req.params.userId, // Use the userId from the request parameters
+         directorateId: directorateOfc,
+         officeId: { $ne: null },
+      })
+         .populate("officeId")
+         .populate("designation");
+ 
+      if (!user) {
+         return res.status(404).json({ error: "User not found" });
+      }
+ 
+      res.render("directorate/edit-user", {
+         directorate,
+         desig,
+         username: req.user.user.username,
+         designation: req.user.user.designation.name,
+         user,
+      });
+     } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+     }
+  });
+  
+  
+  app.post("/cas/directorate/edit-user/:userId", isAuthenticated, async (req, res) => {
+    const userId = req.params.userId;
+    const { name, designation, officeName, mobile, email } = req.body;
+    try {
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { name, designation, mobile, email },
+        { new: true }
+      );
+      updatedUser.officeId.name = officeName;
+      await updatedUser.officeId.save();
+  
+      res.redirect("/cas/directorate/edit-user");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+  
+  
+
+
+  // ---------------------------edit dfo-----------------------------
+  // -----------------------edit benificiary------------------------
+
+
+
+
+app.get('/cas/district/benificiary-edit/:id', isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+    const officeDetails = await District.findOne({ _id: office_Id }).populate("schemes");
+    const beneficiaryId = req.params.id;
+
+    const beneficiaries = await Beneficiary.findOne({ _id: beneficiaryId });
+
+    res.render("districtOffice/benificiary-edit", {
+      officeDetails,
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+      beneficiaries
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+   
+app.post('/cas/district/benificiary-edit/:id', isAuthenticated, async (req, res) => {
+  try {
+
+    const beneficiaryId = req.params.id;
+
+
+    const { benificiary_name, dob, Aadhar_No, Bnk_Acc_No } = req.body;
+
+
+    await Beneficiary.findOneAndUpdate(
+      { _id: beneficiaryId },
+      { benificiary_name, dob, Aadhar_No, Bnk_Acc_No },
+      { new: true } 
+    );
+
+
+    res.redirect(`/cas/district/benificiary-edit/${beneficiaryId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// -----------------------------edit bank-----------------------------
+
+
+app.get("/cas/district/edit-bank/:bankId", isAuthenticated, async (req, res) => {
+  try {
+    const bankId = req.params.bankId;
+
+    const bankDetails = await BankDetails.findOne({ _id: bankId });
+    res.render("districtOffice/edit-bank", {
+      username: req.user.user.username,
+      designation: req.user.user.designation.name,
+      bankDetails,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.post('/cas/district/edit-bank/:bankId', isAuthenticated, async (req, res) => {
+  try {
+    const bankId = req.params.bankId;
+    const { bank, IFSCNumber, accountNumber, branch, office } = req.body;
+
+    await BankDetails.findOneAndUpdate(
+      { _id: bankId },
+      { bank, IFSCNumber, accountNumber, branch, office },
+      { new: true }
+    );
+
+    res.redirect(`/cas/district/edit-bank/${bankId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+// ---------------------------edit schemebank----------------------------------
+
+app.get("/cas/district/edit-scheme2bank/:schemeBankId", isAuthenticated, async (req, res) => {
+  try {
+      const schemeBankId = req.params.schemeBankId;
+
+
+      const schemeBankData = await SchemeBankMaster.findOne({ _id: schemeBankId })
+          .populate("directorate")
+          .populate("bankId")
+          .populate("office")
+          .populate("scheme");
+
+      res.render("districtOffice/edit-schemebank", {
+          schemeBankData,
+          username: req.user.user.username,
+          designation: req.user.user.designation.name,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
+app.post("/cas/district/edit-scheme2bank/:schemeBankId", isAuthenticated, async (req, res) => {
+    try {
+        const schemeBankId = req.params.schemeBankId;
+        const { directorate, bankId, office, scheme     } = req.body;
+
+
+        const directorateObject = await Directorate.findOne({ name: directorate }).select('_id');
+
+        if (!directorateObject) {
+            return res.status(404).json({ error: "Directorate not found" });
+        }
+
+        const updateObject = {
+            directorate: directorateObject._id,
+            bankId,
+            office,
+            scheme,
+
+        };
+
+        const updatedSchemeBankData = await SchemeBankMaster.findByIdAndUpdate(
+            schemeBankId,
+            updateObject,
+            { new: true }
+        )
+        .populate("directorate")
+        .populate("bankId")
+        .populate("office")
+        .populate("scheme");
+
+        if (!updatedSchemeBankData) {
+            return res.status(404).json({ error: "SchemeBank data not found" });
+        }
+
+        res.redirect(`/cas/district/edit-scheme2bank/${schemeBankId}`);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message || "Internal Server Error" });
+    }
+});
+
+
+
+
+
+
+// ----------------------------edit vendor--------------------------
+app.get("/cas/district/edit-vendor/:vendorId", isAuthenticated, async (req, res) => {
+  try {
+      const vendorId = req.params.vendorId;
+      const office_Id = req.user.user.officeId;
+      const officeDetails = await District.findOne({ _id: office_Id }).populate(
+          "schemes"
+      );
+      const vendorDetails = await Vendor.findOne({
+          _id: vendorId,
+          office_name: office_Id,
+      }).populate("office_name");
+
+      if (!vendorDetails) {
+
+          return res.status(404).json({ error: "Vendor not found" });
+      }
+
+      res.render("districtOffice/edit-vendor", {
+          officeDetails,
+          username: req.user.user.username,
+          designation: req.user.user.designation.name,
+          vendorDetails,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/edit-vendor/:vendorId", isAuthenticated, async (req, res) => {
+  try {
+  
+
+  
+      await Vendor.findByIdAndUpdate(
+        { _id: vendorId },
+        {
+         name,
+         office_name,
+         Aadhar_No,      
+         branch_details,
+         Bnk_Acc_No,
+         gst
+     } ,
+       { new: true }
+      )
+
+      res.redirect(`/cas/district/edit-vendor/${vendorId}`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// -----------------------edit purpose--------------------------
+
+app.get("/cas/district/edit-purpose", isAuthenticated, async (req, res) => {
+  try {
+    const office_Id = req.user.user.officeId;
+    const officeDetails = await District.findOne({ _id: office_Id }).populate(
+      "schemes"
+    );
+    res.render("districtOffice/edit-purpose", {
+      officeDetails,
+      username: req.user.user.username,       
+      designation: req.user.user.designation.name,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// -------------------------------edit user------------------------------
+
+
+
+app.get("/cas/district/edit-user/:userId", isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.params.userId;
+      const { officeId, directorate } = req.user.user;
+      const desig = [{ name: "ACCOUNTANT" }, { name: "HEAD-CLERK" }];
+      const district = await District.findOne({ _id: officeId });
+      console.log("districtOfcDtls", district);
+      const user = await User.findOne({ _id: userId, officeId: officeId })
+          .populate("officeId")
+          .populate("designation");
+
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      res.render("districtOffice/edit-user", {
+          district,
+          desig,
+          username: req.user.user.username,
+          designation: req.user.user.designation.name,
+          user,
+      });
+  } catch (error) {              
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/cas/district/edit-user/:userId", isAuthenticated, async (req, res) => {
+  try {
+      const userId = req.params.userId;
+      const { username, designation, districtOfc, mobile_no, email, password, confirm_pswd } = req.body;
+
+
+
+      const designationId = await Designation.findOne({ name: "DFO" }).select('_id');
+      await User.findByIdAndUpdate(userId, { designation: designationId });
+          username,
+          designation,
+          districtOfc,
+          mobile_no,
+          email,
+          password,
+       { new: true };
+
+
+
+      if (!User) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      res.redirect(`/cas/district/edit-user/${userId}`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message || "Internal Server Error" });
+  }
+});
+  
   
 
 // Start the server

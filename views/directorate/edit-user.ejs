@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="assets/images/favicon.png">
+    <link rel="stylesheet" href="assets/css/core/libs.min.css">
+    <link rel="stylesheet" href="assets/css/qompac-ui.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/custom.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/dark.minf700.css?v=1.0.1">
+    <link rel="stylesheet" href="assets/css/customizer.minf700.css?v=1.0.1" >
+    <link rel="stylesheet" href="assets/css/rtl.minf700.css?v=1.0.1">
+</head>
+<body>
+
+    <%-include('../Includes/sidebar.ejs')%>
+    <%-include('../Includes/header-3.ejs')%>
+
+<div class="content-inner container-fluid pb-0" id="page_layout">
+    <h4 class="mb-5">User Master</h4>
+    <div>
+        <div style="margin-left:90%;">
+            <a href="/cas/directorate/user">
+                <button type="button" class="btn btn-primary next action-button"><i
+                        class="fa fa-arrow-left"></i>Back</button>
+            </a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+          <form action="/cas/directorate/edit-user/<%= user._id %>" method="post">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="name" value="<%= user?.name %>" required>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Designation <span class="text-danger">*</span></label>
+                  <select class="form-control" name="designation" id="designation">
+                    <option>Select</option>
+                    <% for (let des of desig) { %>
+                        <option value="<%= des.name %>" <%= user.designation.name === des.name ? 'selected' : '' %> ><%= des.name %></option>
+                    <% } %>
+                </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Office Name <span class="text-danger">*</span></label>
+                  <select class="form-control" name="office_name" id="officeName">
+                    <option>Select</option>
+                    <% for( let ofc of directorate.districts) { %>
+                        <option value="<%= ofc._id %>" <%= directorate?.districts?.name === ofc?.name ? 'selected': '' %> ><%= ofc?.name %></option>
+                    <% } %>
+                </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Mobile <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" name="mobile" value="<%= user?.mobile %>" required>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Email <span class="text-danger">*</span></label>
+                  <input type="email" class="form-control" name="email" value="<%= user?.email %>" required>
+                </div>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+
+
+</div>
+
+<%- include('../Includes/footer.ejs')%>
+
+</body>
+
+</html>

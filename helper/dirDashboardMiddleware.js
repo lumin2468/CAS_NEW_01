@@ -12,6 +12,8 @@ const {
     DirReceipt,
     DisReceipt,
     OpeningBalance,
+    Scheme
+
     
   } = consolidatedSchema;
 
@@ -20,6 +22,7 @@ const calculateDirMiddleware = async (req, res, next) => {
         const directorObDetails = await DirOpeningBalance.find({
           directorate: req.user.directorate,
         }).populate("bank")
+        .populate("scheme")
     
         const dirTotalCash = _.sumBy(directorObDetails, 'cash');
         const dirTotalBankBalance = _.sumBy(directorObDetails, (entry) => entry.bank.balance);
@@ -209,7 +212,52 @@ const calculateDirMiddleware = async (req, res, next) => {
     req.dirCash= dirTotalCash ;
     req.dirBank=dirTotalBankBalance;
     console.log(req.districtDataArray);
-  
+ 
+ 
+    // --------------------Scheme Details------------------------
+    const schemeDetails = await Scheme.find({directorate:req.user.directorate});
+    const today = new Date();
+
+    // Calculate total advances for all schemes
+    // const totalPayment = await DirPayment.aggregate([
+    //   {
+    //     $match: {
+    //       // scheme: new mongoose.Types.ObjectId(schemeId),
+    //       date: {
+    //         $gte: new Date(today.getFullYear(), 3, 1), // Start of the financial year (April 1st)
+    //         $lte: today,
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       totalAdvanceAmount: { $sum: '$amount' },
+    //     },
+    //   },
+    // ]);
+
+    // // Calculate total adjustments for all schemes
+    // const totalReceipt = await DirReceipt.aggregate([
+    //   {
+    //     $group: {
+    //       _id: null,
+    //       totalAdjustmentAmount: { $sum: '$adjAmount' },
+    //     },
+    //   },
+    // ]);
+
+    // Add scheme details to the response object
+    req.schemeData = {
+      schemes: schemeDetails,
+      initialOB:directorObDetails
+      // totalAdvance: totalAdvanceAmount[0]?.totalAdvanceAmount || 0,
+      // totalAdjustments: totalAdjustmentAmount[0]?.totalAdjustmentAmount || 0,
+    };
+
+    console.log('Scheme Details', req.schemeData);
+
+
     next(); // Move to the next middleware or route
   } 
   
